@@ -1,15 +1,46 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Calendar, Clock, User, Building2, FileText, Package } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, User, Building2, FileText, Package, Download, FileJson, FileSpreadsheet, FileText as FilePDF } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { mockDCRs } from "@/lib/mockData";
+import {
+  exportToExcel,
+  exportToJSON,
+  exportDCRToPDF,
+  prepareDCRForExport,
+} from "@/lib/exportUtils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const DCRDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dcr = mockDCRs.find((d) => d.id === id);
+
+  const handleExportExcel = () => {
+    if (dcr) {
+      const exportData = prepareDCRForExport(dcr);
+      exportToExcel([exportData], `DCR_${dcr.mdmId}_${dcr.callDate}`);
+    }
+  };
+
+  const handleExportJSON = () => {
+    if (dcr) {
+      exportToJSON(dcr, `DCR_${dcr.mdmId}_${dcr.callDate}`);
+    }
+  };
+
+  const handleExportPDF = () => {
+    if (dcr) {
+      exportDCRToPDF(dcr);
+    }
+  };
 
   if (!dcr) {
     return (
@@ -28,10 +59,35 @@ const DCRDetail = () => {
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <div className="container mx-auto p-6 space-y-6">
-        <Button variant="ghost" onClick={() => navigate("/")} className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Dashboard
-        </Button>
+        <div className="flex items-center justify-between mb-4">
+          <Button variant="ghost" onClick={() => navigate("/dcr")}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to DCR List
+          </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleExportExcel}>
+                <FileSpreadsheet className="mr-2 h-4 w-4" />
+                Export to Excel
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportPDF}>
+                <FilePDF className="mr-2 h-4 w-4" />
+                Export to PDF
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportJSON}>
+                <FileJson className="mr-2 h-4 w-4" />
+                Export to JSON
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Profile Card */}
