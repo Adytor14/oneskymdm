@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
@@ -74,6 +75,7 @@ const App = () => (
                         <div className="flex h-14 items-center px-4 gap-4">
                           <SidebarTrigger />
                           <div className="flex-1" />
+                          <RoleSwitcher />
                         </div>
                       </header>
                       <main className="flex-1">
