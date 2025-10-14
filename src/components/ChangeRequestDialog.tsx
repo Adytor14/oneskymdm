@@ -1,7 +1,4 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,112 +9,104 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { FileEdit } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
 
-const formSchema = z.object({
-  reason: z.string().min(10, {
-    message: "Reason must be at least 10 characters.",
-  }).max(500, {
-    message: "Reason must not exceed 500 characters.",
-  }),
-  requestedChanges: z.string().min(10, {
-    message: "Requested changes must be at least 10 characters.",
-  }).max(1000, {
-    message: "Requested changes must not exceed 1000 characters.",
-  }),
+const changeRequestSchema = z.object({
+  reason: z.string().trim().min(10, "Reason must be at least 10 characters").max(1000, "Reason must be less than 1000 characters"),
+  requestedChanges: z.string().trim().min(1, "Please describe the changes you want to make"),
 });
 
 interface ChangeRequestDialogProps {
   dcrId: string;
-  dcrData?: any;
 }
 
-export function ChangeRequestDialog({ dcrId, dcrData }: ChangeRequestDialogProps) {
+export const ChangeRequestDialog = ({ dcrId }: ChangeRequestDialogProps) => {
   const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const [requestedChanges, setRequestedChanges] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      reason: "",
-      requestedChanges: "",
-    },
-  });
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsSubmitting(true);
-    
+  const handleSubmit = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
+      // Validate input
+      const validation = changeRequestSchema.safeParse({
+        reason,
+        requestedChanges,
+      });
+
+      if (!validation.success) {
         toast({
-          title: "Authentication required",
-          description: "You must be logged in to submit a change request.",
+          title: "Validation Error",
+          description: validation.error.errors[0].message,
           variant: "destructive",
         });
         return;
       }
 
-      // Check if user has data_steward or admin role
-      const { data: roles, error: rolesError } = await supabase
+      setIsSubmitting(true);
+
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        toast({
+          title: "Authentication Error",
+          description: "You must be logged in to submit a change request",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Check if user has data_steward role
+      const { data: roles, error: roleError } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", user.id);
 
-      if (rolesError) {
-        console.error("Error checking roles:", rolesError);
+      if (roleError) {
         toast({
           title: "Error",
-          description: "Failed to verify user permissions.",
+          description: "Failed to verify user permissions",
           variant: "destructive",
         });
         return;
       }
 
-      const hasPermission = roles?.some(
+      const hasDataStewardRole = roles?.some(
         (r) => r.role === "data_steward" || r.role === "admin"
       );
 
-      if (!hasPermission) {
+      if (!hasDataStewardRole) {
         toast({
-          title: "Permission denied",
-          description: "You must be a Data Steward or Admin to submit change requests.",
+          title: "Permission Denied",
+          description: "Only Data Stewards can submit change requests",
           variant: "destructive",
         });
         return;
       }
 
-      const { error } = await supabase.from("change_requests").insert({
-        dcr_id: dcrId,
-        requested_by: user.id,
-        reason: values.reason,
-        requested_changes: {
-          changes: values.requestedChanges,
-          originalData: dcrData || {},
-        },
-        status: "pending",
-      });
+      // Submit change request
+      const { error: insertError } = await supabase
+        .from("change_requests")
+        .insert({
+          dcr_id: dcrId,
+          requested_by: user.id,
+          reason: validation.data.reason,
+          requested_changes: { description: validation.data.requestedChanges },
+          status: "pending",
+        });
 
-      if (error) {
-        console.error("Error submitting change request:", error);
+      if (insertError) {
         toast({
           title: "Error",
-          description: "Failed to submit change request. Please try again.",
+          description: "Failed to submit change request: " + insertError.message,
           variant: "destructive",
         });
         return;
@@ -125,16 +114,17 @@ export function ChangeRequestDialog({ dcrId, dcrData }: ChangeRequestDialogProps
 
       toast({
         title: "Success",
-        description: "Change request submitted for approval.",
+        description: "Change request submitted successfully and is pending approval",
       });
 
-      form.reset();
+      // Reset form and close dialog
+      setReason("");
+      setRequestedChanges("");
       setOpen(false);
     } catch (error) {
-      console.error("Error submitting change request:", error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
@@ -152,69 +142,54 @@ export function ChangeRequestDialog({ dcrId, dcrData }: ChangeRequestDialogProps
       </DialogTrigger>
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
-          <DialogTitle>Request DCR Change</DialogTitle>
+          <DialogTitle>Submit Change Request</DialogTitle>
           <DialogDescription>
-            Submit a change request for this Doctor Call Report. An admin will review and approve your request.
+            Request changes to DCR record {dcrId}. Your request will be sent for approval.
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="reason"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Reason for Change</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Explain why this change is needed..."
-                      className="resize-none"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Provide a clear reason for requesting this change.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="dcr-id">DCR ID</Label>
+            <Input id="dcr-id" value={dcrId} disabled />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="changes">Requested Changes *</Label>
+            <Textarea
+              id="changes"
+              placeholder="Describe the changes you want to make..."
+              value={requestedChanges}
+              onChange={(e) => setRequestedChanges(e.target.value)}
+              className="min-h-[100px]"
+              maxLength={1000}
             />
-            <FormField
-              control={form.control}
-              name="requestedChanges"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Requested Changes</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Describe the changes you want to make..."
-                      className="resize-none min-h-[100px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Describe in detail what changes should be made.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+            <p className="text-xs text-muted-foreground">
+              {requestedChanges.length}/1000 characters
+            </p>
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="reason">Reason for Change *</Label>
+            <Textarea
+              id="reason"
+              placeholder="Explain why this change is needed..."
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              className="min-h-[100px]"
+              maxLength={1000}
             />
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Submitting..." : "Submit Request"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+            <p className="text-xs text-muted-foreground">
+              {reason.length}/1000 characters
+            </p>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)} disabled={isSubmitting}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit Request"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-}
+};

@@ -28,7 +28,9 @@ const DCRList = () => {
             Manage and view DCR records, visit details, and outcomes
           </p>
         </div>
-        <ChangeRequestDialog dcrId="" />
+        <div className="flex gap-2">
+          <ChangeRequestDialog dcrId={filteredData[0]?.mdmId || "DCR-001"} />
+        </div>
       </div>
 
       <FilterPanel
