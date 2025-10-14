@@ -3,6 +3,7 @@ import { FilterPanel } from "@/components/FilterPanel";
 import { DataTable } from "@/components/DataTable";
 import { mockDCRs } from "@/lib/mockData";
 import { DCRProfile } from "@/types/mdm";
+import { ChangeRequestDialog } from "@/components/ChangeRequestDialog";
 
 const DCRList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,6 +28,7 @@ const DCRList = () => {
             Manage and view DCR records, visit details, and outcomes
           </p>
         </div>
+        <ChangeRequestDialog dcrId="" />
       </div>
 
       <FilterPanel
