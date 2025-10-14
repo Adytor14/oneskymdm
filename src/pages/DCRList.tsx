@@ -3,7 +3,6 @@ import { FilterPanel } from "@/components/FilterPanel";
 import { DataTable } from "@/components/DataTable";
 import { mockDCRs } from "@/lib/mockData";
 import { DCRProfile } from "@/types/mdm";
-import { ChangeRequestDialog } from "@/components/ChangeRequestDialog";
 
 const DCRList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,16 +20,11 @@ const DCRList = () => {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Doctor Call Reports</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage and view DCR records, visit details, and outcomes
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <ChangeRequestDialog dcrId={filteredData[0]?.mdmId || "DCR-001"} />
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">Doctor Call Reports</h1>
+        <p className="text-muted-foreground mt-2">
+          Manage and view DCR records, visit details, and outcomes
+        </p>
       </div>
 
       <FilterPanel

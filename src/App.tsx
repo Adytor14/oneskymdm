@@ -14,6 +14,7 @@ import HCPList from "./pages/HCPList";
 import HCOList from "./pages/HCOList";
 import AddressList from "./pages/AddressList";
 import DCRList from "./pages/DCRList";
+import ChangeRequestList from "./pages/ChangeRequestList";
 import HCPDetail from "./pages/HCPDetail";
 import HCODetail from "./pages/HCODetail";
 import AddressDetail from "./pages/AddressDetail";
@@ -82,6 +83,7 @@ const App = () => (
                           <Route path="/hco" element={<HCOList />} />
                           <Route path="/address" element={<AddressList />} />
                           <Route path="/dcr" element={<DCRList />} />
+                          <Route path="/change-requests" element={<ChangeRequestList />} />
                           <Route path="/hcp/:id" element={<HCPDetail />} />
                           <Route path="/hco/:id" element={<HCODetail />} />
                           <Route path="/address/:id" element={<AddressDetail />} />

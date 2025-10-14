@@ -9,7 +9,9 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { MDMEntity } from "@/types/mdm";
+import { ChangeRequestDialog } from "./ChangeRequestDialog";
 
 interface DataTableProps {
   data: MDMEntity[];
@@ -54,12 +56,13 @@ export function DataTable({ data, title }: DataTableProps) {
                 <TableHead>Status</TableHead>
                 <TableHead>Source</TableHead>
                 <TableHead>Last Updated</TableHead>
+                <TableHead className="w-[100px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {data.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                     No records found
                   </TableCell>
                 </TableRow>
@@ -67,13 +70,18 @@ export function DataTable({ data, title }: DataTableProps) {
                 data.map((entity) => (
                   <TableRow
                     key={entity.id}
-                    className="cursor-pointer hover:bg-muted/50 transition-colors"
-                    onClick={() => handleRowClick(entity)}
+                    className="hover:bg-muted/50 transition-colors"
                   >
-                    <TableCell className="font-medium">{entity.type}</TableCell>
-                    <TableCell>{entity.orgId}</TableCell>
-                    <TableCell>{entity.mdmId}</TableCell>
-                    <TableCell>
+                    <TableCell className="font-medium cursor-pointer" onClick={() => handleRowClick(entity)}>
+                      {entity.type}
+                    </TableCell>
+                    <TableCell className="cursor-pointer" onClick={() => handleRowClick(entity)}>
+                      {entity.orgId}
+                    </TableCell>
+                    <TableCell className="cursor-pointer" onClick={() => handleRowClick(entity)}>
+                      {entity.mdmId}
+                    </TableCell>
+                    <TableCell className="cursor-pointer" onClick={() => handleRowClick(entity)}>
                       <div className="flex gap-1 flex-wrap">
                         {entity.identifiers.slice(0, 2).map((id, idx) => (
                           <Badge key={idx} variant="outline" className="text-xs">
@@ -87,13 +95,23 @@ export function DataTable({ data, title }: DataTableProps) {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="cursor-pointer" onClick={() => handleRowClick(entity)}>
                       <Badge className={getStatusColor(entity.status)}>
                         {entity.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>{entity.source}</TableCell>
-                    <TableCell>{entity.lastUpdated}</TableCell>
+                    <TableCell className="cursor-pointer" onClick={() => handleRowClick(entity)}>
+                      {entity.source}
+                    </TableCell>
+                    <TableCell className="cursor-pointer" onClick={() => handleRowClick(entity)}>
+                      {entity.lastUpdated}
+                    </TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <ChangeRequestDialog 
+                        entityType={entity.type} 
+                        entityId={entity.mdmId} 
+                      />
+                    </TableCell>
                   </TableRow>
                 ))
               )}

@@ -19,9 +19,13 @@ export type Database = {
           approved_at: string | null
           approved_by: string | null
           created_at: string | null
-          dcr_id: string
+          dcr_id: string | null
+          entity_id: string
+          entity_type: string
           id: string
+          priority: string
           reason: string
+          request_type: string
           requested_by: string
           requested_changes: Json
           status: string
@@ -31,9 +35,13 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           created_at?: string | null
-          dcr_id: string
+          dcr_id?: string | null
+          entity_id?: string
+          entity_type?: string
           id?: string
+          priority?: string
           reason: string
+          request_type?: string
           requested_by: string
           requested_changes: Json
           status?: string
@@ -43,9 +51,13 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           created_at?: string | null
-          dcr_id?: string
+          dcr_id?: string | null
+          entity_id?: string
+          entity_type?: string
           id?: string
+          priority?: string
           reason?: string
+          request_type?: string
           requested_by?: string
           requested_changes?: Json
           status?: string

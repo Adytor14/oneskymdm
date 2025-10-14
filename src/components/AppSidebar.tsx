@@ -1,4 +1,4 @@
-import { Building2, User, MapPin, FileText, LayoutDashboard, LogOut } from "lucide-react";
+import { Building2, User, MapPin, FileText, LayoutDashboard, LogOut, FileEdit } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -21,6 +21,7 @@ const items = [
   { title: "HCO Profiles", url: "/hco", icon: Building2 },
   { title: "Addresses", url: "/address", icon: MapPin },
   { title: "DCR Profiles", url: "/dcr", icon: FileText },
+  { title: "Change Requests", url: "/change-requests", icon: FileEdit },
 ];
 
 export function AppSidebar() {

@@ -12,24 +12,31 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileEdit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
+import { EntityType } from "@/types/mdm";
 
 const changeRequestSchema = z.object({
   reason: z.string().trim().min(10, "Reason must be at least 10 characters").max(1000, "Reason must be less than 1000 characters"),
   requestedChanges: z.string().trim().min(1, "Please describe the changes you want to make"),
+  requestType: z.enum(["create", "update", "delete"]),
+  priority: z.enum(["low", "medium", "high", "urgent"]),
 });
 
 interface ChangeRequestDialogProps {
-  dcrId: string;
+  entityType: EntityType;
+  entityId: string;
 }
 
-export const ChangeRequestDialog = ({ dcrId }: ChangeRequestDialogProps) => {
+export const ChangeRequestDialog = ({ entityType, entityId }: ChangeRequestDialogProps) => {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
   const [requestedChanges, setRequestedChanges] = useState("");
+  const [requestType, setRequestType] = useState<"create" | "update" | "delete">("update");
+  const [priority, setPriority] = useState<"low" | "medium" | "high" | "urgent">("medium");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -39,6 +46,8 @@ export const ChangeRequestDialog = ({ dcrId }: ChangeRequestDialogProps) => {
       const validation = changeRequestSchema.safeParse({
         reason,
         requestedChanges,
+        requestType,
+        priority,
       });
 
       if (!validation.success) {
@@ -96,10 +105,13 @@ export const ChangeRequestDialog = ({ dcrId }: ChangeRequestDialogProps) => {
       const { error: insertError } = await supabase
         .from("change_requests")
         .insert({
-          dcr_id: dcrId,
+          entity_type: entityType,
+          entity_id: entityId,
           requested_by: user.id,
           reason: validation.data.reason,
           requested_changes: { description: validation.data.requestedChanges },
+          request_type: validation.data.requestType,
+          priority: validation.data.priority,
           status: "pending",
         });
 
@@ -120,6 +132,8 @@ export const ChangeRequestDialog = ({ dcrId }: ChangeRequestDialogProps) => {
       // Reset form and close dialog
       setReason("");
       setRequestedChanges("");
+      setRequestType("update");
+      setPriority("medium");
       setOpen(false);
     } catch (error) {
       toast({
@@ -144,13 +158,49 @@ export const ChangeRequestDialog = ({ dcrId }: ChangeRequestDialogProps) => {
         <DialogHeader>
           <DialogTitle>Submit Change Request</DialogTitle>
           <DialogDescription>
-            Request changes to DCR record {dcrId}. Your request will be sent for approval.
+            Request changes to {entityType} record {entityId}. Your request will be sent for approval.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="dcr-id">DCR ID</Label>
-            <Input id="dcr-id" value={dcrId} disabled />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="entity-type">Entity Type</Label>
+              <Input id="entity-type" value={entityType} disabled />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="entity-id">Entity ID</Label>
+              <Input id="entity-id" value={entityId} disabled />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="request-type">Request Type *</Label>
+              <Select value={requestType} onValueChange={(value: any) => setRequestType(value)}>
+                <SelectTrigger id="request-type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="create">Create</SelectItem>
+                  <SelectItem value="update">Update</SelectItem>
+                  <SelectItem value="delete">Delete</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="priority">Priority *</Label>
+              <Select value={priority} onValueChange={(value: any) => setPriority(value)}>
+                <SelectTrigger id="priority">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="urgent">Urgent</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="changes">Requested Changes *</Label>
