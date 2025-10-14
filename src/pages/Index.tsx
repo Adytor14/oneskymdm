@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { mockHCPs, mockHCOs, mockAddresses, mockDCRs } from "@/lib/mockData";
 import { 
   Database, 
   Users, 
@@ -224,26 +225,188 @@ const Index = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="hco">
+        <TabsContent value="hco" className="space-y-4">
+          {/* HCO Data Table */}
           <Card>
-            <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">HCO Profiles content coming soon...</p>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">HCO Master Data Records</CardTitle>
+                <p className="text-sm text-muted-foreground">Showing {mockHCOs.length} records</p>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">MDM ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Identifiers</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Source</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mockHCOs.slice(0, 10).map((record, index) => (
+                      <tr 
+                        key={index} 
+                        className="border-b hover:bg-muted/50 cursor-pointer"
+                        onClick={() => navigate(`/hco/${record.mdmId}`)}
+                      >
+                        <td className="py-3 px-4">{record.name}</td>
+                        <td className="py-3 px-4">
+                          <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">HCO</Badge>
+                        </td>
+                        <td className="py-3 px-4 text-sm">{record.orgId}</td>
+                        <td className="py-3 px-4 text-sm">{record.mdmId}</td>
+                        <td className="py-3 px-4 text-sm">NPI-{record.mdmId.slice(-6)}</td>
+                        <td className="py-3 px-4">
+                          <Badge className={
+                            record.status === "Active" 
+                              ? "bg-blue-600 text-white hover:bg-blue-700" 
+                              : "bg-gray-400 text-white hover:bg-gray-500"
+                          }>
+                            {record.status}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4 text-sm">{record.source}</td>
+                        <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
+                        <td className="py-3 px-4">
+                          <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="address">
+        <TabsContent value="address" className="space-y-4">
+          {/* Address Data Table */}
           <Card>
-            <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">Address Profiles content coming soon...</p>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">Address Master Data Records</CardTitle>
+                <p className="text-sm text-muted-foreground">Showing {mockAddresses.length} records</p>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Address</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">City</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">State</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">ZIP Code</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">MDM ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mockAddresses.slice(0, 10).map((record, index) => (
+                      <tr 
+                        key={index} 
+                        className="border-b hover:bg-muted/50 cursor-pointer"
+                        onClick={() => navigate(`/address/${record.mdmId}`)}
+                      >
+                        <td className="py-3 px-4">{record.street}</td>
+                        <td className="py-3 px-4">
+                          <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-200">Address</Badge>
+                        </td>
+                        <td className="py-3 px-4 text-sm">{record.city}</td>
+                        <td className="py-3 px-4 text-sm">{record.state}</td>
+                        <td className="py-3 px-4 text-sm">{record.zipCode}</td>
+                        <td className="py-3 px-4 text-sm">{record.mdmId}</td>
+                        <td className="py-3 px-4">
+                          <Badge className={
+                            record.status === "Active" 
+                              ? "bg-blue-600 text-white hover:bg-blue-700" 
+                              : "bg-gray-400 text-white hover:bg-gray-500"
+                          }>
+                            {record.status}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
+                        <td className="py-3 px-4">
+                          <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="dcr">
+        <TabsContent value="dcr" className="space-y-4">
+          {/* DCR Data Table */}
           <Card>
-            <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">DCR Profiles content coming soon...</p>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">DCR Master Data Records</CardTitle>
+                <p className="text-sm text-muted-foreground">Showing {mockDCRs.length} records</p>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Report ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">MDM ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Visit Type</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Source</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mockDCRs.slice(0, 10).map((record, index) => (
+                      <tr 
+                        key={index} 
+                        className="border-b hover:bg-muted/50 cursor-pointer"
+                        onClick={() => navigate(`/dcr/${record.mdmId}`)}
+                      >
+                        <td className="py-3 px-4">DCR-{record.mdmId.slice(-6)}</td>
+                        <td className="py-3 px-4">
+                          <Badge className="bg-green-100 text-green-700 hover:bg-green-200">DCR</Badge>
+                        </td>
+                        <td className="py-3 px-4 text-sm">{record.orgId}</td>
+                        <td className="py-3 px-4 text-sm">{record.mdmId}</td>
+                        <td className="py-3 px-4 text-sm">Field Visit</td>
+                        <td className="py-3 px-4">
+                          <Badge className={
+                            record.status === "Active" 
+                              ? "bg-blue-600 text-white hover:bg-blue-700" 
+                              : "bg-gray-400 text-white hover:bg-gray-500"
+                          }>
+                            {record.status}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4 text-sm">{record.source}</td>
+                        <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
+                        <td className="py-3 px-4">
+                          <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
