@@ -1,15 +1,41 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, CheckCircle, XCircle } from "lucide-react";
+import { ArrowLeft, MapPin, CheckCircle, XCircle, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { mockAddresses } from "@/lib/mockData";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { exportToExcel, exportToJSON, exportAddressToPDF, prepareAddressForExport } from "@/lib/exportUtils";
 
 const AddressDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const address = mockAddresses.find((a) => a.id === id);
+
+  const handleExportExcel = () => {
+    if (address) {
+      const data = prepareAddressForExport(address);
+      exportToExcel([data], `Address_${address.mdmId}`);
+    }
+  };
+
+  const handleExportJSON = () => {
+    if (address) {
+      exportToJSON(address, `Address_${address.mdmId}`);
+    }
+  };
+
+  const handleExportPDF = () => {
+    if (address) {
+      exportAddressToPDF(address);
+    }
+  };
 
   if (!address) {
     return (
@@ -28,10 +54,32 @@ const AddressDetail = () => {
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <div className="container mx-auto p-6 space-y-6">
-        <Button variant="ghost" onClick={() => navigate("/")} className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Dashboard
-        </Button>
+        <div className="flex justify-between items-center">
+          <Button variant="ghost" onClick={() => navigate("/")} className="mb-4">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Address List
+          </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="mb-4">
+                <Download className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={handleExportExcel}>
+                Export to Excel
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportPDF}>
+                Export to PDF
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportJSON}>
+                Export to JSON
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Profile Card */}

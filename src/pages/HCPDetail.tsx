@@ -1,15 +1,41 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Mail, Phone, MapPin, GraduationCap, Building2 } from "lucide-react";
+import { ArrowLeft, Mail, Phone, MapPin, GraduationCap, Building2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { mockHCPs } from "@/lib/mockData";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { exportToExcel, exportToJSON, exportHCPToPDF, prepareHCPForExport } from "@/lib/exportUtils";
 
 const HCPDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const hcp = mockHCPs.find((h) => h.id === id);
+
+  const handleExportExcel = () => {
+    if (hcp) {
+      const data = prepareHCPForExport(hcp);
+      exportToExcel([data], `HCP_${hcp.lastName}_${hcp.firstName}_${hcp.mdmId}`);
+    }
+  };
+
+  const handleExportJSON = () => {
+    if (hcp) {
+      exportToJSON(hcp, `HCP_${hcp.lastName}_${hcp.firstName}_${hcp.mdmId}`);
+    }
+  };
+
+  const handleExportPDF = () => {
+    if (hcp) {
+      exportHCPToPDF(hcp);
+    }
+  };
 
   if (!hcp) {
     return (
@@ -28,10 +54,32 @@ const HCPDetail = () => {
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <div className="container mx-auto p-6 space-y-6">
-        <Button variant="ghost" onClick={() => navigate("/")} className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Dashboard
-        </Button>
+        <div className="flex justify-between items-center">
+          <Button variant="ghost" onClick={() => navigate("/")} className="mb-4">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to HCP List
+          </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="mb-4">
+                <Download className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={handleExportExcel}>
+                Export to Excel
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportPDF}>
+                Export to PDF
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportJSON}>
+                Export to JSON
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Profile Card */}
