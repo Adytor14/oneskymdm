@@ -1,5 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Calendar, Clock, User, Building2, FileText, Package, Download, FileJson, FileSpreadsheet, FileText as FilePDF } from "lucide-react";
+import { ChangeRequestDialog } from "@/components/ChangeRequestDialog";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -65,28 +67,31 @@ const DCRDetail = () => {
             Back to DCR List
           </Button>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                Export
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleExportExcel}>
-                <FileSpreadsheet className="mr-2 h-4 w-4" />
-                Export to Excel
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExportPDF}>
-                <FilePDF className="mr-2 h-4 w-4" />
-                Export to PDF
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExportJSON}>
-                <FileJson className="mr-2 h-4 w-4" />
-                Export to JSON
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex gap-2">
+            <ChangeRequestDialog entityType="DCR" entityId={dcr.id} />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <Download className="mr-2 h-4 w-4" />
+                  Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleExportJSON}>
+                  <FileJson className="mr-2 h-4 w-4" />
+                  Download JSON
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportExcel}>
+                  <FileSpreadsheet className="mr-2 h-4 w-4" />
+                  Export to Excel
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportPDF}>
+                  <FilePDF className="mr-2 h-4 w-4" />
+                  Export to PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -233,16 +238,16 @@ const DCRDetail = () => {
 
             <Card className="shadow-card">
               <CardHeader>
-                <CardTitle className="text-lg">Metadata</CardTitle>
+                <CardTitle className="text-lg">Record Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="text-sm text-muted-foreground">Source System</p>
-                  <p className="font-semibold">{dcr.source}</p>
+                  <p className="text-sm text-muted-foreground">Created</p>
+                  <p className="font-semibold">{format(new Date(dcr.lastUpdated), "MM/dd/yyyy, HH:mm")}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Last Updated</p>
-                  <p className="font-semibold">{dcr.lastUpdated}</p>
+                  <p className="font-semibold">{format(new Date(dcr.lastUpdated), "MM/dd/yyyy, HH:mm")}</p>
                 </div>
               </CardContent>
             </Card>
