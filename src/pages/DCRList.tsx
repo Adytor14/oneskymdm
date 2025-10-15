@@ -4,13 +4,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { mockDCRs } from "@/lib/mockData";
-import { Search, Eye, FileText, TrendingUp, AlertCircle, Clock } from "lucide-react";
+import { Search, Eye, FileText, TrendingUp, AlertCircle, Clock, Download, FileJson, FileSpreadsheet, FileText as FilePDF } from "lucide-react";
+import { exportToExcel, exportToJSON, exportDCRToPDF, prepareDCRForExport } from "@/lib/exportUtils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
 
 const DCRList = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
   const filteredData = mockDCRs.filter((item) => {
     const matchesSearch =
@@ -32,6 +44,49 @@ const DCRList = () => {
     { title: "Inactive DCRs", value: inactiveCount.toString(), icon: AlertCircle, bgColor: "bg-gray-50", iconColor: "text-gray-600" },
     { title: "Pending DCRs", value: pendingCount.toString(), icon: Clock, bgColor: "bg-orange-50", iconColor: "text-orange-600" },
   ];
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedRows(filteredData.map(item => item.id));
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const handleSelectRow = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedRows([...selectedRows, id]);
+    } else {
+      setSelectedRows(selectedRows.filter(rowId => rowId !== id));
+    }
+  };
+
+  const handleExport = (format: 'excel' | 'json' | 'pdf') => {
+    if (selectedRows.length === 0) {
+      toast({
+        title: "No rows selected",
+        description: "Please select at least one row to export",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const selectedData = mockDCRs.filter(dcr => selectedRows.includes(dcr.id));
+    
+    if (format === 'excel') {
+      const exportData = selectedData.map(prepareDCRForExport);
+      exportToExcel(exportData, 'DCR_Export');
+    } else if (format === 'json') {
+      exportToJSON(selectedData, 'DCR_Export');
+    } else if (format === 'pdf') {
+      selectedData.forEach(dcr => exportDCRToPDF(dcr));
+    }
+
+    toast({
+      title: "Export successful",
+      description: `Exported ${selectedRows.length} record(s) to ${format.toUpperCase()}`,
+    });
+  };
 
   return (
     <div className="space-y-6 p-6">
@@ -120,7 +175,31 @@ const DCRList = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Master Data Records</CardTitle>
-            <p className="text-sm text-muted-foreground">Showing {filteredData.length} of {mockDCRs.length} records</p>
+            <div className="flex items-center gap-4">
+              <p className="text-sm text-muted-foreground">Showing {filteredData.length} of {mockDCRs.length} records</p>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" disabled={selectedRows.length === 0}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export Selected ({selectedRows.length})
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleExport('json')}>
+                    <FileJson className="mr-2 h-4 w-4" />
+                    Download JSON
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport('excel')}>
+                    <FileSpreadsheet className="mr-2 h-4 w-4" />
+                    Export to Excel
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport('pdf')}>
+                    <FilePDF className="mr-2 h-4 w-4" />
+                    Export to PDF
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -128,6 +207,12 @@ const DCRList = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground w-12">
+                    <Checkbox 
+                      checked={selectedRows.length === filteredData.length && filteredData.length > 0}
+                      onCheckedChange={handleSelectAll}
+                    />
+                  </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Report ID</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
@@ -145,6 +230,12 @@ const DCRList = () => {
                     key={index} 
                     className="border-b hover:bg-muted/50"
                   >
+                    <td className="py-3 px-4">
+                      <Checkbox 
+                        checked={selectedRows.includes(record.id)}
+                        onCheckedChange={(checked) => handleSelectRow(record.id, checked as boolean)}
+                      />
+                    </td>
                     <td className="py-3 px-4">{record.hcpName} - {record.hcoName}</td>
                     <td className="py-3 px-4">
                       <Badge className="bg-green-100 text-green-700 hover:bg-green-200">DCR</Badge>

@@ -4,14 +4,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { mockHCPs } from "@/lib/mockData";
-import { Search, Eye, Users, TrendingUp, AlertCircle, Clock } from "lucide-react";
+import { Search, Eye, Users, TrendingUp, AlertCircle, Clock, Download, FileJson, FileSpreadsheet, FileText } from "lucide-react";
+import { exportToExcel, exportToJSON, exportHCPToPDF, prepareHCPForExport } from "@/lib/exportUtils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
 
 const HCPList = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
   const filteredData = mockHCPs.filter((item) => {
     const matchesSearch =
@@ -34,6 +46,49 @@ const HCPList = () => {
     { title: "Inactive HCPs", value: inactiveCount.toString(), icon: AlertCircle, bgColor: "bg-gray-50", iconColor: "text-gray-600" },
     { title: "Pending HCPs", value: pendingCount.toString(), icon: Clock, bgColor: "bg-orange-50", iconColor: "text-orange-600" },
   ];
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedRows(filteredData.map(item => item.id));
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const handleSelectRow = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedRows([...selectedRows, id]);
+    } else {
+      setSelectedRows(selectedRows.filter(rowId => rowId !== id));
+    }
+  };
+
+  const handleExport = (format: 'excel' | 'json' | 'pdf') => {
+    if (selectedRows.length === 0) {
+      toast({
+        title: "No rows selected",
+        description: "Please select at least one row to export",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const selectedData = mockHCPs.filter(hcp => selectedRows.includes(hcp.id));
+    
+    if (format === 'excel') {
+      const exportData = selectedData.map(prepareHCPForExport);
+      exportToExcel(exportData, 'HCP_Export');
+    } else if (format === 'json') {
+      exportToJSON(selectedData, 'HCP_Export');
+    } else if (format === 'pdf') {
+      selectedData.forEach(hcp => exportHCPToPDF(hcp));
+    }
+
+    toast({
+      title: "Export successful",
+      description: `Exported ${selectedRows.length} record(s) to ${format.toUpperCase()}`,
+    });
+  };
 
   return (
     <div className="space-y-6 p-6">
@@ -123,7 +178,31 @@ const HCPList = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Master Data Records</CardTitle>
-            <p className="text-sm text-muted-foreground">Showing {filteredData.length} of {mockHCPs.length} records</p>
+            <div className="flex items-center gap-4">
+              <p className="text-sm text-muted-foreground">Showing {filteredData.length} of {mockHCPs.length} records</p>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" disabled={selectedRows.length === 0}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export Selected ({selectedRows.length})
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleExport('json')}>
+                    <FileJson className="mr-2 h-4 w-4" />
+                    Download JSON
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport('excel')}>
+                    <FileSpreadsheet className="mr-2 h-4 w-4" />
+                    Export to Excel
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport('pdf')}>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Export to PDF
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -131,6 +210,12 @@ const HCPList = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground w-12">
+                    <Checkbox 
+                      checked={selectedRows.length === filteredData.length && filteredData.length > 0}
+                      onCheckedChange={handleSelectAll}
+                    />
+                  </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
@@ -148,6 +233,12 @@ const HCPList = () => {
                     key={index} 
                     className="border-b hover:bg-muted/50"
                   >
+                    <td className="py-3 px-4">
+                      <Checkbox 
+                        checked={selectedRows.includes(record.id)}
+                        onCheckedChange={(checked) => handleSelectRow(record.id, checked as boolean)}
+                      />
+                    </td>
                     <td className="py-3 px-4">Dr. {record.firstName} {record.lastName}</td>
                     <td className="py-3 px-4">
                       <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">HCP</Badge>
