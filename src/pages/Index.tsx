@@ -199,20 +199,30 @@ const Index = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {masterDataRecords.map((record, index) => (
-                      <tr key={index} className="border-b hover:bg-muted/50">
-                        <td className="py-3 px-4">{record.name}</td>
+                    {mockHCPs.slice(0, 10).map((record, index) => (
+                      <tr 
+                        key={index} 
+                        className="border-b hover:bg-muted/50 cursor-pointer"
+                        onClick={() => navigate(`/hcp/${record.id}`)}
+                      >
+                        <td className="py-3 px-4">Dr. {record.firstName} {record.lastName}</td>
                         <td className="py-3 px-4">
-                          <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">{record.type}</Badge>
+                          <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">HCP</Badge>
                         </td>
                         <td className="py-3 px-4 text-sm">{record.orgId}</td>
                         <td className="py-3 px-4 text-sm">{record.mdmId}</td>
-                        <td className="py-3 px-4 text-sm">{record.identifiers}</td>
+                        <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
                         <td className="py-3 px-4">
-                          <Badge className="bg-blue-600 text-white hover:bg-blue-700">{record.status}</Badge>
+                          <Badge className={
+                            record.status === "Active" 
+                              ? "bg-blue-600 text-white hover:bg-blue-700" 
+                              : "bg-gray-400 text-white hover:bg-gray-500"
+                          }>
+                            {record.status}
+                          </Badge>
                         </td>
                         <td className="py-3 px-4 text-sm">{record.source}</td>
-                        <td className="py-3 px-4 text-sm">{record.lastUpdated}</td>
+                        <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
                         <td className="py-3 px-4">
                           <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
                         </td>
@@ -255,7 +265,7 @@ const Index = () => {
                       <tr 
                         key={index} 
                         className="border-b hover:bg-muted/50 cursor-pointer"
-                        onClick={() => navigate(`/hco/${record.mdmId}`)}
+                        onClick={() => navigate(`/hco/${record.id}`)}
                       >
                         <td className="py-3 px-4">{record.name}</td>
                         <td className="py-3 px-4">
@@ -317,7 +327,7 @@ const Index = () => {
                       <tr 
                         key={index} 
                         className="border-b hover:bg-muted/50 cursor-pointer"
-                        onClick={() => navigate(`/address/${record.mdmId}`)}
+                        onClick={() => navigate(`/address/${record.id}`)}
                       >
                         <td className="py-3 px-4">{record.street}</td>
                         <td className="py-3 px-4">
@@ -379,7 +389,7 @@ const Index = () => {
                       <tr 
                         key={index} 
                         className="border-b hover:bg-muted/50 cursor-pointer"
-                        onClick={() => navigate(`/dcr/${record.mdmId}`)}
+                        onClick={() => navigate(`/dcr/${record.id}`)}
                       >
                         <td className="py-3 px-4">DCR-{record.mdmId.slice(-6)}</td>
                         <td className="py-3 px-4">
