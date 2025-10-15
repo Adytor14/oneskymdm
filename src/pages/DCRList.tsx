@@ -143,16 +143,15 @@ const DCRList = () => {
                 {filteredData.map((record, index) => (
                   <tr 
                     key={index} 
-                    className="border-b hover:bg-muted/50 cursor-pointer"
-                    onClick={() => navigate(`/dcr/${record.mdmId}`)}
+                    className="border-b hover:bg-muted/50"
                   >
-                    <td className="py-3 px-4">DCR-{record.mdmId.slice(-6)}</td>
+                    <td className="py-3 px-4">{record.hcpName} - {record.hcoName}</td>
                     <td className="py-3 px-4">
                       <Badge className="bg-green-100 text-green-700 hover:bg-green-200">DCR</Badge>
                     </td>
                     <td className="py-3 px-4 text-sm">{record.orgId}</td>
                     <td className="py-3 px-4 text-sm">{record.mdmId}</td>
-                    <td className="py-3 px-4 text-sm">Field Visit</td>
+                    <td className="py-3 px-4 text-sm">{record.callType}</td>
                     <td className="py-3 px-4">
                       <Badge className={
                         record.status === "Active" 
@@ -165,7 +164,10 @@ const DCRList = () => {
                     <td className="py-3 px-4 text-sm">{record.source}</td>
                     <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
                     <td className="py-3 px-4">
-                      <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
+                      <Eye 
+                        className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
+                        onClick={() => navigate(`/dcr/${record.id}`)}
+                      />
                     </td>
                   </tr>
                 ))}

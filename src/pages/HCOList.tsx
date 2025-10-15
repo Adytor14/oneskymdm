@@ -144,8 +144,7 @@ const HCOList = () => {
                 {filteredData.map((record, index) => (
                   <tr 
                     key={index} 
-                    className="border-b hover:bg-muted/50 cursor-pointer"
-                    onClick={() => navigate(`/hco/${record.mdmId}`)}
+                    className="border-b hover:bg-muted/50"
                   >
                     <td className="py-3 px-4">{record.name}</td>
                     <td className="py-3 px-4">
@@ -153,7 +152,7 @@ const HCOList = () => {
                     </td>
                     <td className="py-3 px-4 text-sm">{record.orgId}</td>
                     <td className="py-3 px-4 text-sm">{record.mdmId}</td>
-                    <td className="py-3 px-4 text-sm">NPI-{record.mdmId.slice(-6)}</td>
+                    <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
                     <td className="py-3 px-4">
                       <Badge className={
                         record.status === "Active" 
@@ -166,7 +165,10 @@ const HCOList = () => {
                     <td className="py-3 px-4 text-sm">{record.source}</td>
                     <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
                     <td className="py-3 px-4">
-                      <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
+                      <Eye 
+                        className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
+                        onClick={() => navigate(`/hco/${record.id}`)}
+                      />
                     </td>
                   </tr>
                 ))}

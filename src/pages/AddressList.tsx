@@ -145,8 +145,7 @@ const AddressList = () => {
                 {filteredData.map((record, index) => (
                   <tr 
                     key={index} 
-                    className="border-b hover:bg-muted/50 cursor-pointer"
-                    onClick={() => navigate(`/address/${record.mdmId}`)}
+                    className="border-b hover:bg-muted/50"
                   >
                     <td className="py-3 px-4">{record.street}</td>
                     <td className="py-3 px-4">
@@ -167,7 +166,10 @@ const AddressList = () => {
                     <td className="py-3 px-4 text-sm">{record.source}</td>
                     <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
                     <td className="py-3 px-4">
-                      <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
+                      <Eye 
+                        className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
+                        onClick={() => navigate(`/address/${record.id}`)}
+                      />
                     </td>
                   </tr>
                 ))}
