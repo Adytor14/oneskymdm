@@ -68,7 +68,7 @@ const HCODetail = () => {
           </Button>
           
           <div className="flex gap-2">
-            <ChangeRequestDialog entityType="HCO" entityId={hco.id} />
+            <ChangeRequestDialog entityType="HCO" entityId={hco.id} entityData={hco} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">

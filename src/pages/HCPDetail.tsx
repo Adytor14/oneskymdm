@@ -63,7 +63,7 @@ const HCPDetail = () => {
           </Button>
           
           <div className="flex gap-2 mb-4">
-            <ChangeRequestDialog entityType="HCP" entityId={hcp.id} />
+            <ChangeRequestDialog entityType="HCP" entityId={hcp.id} entityData={hcp} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button>

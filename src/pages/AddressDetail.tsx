@@ -63,7 +63,7 @@ const AddressDetail = () => {
           </Button>
           
           <div className="flex gap-2 mb-4">
-            <ChangeRequestDialog entityType="Address" entityId={address.id} />
+            <ChangeRequestDialog entityType="Address" entityId={address.id} entityData={address} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button>

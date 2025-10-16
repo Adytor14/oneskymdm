@@ -68,7 +68,7 @@ const DCRDetail = () => {
           </Button>
           
           <div className="flex gap-2">
-            <ChangeRequestDialog entityType="DCR" entityId={dcr.id} />
+            <ChangeRequestDialog entityType="DCR" entityId={dcr.id} entityData={dcr} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
