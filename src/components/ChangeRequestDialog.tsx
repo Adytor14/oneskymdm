@@ -158,34 +158,6 @@ export const ChangeRequestDialog = ({ entityType, entityId, entityData }: Change
         return;
       }
 
-      // Check if user has data_steward role
-      const { data: roles, error: roleError } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id);
-
-      if (roleError) {
-        toast({
-          title: "Error",
-          description: "Failed to verify user permissions",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const hasDataStewardRole = roles?.some(
-        (r) => r.role === "data_steward" || r.role === "admin"
-      );
-
-      if (!hasDataStewardRole) {
-        toast({
-          title: "Permission Denied",
-          description: "Only Data Stewards can submit change requests",
-          variant: "destructive",
-        });
-        return;
-      }
-
       // Submit change request
       const { error: insertError } = await supabase
         .from("change_requests")
