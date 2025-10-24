@@ -85,7 +85,9 @@ const Auth = () => {
       <img src={SkyralyticsLogo} alt="Skyralytics" className="absolute top-6 left-6 h-9" />
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">OneSky</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">
+            OneSky - One source. Endless Referral Intelligence
+          </CardTitle>
           <CardDescription className="text-center">
             {isLogin ? "Sign in to access your dashboard" : "Create an account to get started"}
           </CardDescription>
