@@ -6,28 +6,61 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { mockHCPs, mockHCOs, mockAddresses, mockDCRs } from "@/lib/mockData";
-import { 
-  Database, 
-  Users, 
-  Building2, 
-  MapPin, 
-  FileText, 
-  Search,
-  Eye,
-  TrendingUp
-} from "lucide-react";
+import { Database, Users, Building2, MapPin, FileText, Search, Eye, TrendingUp } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("hcp");
 
   const topStats = [
-    { title: "Total Records", value: "11", subtitle: "All profile types", icon: Database, bgColor: "bg-blue-50", iconColor: "text-blue-600" },
-    { title: "HCP Profiles", value: "2", subtitle: "Healthcare professionals", icon: Users, bgColor: "bg-blue-50", iconColor: "text-blue-600" },
-    { title: "HCO Profiles", value: "4", subtitle: "Healthcare organizations", icon: Building2, bgColor: "bg-blue-50", iconColor: "text-blue-600" },
-    { title: "Addresses", value: "1", subtitle: "Address profiles", icon: MapPin, bgColor: "bg-orange-50", iconColor: "text-orange-600" },
-    { title: "DCR Profiles", value: "4", subtitle: "Data collection reports", icon: FileText, bgColor: "bg-green-50", iconColor: "text-green-600" },
-    { title: "Active Records", value: "7", subtitle: "Currently active", icon: TrendingUp, bgColor: "bg-white", iconColor: "text-green-600" },
+    {
+      title: "Total Records",
+      value: "11",
+      subtitle: "All profile types",
+      icon: Database,
+      bgColor: "bg-blue-50",
+      iconColor: "text-blue-600",
+    },
+    {
+      title: "HCP Profiles",
+      value: "2",
+      subtitle: "Healthcare professionals",
+      icon: Users,
+      bgColor: "bg-blue-50",
+      iconColor: "text-blue-600",
+    },
+    {
+      title: "HCO Profiles",
+      value: "4",
+      subtitle: "Healthcare organizations",
+      icon: Building2,
+      bgColor: "bg-blue-50",
+      iconColor: "text-blue-600",
+    },
+    {
+      title: "Addresses",
+      value: "1",
+      subtitle: "Address profiles",
+      icon: MapPin,
+      bgColor: "bg-orange-50",
+      iconColor: "text-orange-600",
+    },
+    {
+      title: "DCR Profiles",
+      value: "4",
+      subtitle: "Data collection reports",
+      icon: FileText,
+      bgColor: "bg-green-50",
+      iconColor: "text-green-600",
+    },
+    {
+      title: "Active Records",
+      value: "7",
+      subtitle: "Currently active",
+      icon: TrendingUp,
+      bgColor: "bg-white",
+      iconColor: "text-green-600",
+    },
   ];
 
   const hcpMetrics = [
@@ -46,7 +79,7 @@ const Index = () => {
       identifiers: "NPI-123456789, DEA-AB1234567",
       status: "Active",
       source: "NPPES",
-      lastUpdated: "15/01/2024"
+      lastUpdated: "15/01/2024",
     },
     {
       name: "Memorial Hospital",
@@ -56,18 +89,16 @@ const Index = () => {
       identifiers: "NPI-987654321",
       status: "Active",
       source: "CMS",
-      lastUpdated: "14/01/2024"
-    }
+      lastUpdated: "14/01/2024",
+    },
   ];
 
   return (
     <div className="space-y-6 p-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Healthcare Master Data Management</h1>
-        <p className="text-muted-foreground mt-1">
-          Comprehensive management of Healthcare Professional (HCP), Healthcare Organization (HCO), Address, and DCR profiles
-        </p>
+        <h1 className="text-3xl font-bold text-foreground">OneSky</h1>
+        <p className="text-muted-foreground mt-1">One source. Endless referral intelligence</p>
       </div>
 
       {/* Top Stats Cards */}
@@ -200,12 +231,14 @@ const Index = () => {
                   </thead>
                   <tbody>
                     {mockHCPs.slice(0, 10).map((record, index) => (
-                      <tr 
-                        key={index} 
+                      <tr
+                        key={index}
                         className="border-b hover:bg-muted/50 cursor-pointer"
                         onClick={() => navigate(`/hcp/${record.id}`)}
                       >
-                        <td className="py-3 px-4">Dr. {record.firstName} {record.lastName}</td>
+                        <td className="py-3 px-4">
+                          Dr. {record.firstName} {record.lastName}
+                        </td>
                         <td className="py-3 px-4">
                           <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">HCP</Badge>
                         </td>
@@ -213,16 +246,20 @@ const Index = () => {
                         <td className="py-3 px-4 text-sm">{record.mdmId}</td>
                         <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
                         <td className="py-3 px-4">
-                          <Badge className={
-                            record.status === "Active" 
-                              ? "bg-blue-600 text-white hover:bg-blue-700" 
-                              : "bg-gray-400 text-white hover:bg-gray-500"
-                          }>
+                          <Badge
+                            className={
+                              record.status === "Active"
+                                ? "bg-blue-600 text-white hover:bg-blue-700"
+                                : "bg-gray-400 text-white hover:bg-gray-500"
+                            }
+                          >
                             {record.status}
                           </Badge>
                         </td>
                         <td className="py-3 px-4 text-sm">{record.source}</td>
-                        <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
+                        <td className="py-3 px-4 text-sm">
+                          {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
+                        </td>
                         <td className="py-3 px-4">
                           <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
                         </td>
@@ -262,8 +299,8 @@ const Index = () => {
                   </thead>
                   <tbody>
                     {mockHCOs.slice(0, 10).map((record, index) => (
-                      <tr 
-                        key={index} 
+                      <tr
+                        key={index}
                         className="border-b hover:bg-muted/50 cursor-pointer"
                         onClick={() => navigate(`/hco/${record.id}`)}
                       >
@@ -275,16 +312,20 @@ const Index = () => {
                         <td className="py-3 px-4 text-sm">{record.mdmId}</td>
                         <td className="py-3 px-4 text-sm">NPI-{record.mdmId.slice(-6)}</td>
                         <td className="py-3 px-4">
-                          <Badge className={
-                            record.status === "Active" 
-                              ? "bg-blue-600 text-white hover:bg-blue-700" 
-                              : "bg-gray-400 text-white hover:bg-gray-500"
-                          }>
+                          <Badge
+                            className={
+                              record.status === "Active"
+                                ? "bg-blue-600 text-white hover:bg-blue-700"
+                                : "bg-gray-400 text-white hover:bg-gray-500"
+                            }
+                          >
                             {record.status}
                           </Badge>
                         </td>
                         <td className="py-3 px-4 text-sm">{record.source}</td>
-                        <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
+                        <td className="py-3 px-4 text-sm">
+                          {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
+                        </td>
                         <td className="py-3 px-4">
                           <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
                         </td>
@@ -324,8 +365,8 @@ const Index = () => {
                   </thead>
                   <tbody>
                     {mockAddresses.slice(0, 10).map((record, index) => (
-                      <tr 
-                        key={index} 
+                      <tr
+                        key={index}
                         className="border-b hover:bg-muted/50 cursor-pointer"
                         onClick={() => navigate(`/address/${record.id}`)}
                       >
@@ -338,15 +379,19 @@ const Index = () => {
                         <td className="py-3 px-4 text-sm">{record.zipCode}</td>
                         <td className="py-3 px-4 text-sm">{record.mdmId}</td>
                         <td className="py-3 px-4">
-                          <Badge className={
-                            record.status === "Active" 
-                              ? "bg-blue-600 text-white hover:bg-blue-700" 
-                              : "bg-gray-400 text-white hover:bg-gray-500"
-                          }>
+                          <Badge
+                            className={
+                              record.status === "Active"
+                                ? "bg-blue-600 text-white hover:bg-blue-700"
+                                : "bg-gray-400 text-white hover:bg-gray-500"
+                            }
+                          >
                             {record.status}
                           </Badge>
                         </td>
-                        <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
+                        <td className="py-3 px-4 text-sm">
+                          {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
+                        </td>
                         <td className="py-3 px-4">
                           <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
                         </td>
@@ -386,8 +431,8 @@ const Index = () => {
                   </thead>
                   <tbody>
                     {mockDCRs.slice(0, 10).map((record, index) => (
-                      <tr 
-                        key={index} 
+                      <tr
+                        key={index}
                         className="border-b hover:bg-muted/50 cursor-pointer"
                         onClick={() => navigate(`/dcr/${record.id}`)}
                       >
@@ -399,16 +444,20 @@ const Index = () => {
                         <td className="py-3 px-4 text-sm">{record.mdmId}</td>
                         <td className="py-3 px-4 text-sm">Field Visit</td>
                         <td className="py-3 px-4">
-                          <Badge className={
-                            record.status === "Active" 
-                              ? "bg-blue-600 text-white hover:bg-blue-700" 
-                              : "bg-gray-400 text-white hover:bg-gray-500"
-                          }>
+                          <Badge
+                            className={
+                              record.status === "Active"
+                                ? "bg-blue-600 text-white hover:bg-blue-700"
+                                : "bg-gray-400 text-white hover:bg-gray-500"
+                            }
+                          >
                             {record.status}
                           </Badge>
                         </td>
                         <td className="py-3 px-4 text-sm">{record.source}</td>
-                        <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
+                        <td className="py-3 px-4 text-sm">
+                          {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
+                        </td>
                         <td className="py-3 px-4">
                           <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
                         </td>
