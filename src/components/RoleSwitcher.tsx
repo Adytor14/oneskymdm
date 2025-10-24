@@ -32,14 +32,22 @@ export const RoleSwitcher = () => {
         .from("user_roles")
         .select("role")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== "PGRST116") {
+      if (error) {
         console.error("Error fetching role:", error);
         return;
       }
 
-      setCurrentRole(data?.role || "user");
+      // If no role exists, assign default "user" role
+      if (!data) {
+        await supabase
+          .from("user_roles")
+          .insert({ user_id: user.id, role: "user" });
+        setCurrentRole("user");
+      } else {
+        setCurrentRole(data.role);
+      }
     } catch (error) {
       console.error("Error:", error);
     }
