@@ -53,21 +53,12 @@ const Index = () => {
       bgColor: "bg-green-50",
       iconColor: "text-green-600",
     },
-    {
-      title: "Active Records",
-      value: "7",
-      subtitle: "Currently active",
-      icon: TrendingUp,
-      bgColor: "bg-white",
-      iconColor: "text-green-600",
-    },
   ];
 
   const hcpMetrics = [
     { title: "Total HCP Records", value: "2", bgColor: "bg-blue-50" },
     { title: "Active HCPs", value: "2", bgColor: "bg-green-50" },
     { title: "Inactive HCPs", value: "0", bgColor: "bg-gray-50" },
-    { title: "Pending HCPs", value: "0", bgColor: "bg-gray-50" },
   ];
 
   const masterDataRecords = [
@@ -102,7 +93,7 @@ const Index = () => {
       </div>
 
       {/* Top Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+      <div className="grid gap-4 md:grid-cols-5">
         {topStats.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -143,7 +134,7 @@ const Index = () => {
 
         <TabsContent value="hcp" className="space-y-4">
           {/* HCP Metrics */}
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-3">
             {hcpMetrics.map((metric, index) => (
               <Card key={index} className={metric.bgColor}>
                 <CardHeader className="pb-2">
@@ -163,26 +154,13 @@ const Index = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-4">
+              <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Search</label>
                   <div className="relative">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input placeholder="Search by name, ID, or identifier..." className="pl-9" />
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Profile Type</label>
-                  <Select defaultValue="all">
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Types" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Types</SelectItem>
-                      <SelectItem value="hcp">HCP</SelectItem>
-                      <SelectItem value="hco">HCO</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Status</label>
