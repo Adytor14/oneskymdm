@@ -9,6 +9,7 @@ import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
+import SkyralyticsLogo from "@/assets/Skyralytics.svg";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import HCPList from "./pages/HCPList";
@@ -75,6 +76,7 @@ const App = () => (
                       <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                         <div className="flex h-14 items-center px-4 gap-4">
                           <SidebarTrigger />
+                          <img src={SkyralyticsLogo} alt="Skyralytics" className="h-7" />
                           <div className="flex-1" />
                           <RoleSwitcher />
                         </div>
