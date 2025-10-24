@@ -115,15 +115,10 @@ const Auth = () => {
                 required
               />
             </div>
-            <!-- <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Loading..." : isLogin ? "Sign In" : "Sign Up"}
-            </Button> -->
+            </Button>
           </form>
-          <div className="mt-4 text-center text-sm">
-            <button type="button" onClick={() => setIsLogin(!isLogin)} className="text-primary hover:underline">
-              {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-            </button>
-          </div>
         </CardContent>
       </Card>
     </div>
