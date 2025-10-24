@@ -22,6 +22,10 @@ const HCOList = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedFacilityType, setSelectedFacilityType] = useState("all");
+  const [selectedGeography, setSelectedGeography] = useState("all");
+  const [selectedServiceLine, setSelectedServiceLine] = useState("all");
+  const [affiliationsSearch, setAffiliationsSearch] = useState("");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
   const filteredData = mockHCOs.filter((item) => {
@@ -126,7 +130,7 @@ const HCOList = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
             <div className="space-y-2">
               <label className="text-sm font-medium">Search</label>
               <div className="relative">
@@ -140,13 +144,46 @@ const HCOList = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Profile Type</label>
-              <Select defaultValue="hco">
+              <label className="text-sm font-medium">Geography</label>
+              <Select value={selectedGeography} onValueChange={setSelectedGeography}>
                 <SelectTrigger>
-                  <SelectValue placeholder="HCO" />
+                  <SelectValue placeholder="All Locations" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="hco">HCO</SelectItem>
+                  <SelectItem value="all">All Locations</SelectItem>
+                  <SelectItem value="North">North</SelectItem>
+                  <SelectItem value="South">South</SelectItem>
+                  <SelectItem value="East">East</SelectItem>
+                  <SelectItem value="West">West</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Facility Type</label>
+              <Select value={selectedFacilityType} onValueChange={setSelectedFacilityType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Facility Types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Facility Types</SelectItem>
+                  <SelectItem value="Hospital">Hospital</SelectItem>
+                  <SelectItem value="SNF">SNF</SelectItem>
+                  <SelectItem value="ALF">ALF</SelectItem>
+                  <SelectItem value="Clinic">Clinic</SelectItem>
+                  <SelectItem value="Medical Center">Medical Center</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Service Line</label>
+              <Select value={selectedServiceLine} onValueChange={setSelectedServiceLine}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Service Lines" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Service Lines</SelectItem>
+                  <SelectItem value="Home Health">Home Health</SelectItem>
+                  <SelectItem value="Hospice">Hospice</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -166,6 +203,18 @@ const HCOList = () => {
             <div className="space-y-2">
               <label className="text-sm font-medium">Source</label>
               <Input placeholder="e.g., NPPES, CMS, Provider Database" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Affiliations</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="Search affiliations..." 
+                  className="pl-9" 
+                  value={affiliationsSearch}
+                  onChange={(e) => setAffiliationsSearch(e.target.value)}
+                />
+              </div>
             </div>
           </div>
         </CardContent>
