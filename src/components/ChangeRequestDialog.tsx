@@ -44,6 +44,17 @@ export const ChangeRequestDialog = ({ entityType, entityId, entityData }: Change
   const [fieldChanges, setFieldChanges] = useState<Record<string, any>>({});
   const { toast } = useToast();
 
+  const getEntityTypeLabel = (type: EntityType) => {
+    switch (type) {
+      case "HCP":
+        return "Physician Account";
+      case "HCO":
+        return "Facility Account";
+      default:
+        return type;
+    }
+  };
+
   // Initialize field changes with entity data
   const initializeFieldChanges = () => {
     if (!entityData) return {};
@@ -183,7 +194,7 @@ export const ChangeRequestDialog = ({ entityType, entityId, entityData }: Change
 
       toast({
         title: "Success",
-        description: "Change request submitted successfully and is pending approval",
+        description: "Data change request submitted successfully and is pending approval",
       });
 
       // Reset form and close dialog
@@ -446,9 +457,9 @@ export const ChangeRequestDialog = ({ entityType, entityId, entityData }: Change
       </DialogTrigger>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Submit Change Request</DialogTitle>
+          <DialogTitle>Submit Data Change Request</DialogTitle>
           <DialogDescription>
-            Request changes to {entityType} record. Your request will be sent for approval.
+            Request changes to {getEntityTypeLabel(entityType)} record. Your request will be sent for approval.
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="max-h-[60vh] pr-4">

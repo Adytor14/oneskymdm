@@ -97,8 +97,19 @@ const ChangeRequestList = () => {
   const pendingCount = changeRequests.filter(cr => cr.status === "pending").length;
   const rejectedCount = changeRequests.filter(cr => cr.status === "rejected").length;
 
+  const getEntityTypeLabel = (entityType: string) => {
+    switch (entityType) {
+      case "HCP":
+        return "Physician Account";
+      case "HCO":
+        return "Facility Account";
+      default:
+        return entityType;
+    }
+  };
+
   const metrics = [
-    { title: "Total Change Requests", value: changeRequests.length.toString(), icon: FileEdit, bgColor: "bg-blue-50", iconColor: "text-blue-600" },
+    { title: "Total Data Change Requests", value: changeRequests.length.toString(), icon: FileEdit, bgColor: "bg-blue-50", iconColor: "text-blue-600" },
     { title: "Approved", value: approvedCount.toString(), icon: TrendingUp, bgColor: "bg-green-50", iconColor: "text-green-600" },
     { title: "Pending", value: pendingCount.toString(), icon: Clock, bgColor: "bg-orange-50", iconColor: "text-orange-600" },
     { title: "Rejected", value: rejectedCount.toString(), icon: AlertCircle, bgColor: "bg-red-50", iconColor: "text-red-600" },
@@ -108,9 +119,9 @@ const ChangeRequestList = () => {
     <div className="space-y-6 p-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Change Requests</h1>
+        <h1 className="text-3xl font-bold text-foreground">Data Change Requests</h1>
         <p className="text-muted-foreground mt-1">
-          View and manage change requests for all entities
+          View and manage data change requests for all entities
         </p>
       </div>
 
@@ -161,8 +172,8 @@ const ChangeRequestList = () => {
                   <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="HCP">HCP</SelectItem>
-                  <SelectItem value="HCO">HCO</SelectItem>
+                  <SelectItem value="HCP">Physician Account</SelectItem>
+                  <SelectItem value="HCO">Facility Account</SelectItem>
                   <SelectItem value="Address">Address</SelectItem>
                   <SelectItem value="DCR">DCR</SelectItem>
                 </SelectContent>
@@ -205,7 +216,7 @@ const ChangeRequestList = () => {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Change Requests - {entityType}</CardTitle>
+            <CardTitle className="text-lg">Data Change Requests</CardTitle>
             <p className="text-sm text-muted-foreground">Showing {filteredData.length} of {changeRequests.length} records</p>
           </div>
         </CardHeader>
@@ -233,7 +244,7 @@ const ChangeRequestList = () => {
                 ) : filteredData.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="text-center text-muted-foreground py-8">
-                      No change requests found
+                      No data change requests found
                     </td>
                   </tr>
                 ) : (
@@ -241,7 +252,7 @@ const ChangeRequestList = () => {
                     <tr key={request.id} className="border-b hover:bg-muted/50 cursor-pointer">
                       <td className="py-3 px-4 text-sm">{request.id.slice(0, 8)}...</td>
                       <td className="py-3 px-4">
-                        <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">{request.entity_type}</Badge>
+                        <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">{getEntityTypeLabel(request.entity_type)}</Badge>
                       </td>
                       <td className="py-3 px-4 text-sm">{request.entity_id}</td>
                       <td className="py-3 px-4">
