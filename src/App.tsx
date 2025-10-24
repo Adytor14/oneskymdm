@@ -18,6 +18,9 @@ import AddressList from "./pages/AddressList";
 import DCRList from "./pages/DCRList";
 import ChangeRequestList from "./pages/ChangeRequestList";
 import AdminApprovalDashboard from "./pages/AdminApprovalDashboard";
+import RulesManagement from "./pages/RulesManagement";
+import MergeMatchApproval from "./pages/MergeMatchApproval";
+import DataChangeRequestDetail from "./pages/DataChangeRequestDetail";
 import HCPDetail from "./pages/HCPDetail";
 import HCODetail from "./pages/HCODetail";
 import AddressDetail from "./pages/AddressDetail";
@@ -90,6 +93,10 @@ const App = () => (
                           <Route path="/dcr" element={<DCRList />} />
                           <Route path="/change-requests" element={<ChangeRequestList />} />
                           <Route path="/admin/approvals" element={<AdminApprovalDashboard />} />
+                          <Route path="/rules" element={<RulesManagement />} />
+                          <Route path="/merge-match-approval" element={<MergeMatchApproval />} />
+                          <Route path="/data-change-requests" element={<ChangeRequestList />} />
+                          <Route path="/data-change-requests/:id" element={<DataChangeRequestDetail />} />
                           <Route path="/hcp/:id" element={<HCPDetail />} />
                           <Route path="/hco/:id" element={<HCODetail />} />
                           <Route path="/address/:id" element={<AddressDetail />} />

@@ -1,4 +1,4 @@
-import { Building2, User, MapPin, FileText, LayoutDashboard, LogOut, FileEdit, CheckSquare } from "lucide-react";
+import { Building2, User, MapPin, FileText, LayoutDashboard, LogOut, FileEdit, CheckSquare, Layers, GitMerge, ClipboardList } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -25,7 +25,12 @@ const items = [
   { title: "Change Requests", url: "/change-requests", icon: FileEdit },
 ];
 
-const adminItems = [{ title: "Approval Requests", url: "/admin/approvals", icon: CheckSquare }];
+const adminItems = [
+  { title: "Rules Management", url: "/rules", icon: Layers },
+  { title: "Merge/Match Approval", url: "/merge-match-approval", icon: GitMerge },
+  { title: "Data Change Requests", url: "/data-change-requests", icon: ClipboardList },
+  { title: "Approval Requests", url: "/admin/approvals", icon: CheckSquare },
+];
 
 export function AppSidebar() {
   const { open } = useSidebar();

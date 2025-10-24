@@ -65,6 +65,158 @@ export type Database = {
         }
         Relationships: []
       }
+      match_proposals: {
+        Row: {
+          comments: string | null
+          created_at: string | null
+          entity_ids: string[]
+          entity_type: Database["public"]["Enums"]["entity_type"]
+          id: string
+          match_score: number
+          processed_date: string | null
+          request_id: string
+          resolved_by: string | null
+          resolved_date: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          comments?: string | null
+          created_at?: string | null
+          entity_ids: string[]
+          entity_type: Database["public"]["Enums"]["entity_type"]
+          id?: string
+          match_score: number
+          processed_date?: string | null
+          request_id: string
+          resolved_by?: string | null
+          resolved_date?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          comments?: string | null
+          created_at?: string | null
+          entity_ids?: string[]
+          entity_type?: Database["public"]["Enums"]["entity_type"]
+          id?: string
+          match_score?: number
+          processed_date?: string | null
+          request_id?: string
+          resolved_by?: string | null
+          resolved_date?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      merge_match_rules: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          entity_type: Database["public"]["Enums"]["entity_type"]
+          id: string
+          is_active: boolean | null
+          match_type: Database["public"]["Enums"]["match_type"]
+          rule_name: string
+          threshold_max: number | null
+          threshold_min: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          entity_type: Database["public"]["Enums"]["entity_type"]
+          id?: string
+          is_active?: boolean | null
+          match_type?: Database["public"]["Enums"]["match_type"]
+          rule_name: string
+          threshold_max?: number | null
+          threshold_min?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          entity_type?: Database["public"]["Enums"]["entity_type"]
+          id?: string
+          is_active?: boolean | null
+          match_type?: Database["public"]["Enums"]["match_type"]
+          rule_name?: string
+          threshold_max?: number | null
+          threshold_min?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      rule_attributes: {
+        Row: {
+          attribute_name: string
+          created_at: string | null
+          id: string
+          match_category: Database["public"]["Enums"]["match_category"]
+          rule_id: string | null
+          weightage: number | null
+        }
+        Insert: {
+          attribute_name: string
+          created_at?: string | null
+          id?: string
+          match_category?: Database["public"]["Enums"]["match_category"]
+          rule_id?: string | null
+          weightage?: number | null
+        }
+        Update: {
+          attribute_name?: string
+          created_at?: string | null
+          id?: string
+          match_category?: Database["public"]["Enums"]["match_category"]
+          rule_id?: string | null
+          weightage?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rule_attributes_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "merge_match_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      survivorship_rules: {
+        Row: {
+          attribute_name: string
+          created_at: string | null
+          created_by: string | null
+          entity_type: Database["public"]["Enums"]["entity_type"]
+          id: string
+          rule_type: Database["public"]["Enums"]["survivorship_rule_type"]
+          rule_value: string
+          updated_at: string | null
+        }
+        Insert: {
+          attribute_name: string
+          created_at?: string | null
+          created_by?: string | null
+          entity_type: Database["public"]["Enums"]["entity_type"]
+          id?: string
+          rule_type: Database["public"]["Enums"]["survivorship_rule_type"]
+          rule_value: string
+          updated_at?: string | null
+        }
+        Update: {
+          attribute_name?: string
+          created_at?: string | null
+          created_by?: string | null
+          entity_type?: Database["public"]["Enums"]["entity_type"]
+          id?: string
+          rule_type?: Database["public"]["Enums"]["survivorship_rule_type"]
+          rule_value?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -101,6 +253,10 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "data_steward" | "user"
+      entity_type: "HCP" | "HCO" | "Address" | "SLN"
+      match_category: "exact" | "fuzzy"
+      match_type: "automatic" | "suspect" | "negative"
+      survivorship_rule_type: "status" | "priority" | "recency" | "aggregation"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -229,6 +385,10 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "data_steward", "user"],
+      entity_type: ["HCP", "HCO", "Address", "SLN"],
+      match_category: ["exact", "fuzzy"],
+      match_type: ["automatic", "suspect", "negative"],
+      survivorship_rule_type: ["status", "priority", "recency", "aggregation"],
     },
   },
 } as const
