@@ -97,11 +97,8 @@ const Index = () => {
     <div className="space-y-6 p-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Healthcare Master Data Management</h1>
-        <p className="text-muted-foreground mt-1">
-          Comprehensive management of Healthcare Professional (HCP), Healthcare Organization (HCO), Address, and DCR
-          profiles
-        </p>
+        <h1 className="text-3xl font-bold text-foreground">OneSky</h1>
+        <p className="text-muted-foreground mt-1">One source. Endless referral intelligence</p>
       </div>
 
       {/* Top Stats Cards */}
@@ -173,6 +170,19 @@ const Index = () => {
                     <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input placeholder="Search by name, ID, or identifier..." className="pl-9" />
                   </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Profile Type</label>
+                  <Select defaultValue="all">
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Types" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="hcp">HCP</SelectItem>
+                      <SelectItem value="hco">HCO</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Status</label>
