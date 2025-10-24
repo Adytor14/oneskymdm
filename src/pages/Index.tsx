@@ -53,14 +53,6 @@ const Index = () => {
       bgColor: "bg-green-50",
       iconColor: "text-green-600",
     },
-    {
-      title: "Active Records",
-      value: "7",
-      subtitle: "Currently active",
-      icon: TrendingUp,
-      bgColor: "bg-white",
-      iconColor: "text-green-600",
-    },
   ];
 
   const hcpMetrics = [
@@ -97,8 +89,11 @@ const Index = () => {
     <div className="space-y-6 p-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">OneSky</h1>
-        <p className="text-muted-foreground mt-1">One source. Endless referral intelligence</p>
+        <h1 className="text-3xl font-bold text-foreground">Healthcare Master Data Management</h1>
+        <p className="text-muted-foreground mt-1">
+          Comprehensive management of Healthcare Professional (HCP), Healthcare Organization (HCO), Address, and DCR
+          profiles
+        </p>
       </div>
 
       {/* Top Stats Cards */}
