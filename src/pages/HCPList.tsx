@@ -23,6 +23,8 @@ const HCPList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
+  const [selectedGeography, setSelectedGeography] = useState("all");
+  const [affiliationsSearch, setAffiliationsSearch] = useState("");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
   const filteredData = mockHCPs.filter((item) => {
@@ -127,7 +129,7 @@ const HCPList = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
             <div className="space-y-2">
               <label className="text-sm font-medium">Search</label>
               <div className="relative">
@@ -141,13 +143,32 @@ const HCPList = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Profile Type</label>
-              <Select defaultValue="hcp">
+              <label className="text-sm font-medium">Geography</label>
+              <Select value={selectedGeography} onValueChange={setSelectedGeography}>
                 <SelectTrigger>
-                  <SelectValue placeholder="HCP" />
+                  <SelectValue placeholder="All Locations" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="hcp">HCP</SelectItem>
+                  <SelectItem value="all">All Locations</SelectItem>
+                  <SelectItem value="North">North</SelectItem>
+                  <SelectItem value="South">South</SelectItem>
+                  <SelectItem value="East">East</SelectItem>
+                  <SelectItem value="West">West</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Specialty</label>
+              <Select value={selectedSpecialty} onValueChange={setSelectedSpecialty}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Specialties" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Specialties</SelectItem>
+                  <SelectItem value="Cardiology">Cardiology</SelectItem>
+                  <SelectItem value="Neurology">Neurology</SelectItem>
+                  <SelectItem value="Oncology">Oncology</SelectItem>
+                  <SelectItem value="Orthopedics">Orthopedics</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -168,6 +189,18 @@ const HCPList = () => {
             <div className="space-y-2">
               <label className="text-sm font-medium">Source</label>
               <Input placeholder="e.g., NPPES, CMS, Provider Database" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Affiliations</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="Search affiliations..." 
+                  className="pl-9" 
+                  value={affiliationsSearch}
+                  onChange={(e) => setAffiliationsSearch(e.target.value)}
+                />
+              </div>
             </div>
           </div>
         </CardContent>
