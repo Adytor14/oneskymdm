@@ -25,9 +25,7 @@ const items = [
   { title: "Change Requests", url: "/change-requests", icon: FileEdit },
 ];
 
-const adminItems = [
-  { title: "Approval Requests", url: "/admin/approvals", icon: CheckSquare },
-];
+const adminItems = [{ title: "Approval Requests", url: "/admin/approvals", icon: CheckSquare }];
 
 export function AppSidebar() {
   const { open } = useSidebar();
@@ -41,11 +39,12 @@ export function AppSidebar() {
 
   const checkAdminStatus = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await supabase
-        .rpc("has_role", { _user_id: user.id, _role: "admin" });
+      const { data, error } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
 
       if (!error && data) {
         setIsAdmin(true);
@@ -76,11 +75,13 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
       <SidebarContent>
         <div className="px-3 py-4">
-          <h2 className={`font-semibold text-sidebar-foreground transition-all ${open ? 'text-lg' : 'text-xs text-center'}`}>
-            {open ? 'Healthcare MDM' : 'MDM'}
+          <h2
+            className={`font-semibold text-sidebar-foreground transition-all ${open ? "text-lg" : "text-xs text-center"}`}
+          >
+            {open ? "OneSky" : "MDM"}
           </h2>
         </div>
-        
+
         <SidebarGroup>
           <SidebarGroupLabel>Master Data</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -91,11 +92,7 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       end={item.url === "/"}
-                      className={({ isActive }) =>
-                        isActive
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                          : ""
-                      }
+                      className={({ isActive }) => (isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "")}
                     >
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
@@ -106,7 +103,7 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        
+
         {isAdmin && (
           <SidebarGroup>
             <SidebarGroupLabel>Admin</SidebarGroupLabel>
@@ -118,9 +115,7 @@ export function AppSidebar() {
                       <NavLink
                         to={item.url}
                         className={({ isActive }) =>
-                          isActive
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                            : ""
+                          isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
                         }
                       >
                         <item.icon className="h-4 w-4" />
