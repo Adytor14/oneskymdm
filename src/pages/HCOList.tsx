@@ -201,10 +201,6 @@ const HCOList = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Source</label>
-              <Input placeholder="e.g., NPPES, CMS, Provider Database" />
-            </div>
-            <div className="space-y-2">
               <label className="text-sm font-medium">Affiliations</label>
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -269,7 +265,6 @@ const HCOList = () => {
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Identifiers</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Source</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
                 </tr>
@@ -302,7 +297,6 @@ const HCOList = () => {
                         {record.status}
                       </Badge>
                     </td>
-                    <td className="py-3 px-4 text-sm">{record.source}</td>
                     <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
                     <td className="py-3 px-4">
                       <Eye 

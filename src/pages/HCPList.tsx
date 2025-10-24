@@ -129,7 +129,7 @@ const HCPList = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
             <div className="space-y-2">
               <label className="text-sm font-medium">Search</label>
               <div className="relative">
@@ -185,10 +185,6 @@ const HCPList = () => {
                   <SelectItem value="Pending">Pending</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Source</label>
-              <Input placeholder="e.g., NPPES, CMS, Provider Database" />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Affiliations</label>
@@ -255,7 +251,6 @@ const HCPList = () => {
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Identifiers</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Source</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
                 </tr>
@@ -288,7 +283,6 @@ const HCPList = () => {
                         {record.status}
                       </Badge>
                     </td>
-                    <td className="py-3 px-4 text-sm">{record.source}</td>
                     <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
                     <td className="py-3 px-4">
                       <Eye 

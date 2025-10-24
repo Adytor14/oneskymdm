@@ -105,7 +105,6 @@ export function DataTable({ data, title }: DataTableProps) {
                 <TableHead>Skyra MDM ID</TableHead>
                 <TableHead>Identifiers</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Source</TableHead>
                 <TableHead>Last Updated</TableHead>
                 <TableHead className="w-[100px]">View</TableHead>
               </TableRow>
@@ -113,7 +112,7 @@ export function DataTable({ data, title }: DataTableProps) {
             <TableBody>
               {data.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                     No records found
                   </TableCell>
                 </TableRow>
@@ -150,9 +149,6 @@ export function DataTable({ data, title }: DataTableProps) {
                       <Badge className={getStatusColor(entity.status)}>
                         {entity.status}
                       </Badge>
-                    </TableCell>
-                    <TableCell className="cursor-pointer" onClick={() => handleRowClick(entity)}>
-                      {entity.source}
                     </TableCell>
                     <TableCell className="cursor-pointer" onClick={() => handleRowClick(entity)}>
                       {entity.lastUpdated}
