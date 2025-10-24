@@ -48,7 +48,7 @@ const Index = () => {
     {
       title: "Data Change Requests",
       value: "4",
-      subtitle: "Data collection reports",
+
       icon: FileText,
       bgColor: "bg-green-50",
       iconColor: "text-green-600",
@@ -184,7 +184,9 @@ const Index = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Master Data</CardTitle>
-                <p className="text-sm text-muted-foreground">Showing {mockHCPs.filter(r => r.status === "Active").length} of {mockHCPs.length} profiles</p>
+                <p className="text-sm text-muted-foreground">
+                  Showing {mockHCPs.filter((r) => r.status === "Active").length} of {mockHCPs.length} profiles
+                </p>
               </div>
             </CardHeader>
             <CardContent>
@@ -203,40 +205,43 @@ const Index = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {mockHCPs.filter(record => record.status === "Active").slice(0, 10).map((record, index) => (
-                      <tr
-                        key={index}
-                        className="border-b hover:bg-muted/50 cursor-pointer"
-                        onClick={() => navigate(`/hcp/${record.id}`)}
-                      >
-                        <td className="py-3 px-4">
-                          Dr. {record.firstName} {record.lastName}
-                        </td>
-                        <td className="py-3 px-4">
-                          <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">Physician</Badge>
-                        </td>
-                        <td className="py-3 px-4 text-sm">{record.orgId}</td>
-                        <td className="py-3 px-4 text-sm">{record.mdmId}</td>
-                        <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
-                        <td className="py-3 px-4">
-                          <Badge
-                            className={
-                              record.status === "Active"
-                                ? "bg-blue-600 text-white hover:bg-blue-700"
-                                : "bg-gray-400 text-white hover:bg-gray-500"
-                            }
-                          >
-                            {record.status}
-                          </Badge>
-                        </td>
-                        <td className="py-3 px-4 text-sm">
-                          {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
-                        </td>
-                        <td className="py-3 px-4">
-                          <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
-                        </td>
-                      </tr>
-                    ))}
+                    {mockHCPs
+                      .filter((record) => record.status === "Active")
+                      .slice(0, 10)
+                      .map((record, index) => (
+                        <tr
+                          key={index}
+                          className="border-b hover:bg-muted/50 cursor-pointer"
+                          onClick={() => navigate(`/hcp/${record.id}`)}
+                        >
+                          <td className="py-3 px-4">
+                            Dr. {record.firstName} {record.lastName}
+                          </td>
+                          <td className="py-3 px-4">
+                            <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">Physician</Badge>
+                          </td>
+                          <td className="py-3 px-4 text-sm">{record.orgId}</td>
+                          <td className="py-3 px-4 text-sm">{record.mdmId}</td>
+                          <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
+                          <td className="py-3 px-4">
+                            <Badge
+                              className={
+                                record.status === "Active"
+                                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                                  : "bg-gray-400 text-white hover:bg-gray-500"
+                              }
+                            >
+                              {record.status}
+                            </Badge>
+                          </td>
+                          <td className="py-3 px-4 text-sm">
+                            {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
+                          </td>
+                          <td className="py-3 px-4">
+                            <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
@@ -250,7 +255,9 @@ const Index = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Facility Accounts Master Data</CardTitle>
-                <p className="text-sm text-muted-foreground">Showing {mockHCOs.filter(r => r.status === "Active").length} of {mockHCOs.length} profiles</p>
+                <p className="text-sm text-muted-foreground">
+                  Showing {mockHCOs.filter((r) => r.status === "Active").length} of {mockHCOs.length} profiles
+                </p>
               </div>
             </CardHeader>
             <CardContent>
@@ -269,38 +276,41 @@ const Index = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {mockHCOs.filter(record => record.status === "Active").slice(0, 10).map((record, index) => (
-                      <tr
-                        key={index}
-                        className="border-b hover:bg-muted/50 cursor-pointer"
-                        onClick={() => navigate(`/hco/${record.id}`)}
-                      >
-                        <td className="py-3 px-4">{record.name}</td>
-                        <td className="py-3 px-4">
-                          <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">Facility</Badge>
-                        </td>
-                        <td className="py-3 px-4 text-sm">{record.orgId}</td>
-                        <td className="py-3 px-4 text-sm">{record.mdmId}</td>
-                        <td className="py-3 px-4 text-sm">NPI-{record.mdmId.slice(-6)}</td>
-                        <td className="py-3 px-4">
-                          <Badge
-                            className={
-                              record.status === "Active"
-                                ? "bg-blue-600 text-white hover:bg-blue-700"
-                                : "bg-gray-400 text-white hover:bg-gray-500"
-                            }
-                          >
-                            {record.status}
-                          </Badge>
-                        </td>
-                        <td className="py-3 px-4 text-sm">
-                          {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
-                        </td>
-                        <td className="py-3 px-4">
-                          <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
-                        </td>
-                      </tr>
-                    ))}
+                    {mockHCOs
+                      .filter((record) => record.status === "Active")
+                      .slice(0, 10)
+                      .map((record, index) => (
+                        <tr
+                          key={index}
+                          className="border-b hover:bg-muted/50 cursor-pointer"
+                          onClick={() => navigate(`/hco/${record.id}`)}
+                        >
+                          <td className="py-3 px-4">{record.name}</td>
+                          <td className="py-3 px-4">
+                            <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">Facility</Badge>
+                          </td>
+                          <td className="py-3 px-4 text-sm">{record.orgId}</td>
+                          <td className="py-3 px-4 text-sm">{record.mdmId}</td>
+                          <td className="py-3 px-4 text-sm">NPI-{record.mdmId.slice(-6)}</td>
+                          <td className="py-3 px-4">
+                            <Badge
+                              className={
+                                record.status === "Active"
+                                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                                  : "bg-gray-400 text-white hover:bg-gray-500"
+                              }
+                            >
+                              {record.status}
+                            </Badge>
+                          </td>
+                          <td className="py-3 px-4 text-sm">
+                            {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
+                          </td>
+                          <td className="py-3 px-4">
+                            <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
