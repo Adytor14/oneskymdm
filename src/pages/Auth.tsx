@@ -52,7 +52,14 @@ const Auth = () => {
           title: "Success",
           description: "Logged in successfully",
         });
-      };
+      } else {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+          },
+        });
         if (error) throw error;
         toast({
           title: "Success",
