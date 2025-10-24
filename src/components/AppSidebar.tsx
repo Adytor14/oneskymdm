@@ -18,10 +18,10 @@ import {
 
 const items = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "HCP Profiles", url: "/hcp", icon: User },
-  { title: "HCO Profiles", url: "/hco", icon: Building2 },
+  { title: "Physician Accounts", url: "/hcp", icon: User },
+  { title: "Facility Accounts", url: "/hco", icon: Building2 },
   { title: "Addresses", url: "/address", icon: MapPin },
-  { title: "DCR Profiles", url: "/dcr", icon: FileText },
+  { title: "Data Change Requests", url: "/dcr", icon: FileText },
   { title: "Change Requests", url: "/change-requests", icon: FileEdit },
 ];
 

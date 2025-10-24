@@ -22,7 +22,7 @@ const Index = () => {
       iconColor: "text-blue-600",
     },
     {
-      title: "HCP Profiles",
+      title: "Physician Accounts",
       value: "2",
       subtitle: "Healthcare professionals",
       icon: Users,
@@ -30,7 +30,7 @@ const Index = () => {
       iconColor: "text-blue-600",
     },
     {
-      title: "HCO Profiles",
+      title: "Facility Accounts",
       value: "4",
       subtitle: "Healthcare organizations",
       icon: Building2,
@@ -46,7 +46,7 @@ const Index = () => {
       iconColor: "text-orange-600",
     },
     {
-      title: "DCR Profiles",
+      title: "Data Change Requests",
       value: "4",
       subtitle: "Data collection reports",
       icon: FileText,
@@ -56,9 +56,9 @@ const Index = () => {
   ];
 
   const hcpMetrics = [
-    { title: "Total HCP Profiles", value: "2", bgColor: "bg-blue-50" },
-    { title: "Active HCPs", value: "2", bgColor: "bg-green-50" },
-    { title: "Inactive HCPs", value: "0", bgColor: "bg-gray-50" },
+    { title: "Total Physician Accounts", value: "2", bgColor: "bg-blue-50" },
+    { title: "Active Physicians", value: "2", bgColor: "bg-green-50" },
+    { title: "Inactive Physicians", value: "0", bgColor: "bg-gray-50" },
   ];
 
   const masterDataRecords = [
@@ -116,11 +116,11 @@ const Index = () => {
         <TabsList className="bg-blue-50">
           <TabsTrigger value="hcp" className="data-[state=active]:bg-white">
             <Users className="h-4 w-4 mr-2" />
-            HCP Profiles
+            Physician Accounts
           </TabsTrigger>
           <TabsTrigger value="hco">
             <Building2 className="h-4 w-4 mr-2" />
-            HCO Profiles
+            Facility Accounts
           </TabsTrigger>
           <TabsTrigger value="address">
             <MapPin className="h-4 w-4 mr-2" />
@@ -128,7 +128,7 @@ const Index = () => {
           </TabsTrigger>
           <TabsTrigger value="dcr">
             <FileText className="h-4 w-4 mr-2" />
-            DCR Profiles
+            Data Change Requests
           </TabsTrigger>
         </TabsList>
 
@@ -188,7 +188,7 @@ const Index = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Master Data</CardTitle>
-                <p className="text-sm text-muted-foreground">Showing 2 of 2 profiles</p>
+                <p className="text-sm text-muted-foreground">Showing {mockHCPs.filter(r => r.status === "Active").length} of {mockHCPs.length} profiles</p>
               </div>
             </CardHeader>
             <CardContent>
@@ -199,16 +199,16 @@ const Index = () => {
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">MDM ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Identifiers</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Source</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Actions</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {mockHCPs.slice(0, 10).map((record, index) => (
+                    {mockHCPs.filter(record => record.status === "Active").slice(0, 10).map((record, index) => (
                       <tr
                         key={index}
                         className="border-b hover:bg-muted/50 cursor-pointer"
@@ -218,7 +218,7 @@ const Index = () => {
                           Dr. {record.firstName} {record.lastName}
                         </td>
                         <td className="py-3 px-4">
-                          <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">HCP</Badge>
+                          <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">Physician</Badge>
                         </td>
                         <td className="py-3 px-4 text-sm">{record.orgId}</td>
                         <td className="py-3 px-4 text-sm">{record.mdmId}</td>
@@ -255,8 +255,8 @@ const Index = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">HCO Master Data</CardTitle>
-                <p className="text-sm text-muted-foreground">Showing {mockHCOs.length} profiles</p>
+                <CardTitle className="text-lg">Facility Accounts Master Data</CardTitle>
+                <p className="text-sm text-muted-foreground">Showing {mockHCOs.filter(r => r.status === "Active").length} of {mockHCOs.length} profiles</p>
               </div>
             </CardHeader>
             <CardContent>
@@ -267,16 +267,16 @@ const Index = () => {
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">MDM ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Identifiers</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Source</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Actions</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {mockHCOs.slice(0, 10).map((record, index) => (
+                    {mockHCOs.filter(record => record.status === "Active").slice(0, 10).map((record, index) => (
                       <tr
                         key={index}
                         className="border-b hover:bg-muted/50 cursor-pointer"
@@ -284,7 +284,7 @@ const Index = () => {
                       >
                         <td className="py-3 px-4">{record.name}</td>
                         <td className="py-3 px-4">
-                          <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">HCO</Badge>
+                          <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">Facility</Badge>
                         </td>
                         <td className="py-3 px-4 text-sm">{record.orgId}</td>
                         <td className="py-3 px-4 text-sm">{record.mdmId}</td>
@@ -335,10 +335,10 @@ const Index = () => {
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">City</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">State</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">ZIP Code</th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">MDM ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Actions</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -387,7 +387,7 @@ const Index = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">DCR Master Data</CardTitle>
+                <CardTitle className="text-lg">Data Change Requests Master Data</CardTitle>
                 <p className="text-sm text-muted-foreground">Showing {mockDCRs.length} profiles</p>
               </div>
             </CardHeader>
@@ -399,12 +399,12 @@ const Index = () => {
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Report ID</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">MDM ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Visit Type</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Source</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Actions</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
                     </tr>
                   </thead>
                   <tbody>

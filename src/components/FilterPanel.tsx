@@ -42,10 +42,10 @@ export function FilterPanel({
               </SelectTrigger>
               <SelectContent className="bg-popover z-50">
                 <SelectItem value="All">All Types</SelectItem>
-                <SelectItem value="HCP">HCP Profiles</SelectItem>
-                <SelectItem value="HCO">HCO Profiles</SelectItem>
+                <SelectItem value="HCP">Physician Accounts</SelectItem>
+                <SelectItem value="HCO">Facility Accounts</SelectItem>
                 <SelectItem value="Address">Addresses</SelectItem>
-                <SelectItem value="DCR">DCR Profiles</SelectItem>
+                <SelectItem value="DCR">Data Change Requests</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -102,12 +102,12 @@ export function DataTable({ data, title }: DataTableProps) {
               <TableRow>
                 <TableHead>Entity Type</TableHead>
                 <TableHead>Org ID</TableHead>
-                <TableHead>MDM ID</TableHead>
+                <TableHead>Skyra MDM ID</TableHead>
                 <TableHead>Identifiers</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Source</TableHead>
                 <TableHead>Last Updated</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
+                <TableHead className="w-[100px]">View</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
