@@ -32,8 +32,9 @@ const HCPList = () => {
 
     const matchesStatus = selectedStatus === "all" || item.status === selectedStatus;
     const matchesSpecialty = selectedSpecialty === "all" || item.speciality.includes(selectedSpecialty);
+    const isActive = item.status === "Active";
 
-    return matchesSearch && matchesStatus && matchesSpecialty;
+    return matchesSearch && matchesStatus && matchesSpecialty && isActive;
   });
 
   const activeCount = mockHCPs.filter(hcp => hcp.status === "Active").length;
@@ -41,10 +42,9 @@ const HCPList = () => {
   const pendingCount = mockHCPs.filter(hcp => hcp.status === "Pending").length;
 
   const metrics = [
-    { title: "Total HCP Records", value: mockHCPs.length.toString(), icon: Users, bgColor: "bg-blue-50", iconColor: "text-blue-600" },
-    { title: "Active HCPs", value: activeCount.toString(), icon: TrendingUp, bgColor: "bg-green-50", iconColor: "text-green-600" },
-    { title: "Inactive HCPs", value: inactiveCount.toString(), icon: AlertCircle, bgColor: "bg-gray-50", iconColor: "text-gray-600" },
-    { title: "Pending HCPs", value: pendingCount.toString(), icon: Clock, bgColor: "bg-orange-50", iconColor: "text-orange-600" },
+    { title: "Total Physician Accounts", value: mockHCPs.length.toString(), icon: Users, bgColor: "bg-blue-50", iconColor: "text-blue-600" },
+    { title: "Active Physician Accounts", value: activeCount.toString(), icon: TrendingUp, bgColor: "bg-green-50", iconColor: "text-green-600" },
+    { title: "Inactive Physician Accounts", value: inactiveCount.toString(), icon: AlertCircle, bgColor: "bg-gray-50", iconColor: "text-gray-600" },
   ];
 
   const handleSelectAll = (checked: boolean) => {
@@ -94,14 +94,14 @@ const HCPList = () => {
     <div className="space-y-6 p-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">HCP Profiles</h1>
+        <h1 className="text-3xl font-bold text-foreground">Physician Accounts</h1>
         <p className="text-muted-foreground mt-1">
-          Healthcare professionals - Manage and view HCP profiles, credentials, and affiliations
+          Healthcare professionals - Manage and view physician profiles, credentials, and affiliations
         </p>
       </div>
 
       {/* Metrics */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-3">
         {metrics.map((metric, index) => {
           const Icon = metric.icon;
           return (
@@ -177,7 +177,7 @@ const HCPList = () => {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Master Data Records</CardTitle>
+            <CardTitle className="text-lg">Master Data</CardTitle>
             <div className="flex items-center gap-4">
               <p className="text-sm text-muted-foreground">Showing {filteredData.length} of {mockHCPs.length} records</p>
               <DropdownMenu>
@@ -219,12 +219,12 @@ const HCPList = () => {
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">MDM ID</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Identifiers</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Source</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Actions</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
                 </tr>
               </thead>
               <tbody>
@@ -241,7 +241,7 @@ const HCPList = () => {
                     </td>
                     <td className="py-3 px-4">Dr. {record.firstName} {record.lastName}</td>
                     <td className="py-3 px-4">
-                      <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">HCP</Badge>
+                      <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">Physician Account</Badge>
                     </td>
                     <td className="py-3 px-4 text-sm">{record.orgId}</td>
                     <td className="py-3 px-4 text-sm">{record.mdmId}</td>

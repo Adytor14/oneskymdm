@@ -31,8 +31,9 @@ const HCOList = () => {
       item.orgId.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus = selectedStatus === "all" || item.status === selectedStatus;
+    const isActive = item.status === "Active";
 
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && isActive;
   });
 
   const activeCount = mockHCOs.filter(hco => hco.status === "Active").length;
@@ -40,10 +41,9 @@ const HCOList = () => {
   const pendingCount = 0; // No pending in current data
 
   const metrics = [
-    { title: "Total HCO Records", value: mockHCOs.length.toString(), icon: Building2, bgColor: "bg-blue-50", iconColor: "text-blue-600" },
-    { title: "Active HCOs", value: activeCount.toString(), icon: TrendingUp, bgColor: "bg-green-50", iconColor: "text-green-600" },
-    { title: "Inactive HCOs", value: inactiveCount.toString(), icon: AlertCircle, bgColor: "bg-gray-50", iconColor: "text-gray-600" },
-    { title: "Pending HCOs", value: pendingCount.toString(), icon: Clock, bgColor: "bg-orange-50", iconColor: "text-orange-600" },
+    { title: "Total Facility Accounts", value: mockHCOs.length.toString(), icon: Building2, bgColor: "bg-blue-50", iconColor: "text-blue-600" },
+    { title: "Active Facility Accounts", value: activeCount.toString(), icon: TrendingUp, bgColor: "bg-green-50", iconColor: "text-green-600" },
+    { title: "Inactive Facility Accounts", value: inactiveCount.toString(), icon: AlertCircle, bgColor: "bg-gray-50", iconColor: "text-gray-600" },
   ];
 
   const handleSelectAll = (checked: boolean) => {
@@ -93,14 +93,14 @@ const HCOList = () => {
     <div className="space-y-6 p-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">HCO Profiles</h1>
+        <h1 className="text-3xl font-bold text-foreground">Facility Accounts</h1>
         <p className="text-muted-foreground mt-1">
-          Healthcare organizations - Manage and view HCO profiles, facilities, and departments
+          Healthcare organizations - Manage and view facility profiles, facilities, and departments
         </p>
       </div>
 
       {/* Metrics */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-3">
         {metrics.map((metric, index) => {
           const Icon = metric.icon;
           return (
@@ -175,7 +175,7 @@ const HCOList = () => {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Master Data Records</CardTitle>
+            <CardTitle className="text-lg">Master Data</CardTitle>
             <div className="flex items-center gap-4">
               <p className="text-sm text-muted-foreground">Showing {filteredData.length} of {mockHCOs.length} records</p>
               <DropdownMenu>
@@ -217,12 +217,12 @@ const HCOList = () => {
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">MDM ID</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Identifiers</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Source</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Actions</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
                 </tr>
               </thead>
               <tbody>
@@ -239,7 +239,7 @@ const HCOList = () => {
                     </td>
                     <td className="py-3 px-4">{record.name}</td>
                     <td className="py-3 px-4">
-                      <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">HCO</Badge>
+                      <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">Facility Account</Badge>
                     </td>
                     <td className="py-3 px-4 text-sm">{record.orgId}</td>
                     <td className="py-3 px-4 text-sm">{record.mdmId}</td>

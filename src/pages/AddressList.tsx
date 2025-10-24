@@ -32,8 +32,9 @@ const AddressList = () => {
       item.orgId.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus = selectedStatus === "all" || item.status === selectedStatus;
+    const isActive = item.status === "Active";
 
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && isActive;
   });
 
   const activeCount = mockAddresses.filter(addr => addr.status === "Active").length;
@@ -41,10 +42,9 @@ const AddressList = () => {
   const pendingCount = 0;
 
   const metrics = [
-    { title: "Total Address Records", value: mockAddresses.length.toString(), icon: MapPin, bgColor: "bg-orange-50", iconColor: "text-orange-600" },
+    { title: "Total Addresses", value: mockAddresses.length.toString(), icon: MapPin, bgColor: "bg-orange-50", iconColor: "text-orange-600" },
     { title: "Active Addresses", value: activeCount.toString(), icon: TrendingUp, bgColor: "bg-green-50", iconColor: "text-green-600" },
     { title: "Inactive Addresses", value: inactiveCount.toString(), icon: AlertCircle, bgColor: "bg-gray-50", iconColor: "text-gray-600" },
-    { title: "Pending Addresses", value: pendingCount.toString(), icon: Clock, bgColor: "bg-orange-50", iconColor: "text-orange-600" },
   ];
 
   const handleSelectAll = (checked: boolean) => {
@@ -101,7 +101,7 @@ const AddressList = () => {
       </div>
 
       {/* Metrics */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-3">
         {metrics.map((metric, index) => {
           const Icon = metric.icon;
           return (
@@ -176,7 +176,7 @@ const AddressList = () => {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Master Data Records</CardTitle>
+            <CardTitle className="text-lg">Master Data</CardTitle>
             <div className="flex items-center gap-4">
               <p className="text-sm text-muted-foreground">Showing {filteredData.length} of {mockAddresses.length} records</p>
               <DropdownMenu>
@@ -218,12 +218,12 @@ const AddressList = () => {
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Address</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">MDM ID</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">City/State</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Source</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Actions</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
                 </tr>
               </thead>
               <tbody>
