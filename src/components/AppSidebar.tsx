@@ -21,8 +21,7 @@ const items = [
   { title: "Physician Accounts", url: "/hcp", icon: User },
   { title: "Facility Accounts", url: "/hco", icon: Building2 },
   { title: "Addresses", url: "/address", icon: MapPin },
-  { title: "Data Change Requests", url: "/dcr", icon: FileText },
-  { title: "Change Requests", url: "/change-requests", icon: FileEdit },
+  { title: "Data Change Requests", url: "/change-requests", icon: FileEdit },
 ];
 
 const adminItems = [
