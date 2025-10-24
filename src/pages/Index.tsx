@@ -38,9 +38,9 @@ const Index = () => {
       iconColor: "text-blue-600",
     },
     {
-      title: "Addresses",
+      title: "Address Profiles",
       value: "1",
-      subtitle: "Address profiles",
+
       icon: MapPin,
       bgColor: "bg-orange-50",
       iconColor: "text-orange-600",
