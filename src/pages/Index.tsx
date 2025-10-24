@@ -14,7 +14,7 @@ const Index = () => {
 
   const topStats = [
     {
-      title: "Total Records",
+      title: "Total Profiles",
       value: "11",
       subtitle: "All profile types",
       icon: Database,
@@ -56,7 +56,7 @@ const Index = () => {
   ];
 
   const hcpMetrics = [
-    { title: "Total HCP Records", value: "2", bgColor: "bg-blue-50" },
+    { title: "Total HCP Profiles", value: "2", bgColor: "bg-blue-50" },
     { title: "Active HCPs", value: "2", bgColor: "bg-green-50" },
     { title: "Inactive HCPs", value: "0", bgColor: "bg-gray-50" },
   ];
@@ -187,8 +187,8 @@ const Index = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Master Data Records</CardTitle>
-                <p className="text-sm text-muted-foreground">Showing 2 of 2 records</p>
+                <CardTitle className="text-lg">Master Data</CardTitle>
+                <p className="text-sm text-muted-foreground">Showing 2 of 2 profiles</p>
               </div>
             </CardHeader>
             <CardContent>
@@ -255,8 +255,8 @@ const Index = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">HCO Master Data Records</CardTitle>
-                <p className="text-sm text-muted-foreground">Showing {mockHCOs.length} records</p>
+                <CardTitle className="text-lg">HCO Master Data</CardTitle>
+                <p className="text-sm text-muted-foreground">Showing {mockHCOs.length} profiles</p>
               </div>
             </CardHeader>
             <CardContent>
@@ -321,8 +321,8 @@ const Index = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Address Master Data Records</CardTitle>
-                <p className="text-sm text-muted-foreground">Showing {mockAddresses.length} records</p>
+                <CardTitle className="text-lg">Address Master Data</CardTitle>
+                <p className="text-sm text-muted-foreground">Showing {mockAddresses.length} profiles</p>
               </div>
             </CardHeader>
             <CardContent>
@@ -387,8 +387,8 @@ const Index = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">DCR Master Data Records</CardTitle>
-                <p className="text-sm text-muted-foreground">Showing {mockDCRs.length} records</p>
+                <CardTitle className="text-lg">DCR Master Data</CardTitle>
+                <p className="text-sm text-muted-foreground">Showing {mockDCRs.length} profiles</p>
               </div>
             </CardHeader>
             <CardContent>
