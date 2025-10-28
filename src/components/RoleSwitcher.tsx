@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 
-type AppRole = "admin" | "data_steward" | "user";
+type AppRole = "admin" | "data_steward";
 
 export const RoleSwitcher = () => {
   const [currentRole, setCurrentRole] = useState<AppRole | null>(null);
@@ -39,14 +39,16 @@ export const RoleSwitcher = () => {
         return;
       }
 
-      // If no role exists, assign default "user" role
+      // If no role exists, assign default "admin" role
       if (!data) {
         await supabase
           .from("user_roles")
-          .insert({ user_id: user.id, role: "user" });
-        setCurrentRole("user");
+          .insert({ user_id: user.id, role: "admin" });
+        setCurrentRole("admin");
       } else {
-        setCurrentRole(data.role);
+        // Map old "user" role to "admin" if it exists
+        const role = data.role === "user" ? "admin" : data.role;
+        setCurrentRole(role as AppRole);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -101,7 +103,6 @@ export const RoleSwitcher = () => {
         <SelectContent>
           <SelectItem value="admin">Admin</SelectItem>
           <SelectItem value="data_steward">Data Steward</SelectItem>
-          <SelectItem value="user">User</SelectItem>
         </SelectContent>
       </Select>
     </div>
