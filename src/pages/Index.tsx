@@ -11,6 +11,7 @@ import { Database, Users, Building2, MapPin, FileText, Search, Eye, TrendingUp }
 const Index = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("hcp");
+  const [selectedOrganization, setSelectedOrganization] = useState("all");
 
   const topStats = [
     {
@@ -91,6 +92,28 @@ const Index = () => {
         <h1 className="text-3xl font-bold text-foreground">OneSky</h1>
         <p className="text-muted-foreground mt-1">One source. Endless referral intelligence</p>
       </div>
+
+      {/* Organization Filter */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="space-y-2 max-w-xs">
+            <label className="text-sm font-medium">Organization</label>
+            <Select value={selectedOrganization} onValueChange={setSelectedOrganization}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Organization" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Organizations</SelectItem>
+                <SelectItem value="reliant">Reliant</SelectItem>
+                <SelectItem value="opuscare">Opuscare</SelectItem>
+                <SelectItem value="choice">Choice</SelectItem>
+                <SelectItem value="jethealth">Jethealth</SelectItem>
+                <SelectItem value="skyra">Skyra</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Top Stats Cards */}
       <div className="grid gap-4 md:grid-cols-5">
