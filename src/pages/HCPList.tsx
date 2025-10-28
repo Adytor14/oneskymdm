@@ -24,6 +24,7 @@ const HCPList = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
   const [selectedGeography, setSelectedGeography] = useState("all");
+  const [selectedServiceLine, setSelectedServiceLine] = useState("all");
   const [affiliationsSearch, setAffiliationsSearch] = useState("");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
@@ -129,7 +130,7 @@ const HCPList = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
             <div className="space-y-2">
               <label className="text-sm font-medium">Search</label>
               <div className="relative">
@@ -169,6 +170,19 @@ const HCPList = () => {
                   <SelectItem value="Neurology">Neurology</SelectItem>
                   <SelectItem value="Oncology">Oncology</SelectItem>
                   <SelectItem value="Orthopedics">Orthopedics</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Service Line</label>
+              <Select value={selectedServiceLine} onValueChange={setSelectedServiceLine}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Service Lines" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Service Lines</SelectItem>
+                  <SelectItem value="Home Health">Home Health</SelectItem>
+                  <SelectItem value="Hospice">Hospice</SelectItem>
                 </SelectContent>
               </Select>
             </div>
