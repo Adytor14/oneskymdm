@@ -269,7 +269,7 @@ const HCPList = () => {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Profile List</CardTitle>
+            <CardTitle className="text-lg">Master Data</CardTitle>
             <div className="flex items-center gap-4">
               <p className="text-sm text-muted-foreground">Showing {filteredData.length} of {mockHCPs.length} records</p>
               <DropdownMenu>

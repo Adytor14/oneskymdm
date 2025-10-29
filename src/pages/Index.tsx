@@ -244,7 +244,7 @@ const Index = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Profile List</CardTitle>
+                <CardTitle className="text-lg">Master Data</CardTitle>
                 <p className="text-sm text-muted-foreground">
                   Showing 2,683 of 2,847 profiles
                 </p>
@@ -312,7 +312,7 @@ const Index = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Profile List</CardTitle>
+                <CardTitle className="text-lg">Facility Accounts Master Data</CardTitle>
                 <p className="text-sm text-muted-foreground">
                   Showing 441 of 468 profiles
                 </p>
