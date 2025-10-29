@@ -26,6 +26,9 @@ const HCPList = () => {
   const [selectedGeography, setSelectedGeography] = useState("all");
   const [selectedServiceLine, setSelectedServiceLine] = useState("all");
   const [affiliationsSearch, setAffiliationsSearch] = useState("");
+  const [selectedPatientVolume, setSelectedPatientVolume] = useState("all");
+  const [selectedStarRating, setSelectedStarRating] = useState("all");
+  const [deliberateDuplicates, setDeliberateDuplicates] = useState(false);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
   const filteredData = mockHCPs.filter((item) => {
@@ -130,7 +133,7 @@ const HCPList = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Search</label>
               <div className="relative">
@@ -149,7 +152,7 @@ const HCPList = () => {
                 <SelectTrigger>
                   <SelectValue placeholder="All Locations" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover z-50">
                   <SelectItem value="all">All Locations</SelectItem>
                   <SelectItem value="North">North</SelectItem>
                   <SelectItem value="South">South</SelectItem>
@@ -159,12 +162,12 @@ const HCPList = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Specialty</label>
+              <label className="text-sm font-medium">Specialty/Diagnosis</label>
               <Select value={selectedSpecialty} onValueChange={setSelectedSpecialty}>
                 <SelectTrigger>
                   <SelectValue placeholder="All Specialties" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover z-50">
                   <SelectItem value="all">All Specialties</SelectItem>
                   <SelectItem value="Cardiology">Cardiology</SelectItem>
                   <SelectItem value="Neurology">Neurology</SelectItem>
@@ -179,7 +182,7 @@ const HCPList = () => {
                 <SelectTrigger>
                   <SelectValue placeholder="All Service Lines" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover z-50">
                   <SelectItem value="all">All Service Lines</SelectItem>
                   <SelectItem value="Home Health">Home Health</SelectItem>
                   <SelectItem value="Hospice">Hospice</SelectItem>
@@ -192,7 +195,7 @@ const HCPList = () => {
                 <SelectTrigger>
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover z-50">
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="Active">Active</SelectItem>
                   <SelectItem value="Inactive">Inactive</SelectItem>
@@ -210,6 +213,52 @@ const HCPList = () => {
                   value={affiliationsSearch}
                   onChange={(e) => setAffiliationsSearch(e.target.value)}
                 />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Patient Volume</label>
+              <Select value={selectedPatientVolume} onValueChange={setSelectedPatientVolume}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Volumes" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">All Volumes</SelectItem>
+                  <SelectItem value="0-100">0-100</SelectItem>
+                  <SelectItem value="101-500">101-500</SelectItem>
+                  <SelectItem value=">500">&gt;500</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Star Rating</label>
+              <Select value={selectedStarRating} onValueChange={setSelectedStarRating}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Ratings" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">All Ratings</SelectItem>
+                  <SelectItem value="1">1 Star</SelectItem>
+                  <SelectItem value="2">2 Star</SelectItem>
+                  <SelectItem value="3">3 Star</SelectItem>
+                  <SelectItem value="4">4 Star</SelectItem>
+                  <SelectItem value="5">5 Star</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Options</label>
+              <div className="flex items-center space-x-2 h-10">
+                <Checkbox 
+                  id="deliberate-duplicates"
+                  checked={deliberateDuplicates}
+                  onCheckedChange={(checked) => setDeliberateDuplicates(checked as boolean)}
+                />
+                <label
+                  htmlFor="deliberate-duplicates"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  Deliberate Duplicates
+                </label>
               </div>
             </div>
           </div>
