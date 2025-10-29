@@ -88,32 +88,30 @@ const Index = () => {
   return (
     <div className="space-y-6 p-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">OneSky</h1>
-        <p className="text-muted-foreground mt-1">One source. Endless referral intelligence</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">OneSky</h1>
+          <p className="text-muted-foreground mt-1">One source. Endless referral intelligence</p>
+        </div>
+        
+        {/* Organization Filter */}
+        <div className="space-y-2 w-64">
+          <label className="text-sm font-medium">Organization</label>
+          <Select value={selectedOrganization} onValueChange={setSelectedOrganization}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Organization" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Organizations</SelectItem>
+              <SelectItem value="reliant">Reliant</SelectItem>
+              <SelectItem value="opuscare">Opuscare</SelectItem>
+              <SelectItem value="choice">Choice</SelectItem>
+              <SelectItem value="jethealth">Jethealth</SelectItem>
+              <SelectItem value="skyra">Skyra</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
-
-      {/* Organization Filter */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-2 max-w-xs">
-            <label className="text-sm font-medium">Organization</label>
-            <Select value={selectedOrganization} onValueChange={setSelectedOrganization}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select Organization" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Organizations</SelectItem>
-                <SelectItem value="reliant">Reliant</SelectItem>
-                <SelectItem value="opuscare">Opuscare</SelectItem>
-                <SelectItem value="choice">Choice</SelectItem>
-                <SelectItem value="jethealth">Jethealth</SelectItem>
-                <SelectItem value="skyra">Skyra</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Top Stats Cards */}
       <div className="grid gap-4 md:grid-cols-5">
