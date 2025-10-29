@@ -20,7 +20,7 @@ const Index = () => {
   const topStats = [
     {
       title: "Total Profiles",
-      value: "11",
+      value: "7,836",
       subtitle: "All profile types",
       icon: Database,
       bgColor: "bg-blue-50",
@@ -28,7 +28,7 @@ const Index = () => {
     },
     {
       title: "Physician Accounts",
-      value: "2",
+      value: "2,847",
       subtitle: "Healthcare professionals",
       icon: Users,
       bgColor: "bg-blue-50",
@@ -36,7 +36,7 @@ const Index = () => {
     },
     {
       title: "Facility Accounts",
-      value: "4",
+      value: "468",
       subtitle: "Healthcare organizations",
       icon: Building2,
       bgColor: "bg-blue-50",
@@ -44,7 +44,7 @@ const Index = () => {
     },
     {
       title: "Address Profiles",
-      value: "1",
+      value: "4,521",
 
       icon: MapPin,
       bgColor: "bg-orange-50",
@@ -52,7 +52,7 @@ const Index = () => {
     },
     {
       title: "Data Change Requests",
-      value: "4",
+      value: "342",
 
       icon: FileText,
       bgColor: "bg-green-50",
@@ -61,9 +61,9 @@ const Index = () => {
   ];
 
   const hcpMetrics = [
-    { title: "Total Physician Accounts", value: "2", bgColor: "bg-blue-50" },
-    { title: "Active Physicians", value: "2", bgColor: "bg-green-50" },
-    { title: "Inactive Physicians", value: "0", bgColor: "bg-gray-50" },
+    { title: "Total Physician Accounts", value: "2,847", bgColor: "bg-blue-50" },
+    { title: "Active Physicians", value: "2,683", bgColor: "bg-green-50" },
+    { title: "Inactive Physicians", value: "164", bgColor: "bg-gray-50" },
   ];
 
   const masterDataRecords = [
@@ -246,7 +246,7 @@ const Index = () => {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Master Data</CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Showing {mockHCPs.filter((r) => r.status === "Active").length} of {mockHCPs.length} profiles
+                  Showing 2,683 of 2,847 profiles
                 </p>
               </div>
             </CardHeader>
@@ -314,7 +314,7 @@ const Index = () => {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Facility Accounts Master Data</CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Showing {mockHCOs.filter((r) => r.status === "Active").length} of {mockHCOs.length} profiles
+                  Showing 441 of 468 profiles
                 </p>
               </div>
             </CardHeader>
@@ -379,7 +379,7 @@ const Index = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Address Master Data</CardTitle>
-                <p className="text-sm text-muted-foreground">Showing {mockAddresses.length} profiles</p>
+                <p className="text-sm text-muted-foreground">Showing 4,521 profiles</p>
               </div>
             </CardHeader>
             <CardContent>
@@ -446,7 +446,7 @@ const Index = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Data Change Requests Master Data</CardTitle>
-                <p className="text-sm text-muted-foreground">Showing {mockDCRs.length} profiles</p>
+                <p className="text-sm text-muted-foreground">Showing 342 change requests</p>
               </div>
             </CardHeader>
             <CardContent>
