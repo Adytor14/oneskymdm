@@ -7,11 +7,15 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { mockHCPs, mockHCOs, mockAddresses, mockDCRs } from "@/lib/mockData";
 import { Database, Users, Building2, MapPin, FileText, Search, Eye, TrendingUp } from "lucide-react";
+import { getOrganizationTheme } from "@/lib/organizationThemes";
 
 const Index = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("hcp");
   const [selectedOrganization, setSelectedOrganization] = useState("all");
+  
+  // Get current organization theme
+  const currentTheme = getOrganizationTheme(selectedOrganization);
 
   const topStats = [
     {
@@ -87,29 +91,44 @@ const Index = () => {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">OneSky</h1>
-          <p className="text-muted-foreground mt-1">One source. Endless referral intelligence</p>
-        </div>
-        
-        {/* Organization Filter */}
-        <div className="space-y-2 w-64">
-          <label className="text-sm font-medium">Organization</label>
-          <Select value={selectedOrganization} onValueChange={setSelectedOrganization}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Organization" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Organizations</SelectItem>
-              <SelectItem value="reliant">Reliant</SelectItem>
-              <SelectItem value="opuscare">Opuscare</SelectItem>
-              <SelectItem value="choice">Choice</SelectItem>
-              <SelectItem value="jethealth">Jethealth</SelectItem>
-              <SelectItem value="skyra">Skyra</SelectItem>
-            </SelectContent>
-          </Select>
+      {/* Branded Header Band */}
+      <div 
+        className="rounded-lg p-6 shadow-lg mb-6"
+        style={{ 
+          background: currentTheme.colors.headerBg,
+          color: currentTheme.colors.headerText
+        }}
+      >
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <img 
+              src={currentTheme.logo} 
+              alt={`${currentTheme.name} Logo`}
+              className="h-16 w-auto object-contain"
+            />
+            <div>
+              <h1 className="text-3xl font-bold">{currentTheme.name}</h1>
+              <p className="mt-1 opacity-90">{currentTheme.tagline}</p>
+            </div>
+          </div>
+          
+          {/* Organization Filter */}
+          <div className="space-y-2 w-64">
+            <label className="text-sm font-medium">Organization</label>
+            <Select value={selectedOrganization} onValueChange={setSelectedOrganization}>
+              <SelectTrigger className="bg-white text-foreground">
+                <SelectValue placeholder="Select Organization" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Organizations</SelectItem>
+                <SelectItem value="reliant">Reliant</SelectItem>
+                <SelectItem value="opuscare">Opuscare</SelectItem>
+                <SelectItem value="choice">Choice</SelectItem>
+                <SelectItem value="jethealth">Jethealth</SelectItem>
+                <SelectItem value="skyra">Skyra</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
@@ -118,13 +137,24 @@ const Index = () => {
         {topStats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className={stat.bgColor}>
+            <Card 
+              key={index} 
+              style={{ backgroundColor: currentTheme.colors.cardBg }}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
-                <Icon className={`h-4 w-4 ${stat.iconColor}`} />
+                <Icon 
+                  className="h-4 w-4" 
+                  style={{ color: currentTheme.colors.iconColor }}
+                />
               </CardHeader>
               <CardContent>
-                <div className={`text-3xl font-bold ${stat.iconColor}`}>{stat.value}</div>
+                <div 
+                  className="text-3xl font-bold"
+                  style={{ color: currentTheme.colors.primary }}
+                >
+                  {stat.value}
+                </div>
                 <p className="text-xs text-muted-foreground mt-1">{stat.subtitle}</p>
               </CardContent>
             </Card>
@@ -134,7 +164,9 @@ const Index = () => {
 
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="bg-blue-50">
+        <TabsList 
+          style={{ backgroundColor: currentTheme.colors.cardBg }}
+        >
           <TabsTrigger value="hcp" className="data-[state=active]:bg-white">
             <Users className="h-4 w-4 mr-2" />
             Physician Accounts
@@ -157,9 +189,17 @@ const Index = () => {
           {/* HCP Metrics */}
           <div className="grid gap-4 md:grid-cols-3">
             {hcpMetrics.map((metric, index) => (
-              <Card key={index} className={metric.bgColor}>
+              <Card 
+                key={index} 
+                style={{ backgroundColor: currentTheme.colors.cardBg }}
+              >
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-xl font-bold text-primary">{metric.value}</CardTitle>
+                  <CardTitle 
+                    className="text-xl font-bold"
+                    style={{ color: currentTheme.colors.primary }}
+                  >
+                    {metric.value}
+                  </CardTitle>
                   <p className="text-sm text-muted-foreground">{metric.title}</p>
                 </CardHeader>
               </Card>
@@ -241,15 +281,16 @@ const Index = () => {
                           <td className="py-3 px-4 text-sm">{record.mdmId}</td>
                           <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
                           <td className="py-3 px-4">
-                            <Badge
-                              className={
-                                record.status === "Active"
-                                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                                  : "bg-gray-400 text-white hover:bg-gray-500"
-                              }
-                            >
-                              {record.status}
-                            </Badge>
+                             <Badge
+                               style={{
+                                 backgroundColor: record.status === "Active" 
+                                   ? currentTheme.colors.primary 
+                                   : "hsl(0, 0%, 60%)",
+                                 color: "white"
+                               }}
+                             >
+                               {record.status}
+                             </Badge>
                           </td>
                           <td className="py-3 px-4 text-sm">
                             {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
@@ -305,17 +346,18 @@ const Index = () => {
                           <td className="py-3 px-4 text-sm">{record.orgId}</td>
                           <td className="py-3 px-4 text-sm">{record.mdmId}</td>
                           <td className="py-3 px-4 text-sm">NPI-{record.mdmId.slice(-6)}</td>
-                          <td className="py-3 px-4">
-                            <Badge
-                              className={
-                                record.status === "Active"
-                                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                                  : "bg-gray-400 text-white hover:bg-gray-500"
-                              }
-                            >
-                              {record.status}
-                            </Badge>
-                          </td>
+                           <td className="py-3 px-4">
+                             <Badge
+                               style={{
+                                 backgroundColor: record.status === "Active" 
+                                   ? currentTheme.colors.primary 
+                                   : "hsl(0, 0%, 60%)",
+                                 color: "white"
+                               }}
+                             >
+                               {record.status}
+                             </Badge>
+                           </td>
                           <td className="py-3 px-4 text-sm">
                             {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
                           </td>
@@ -371,17 +413,18 @@ const Index = () => {
                         <td className="py-3 px-4 text-sm">{record.state}</td>
                         <td className="py-3 px-4 text-sm">{record.zipCode}</td>
                         <td className="py-3 px-4 text-sm">{record.mdmId}</td>
-                        <td className="py-3 px-4">
-                          <Badge
-                            className={
-                              record.status === "Active"
-                                ? "bg-blue-600 text-white hover:bg-blue-700"
-                                : "bg-gray-400 text-white hover:bg-gray-500"
-                            }
-                          >
-                            {record.status}
-                          </Badge>
-                        </td>
+                         <td className="py-3 px-4">
+                           <Badge
+                             style={{
+                               backgroundColor: record.status === "Active" 
+                                 ? currentTheme.colors.primary 
+                                 : "hsl(0, 0%, 60%)",
+                               color: "white"
+                             }}
+                           >
+                             {record.status}
+                           </Badge>
+                         </td>
                         <td className="py-3 px-4 text-sm">
                           {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
                         </td>
@@ -435,17 +478,18 @@ const Index = () => {
                         <td className="py-3 px-4 text-sm">{record.orgId}</td>
                         <td className="py-3 px-4 text-sm">{record.mdmId}</td>
                         <td className="py-3 px-4 text-sm">Field Visit</td>
-                        <td className="py-3 px-4">
-                          <Badge
-                            className={
-                              record.status === "Active"
-                                ? "bg-blue-600 text-white hover:bg-blue-700"
-                                : "bg-gray-400 text-white hover:bg-gray-500"
-                            }
-                          >
-                            {record.status}
-                          </Badge>
-                        </td>
+                         <td className="py-3 px-4">
+                           <Badge
+                             style={{
+                               backgroundColor: record.status === "Active" 
+                                 ? currentTheme.colors.primary 
+                                 : "hsl(0, 0%, 60%)",
+                               color: "white"
+                             }}
+                           >
+                             {record.status}
+                           </Badge>
+                         </td>
                         <td className="py-3 px-4 text-sm">
                           {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
                         </td>
