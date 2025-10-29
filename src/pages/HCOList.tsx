@@ -260,7 +260,6 @@ const HCOList = () => {
                     />
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Identifiers</th>
@@ -282,9 +281,6 @@ const HCOList = () => {
                       />
                     </td>
                     <td className="py-3 px-4">{record.name}</td>
-                    <td className="py-3 px-4">
-                      <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">Facility Account</Badge>
-                    </td>
                     <td className="py-3 px-4 text-sm">{record.orgId}</td>
                     <td className="py-3 px-4 text-sm">{record.mdmId}</td>
                     <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
