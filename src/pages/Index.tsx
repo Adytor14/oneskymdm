@@ -6,11 +6,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { mockHCPs, mockHCOs, mockAddresses, mockDCRs } from "@/lib/mockData";
-import { Database, Users, Building2, MapPin, FileText, Search, Eye, TrendingUp } from "lucide-react";
+import { Database, Users, Building2, MapPin, FileText, Search, Eye, TrendingUp, ArrowUpRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { getOrganizationTheme } from "@/lib/organizationThemes";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("hcp");
   const [selectedOrganization, setSelectedOrganization] = useState("all");
   
@@ -250,13 +253,13 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          {/* Master Data Records Table */}
+          {/* Physician Accounts Table */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Master Data</CardTitle>
+                <CardTitle className="text-lg">Physician Accounts</CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Showing 2,683 of 2,847 profiles
+                  Showing 13 of 15 profiles
                 </p>
               </div>
             </CardHeader>
@@ -266,50 +269,98 @@ const Index = () => {
                   <thead>
                     <tr className="border-b">
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Identifiers</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">NPI Type</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">City</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">State</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">One ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Speciality</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Sub Speciality</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Assigned Identifiers</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Distinct Patients</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Growth</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Push</th>
                     </tr>
                   </thead>
                   <tbody>
                     {mockHCPs
                       .filter((record) => record.status === "Active")
                       .slice(0, 10)
-                      .map((record, index) => (
-                        <tr
-                          key={index}
-                          className="border-b hover:bg-muted/50 cursor-pointer"
-                          onClick={() => navigate(`/hcp/${record.id}`)}
-                        >
-                          <td className="py-3 px-4">
-                            Dr. {record.firstName} {record.lastName}
-                          </td>
-                          <td className="py-3 px-4 text-sm">{record.orgId}</td>
-                          <td className="py-3 px-4 text-sm">{record.mdmId}</td>
-                          <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
-                          <td className="py-3 px-4">
-                             <Badge
-                               style={{
-                                 backgroundColor: record.status === "Active" 
-                                   ? currentTheme.colors.primary 
-                                   : "hsl(0, 0%, 60%)",
-                                 color: "white"
-                               }}
-                             >
-                               {record.status}
-                             </Badge>
-                          </td>
-                          <td className="py-3 px-4 text-sm">
-                            {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
-                          </td>
-                          <td className="py-3 px-4">
-                            <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
-                          </td>
-                        </tr>
-                      ))}
+                      .map((record, index) => {
+                        // Mock data for new columns
+                        const npiType = "Physician";
+                        const city = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5];
+                        const state = ["NY", "CA", "IL", "TX", "AZ"][index % 5];
+                        const subSpeciality = record.speciality[0] === "Cardiology" ? "Interventional" : "General";
+                        const distinctPatients = Math.floor(Math.random() * 500) + 100;
+                        const growth = `${Math.floor(Math.random() * 20) + 1}%`;
+                        
+                        return (
+                          <tr
+                            key={index}
+                            className="border-b hover:bg-muted/50"
+                          >
+                            <td className="py-3 px-4">
+                              Dr. {record.firstName} {record.lastName}
+                            </td>
+                            <td className="py-3 px-4">
+                              <Badge 
+                                variant="outline" 
+                                className="bg-blue-50 text-blue-700 border-blue-200"
+                              >
+                                {npiType}
+                              </Badge>
+                            </td>
+                            <td className="py-3 px-4 text-sm">{city}</td>
+                            <td className="py-3 px-4 text-sm">{state}</td>
+                            <td className="py-3 px-4 text-sm">{record.mdmId}</td>
+                            <td className="py-3 px-4 text-sm">{record.speciality[0]}</td>
+                            <td className="py-3 px-4 text-sm">{subSpeciality}</td>
+                            <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
+                            <td className="py-3 px-4 text-sm font-medium">{distinctPatients}</td>
+                            <td className="py-3 px-4 text-sm text-green-600 font-medium">{growth}</td>
+                            <td className="py-3 px-4">
+                              <Badge
+                                style={{
+                                  backgroundColor: record.status === "Active" 
+                                    ? currentTheme.colors.primary 
+                                    : "hsl(0, 0%, 60%)",
+                                  color: "white"
+                                }}
+                              >
+                                {record.status}
+                              </Badge>
+                            </td>
+                            <td className="py-3 px-4 text-sm">
+                              {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
+                            </td>
+                            <td className="py-3 px-4">
+                              <Eye 
+                                className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
+                                onClick={() => navigate(`/hcp/${record.id}`)}
+                              />
+                            </td>
+                            <td className="py-3 px-4">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                className="h-8 px-3"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toast({
+                                    title: "Push initiated",
+                                    description: `Pushing data for Dr. ${record.firstName} ${record.lastName}`,
+                                  });
+                                }}
+                              >
+                                <ArrowUpRight className="h-4 w-4" />
+                              </Button>
+                            </td>
+                          </tr>
+                        );
+                      })}
                   </tbody>
                 </table>
               </div>
