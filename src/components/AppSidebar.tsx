@@ -1,5 +1,5 @@
-import { Building2, User, FileText, LayoutDashboard, LogOut, FileEdit, CheckSquare, Layers, GitMerge, ClipboardList, TrendingUp } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Building2, User, FileText, LayoutDashboard, LogOut, FileEdit, CheckSquare, Layers, GitMerge, ClipboardList, TrendingUp, ChevronDown } from "lucide-react";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
@@ -13,8 +13,16 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
   useSidebar,
 } from "@/components/ui/sidebar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const marketAnalysisItems = [
   { title: "Highlights", url: "/", icon: LayoutDashboard },
@@ -26,8 +34,10 @@ const myDataItems = [
   { title: "Facility Accounts", url: "/hco", icon: Building2 },
 ];
 
-const dcrItems = [
-  { title: "Data Change Requests", url: "/change-requests", icon: FileEdit },
+const dcrSubItems = [
+  { title: "Open", url: "/change-requests/open" },
+  { title: "Approved", url: "/change-requests/approved" },
+  { title: "Rejected", url: "/change-requests/rejected" },
 ];
 
 const adminItems = [
@@ -41,7 +51,9 @@ export function AppSidebar() {
   const { open } = useSidebar();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const location = useLocation();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [dcrOpen, setDcrOpen] = useState(true);
 
   useEffect(() => {
     checkAdminStatus();
@@ -138,19 +150,33 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {dcrItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      className={({ isActive }) => (isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "")}
-                    >
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
+              <Collapsible open={dcrOpen} onOpenChange={setDcrOpen} className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton>
+                      <FileEdit className="h-4 w-4" />
+                      <span>Data Change Requests</span>
+                      <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {dcrSubItems.map((item) => (
+                        <SidebarMenuSubItem key={item.title}>
+                          <SidebarMenuSubButton asChild>
+                            <NavLink
+                              to={item.url}
+                              className={({ isActive }) => (isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "")}
+                            >
+                              <span>{item.title}</span>
+                            </NavLink>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
                 </SidebarMenuItem>
-              ))}
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

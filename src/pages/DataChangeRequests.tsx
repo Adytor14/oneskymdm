@@ -1,21 +1,57 @@
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Eye } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, Navigate } from "react-router-dom";
 import { mockDCRs } from "@/lib/mockData";
 
 const DataChangeRequests = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("open");
+  const { status } = useParams<{ status: string }>();
 
-  // Simulate different statuses for the sections
+  // Redirect to open by default if no status
+  if (!status) {
+    return <Navigate to="/change-requests/open" replace />;
+  }
+
+  // Validate status
+  if (!["open", "approved", "rejected"].includes(status)) {
+    return <Navigate to="/change-requests/open" replace />;
+  }
+
+  // Get requests based on status
   const openRequests = mockDCRs.slice(0, 5);
   const approvedRequests = mockDCRs.slice(5, 8);
   const rejectedRequests = mockDCRs.slice(8, 10);
 
-  const renderTable = (requests: typeof mockDCRs, status: string) => (
+  const getRequests = () => {
+    switch (status) {
+      case "open":
+        return openRequests;
+      case "approved":
+        return approvedRequests;
+      case "rejected":
+        return rejectedRequests;
+      default:
+        return openRequests;
+    }
+  };
+
+  const getTitle = () => {
+    switch (status) {
+      case "open":
+        return "Open Requests";
+      case "approved":
+        return "Approved Requests";
+      case "rejected":
+        return "Rejected Requests";
+      default:
+        return "Requests";
+    }
+  };
+
+  const requests = getRequests();
+
+  const renderTable = (requests: typeof mockDCRs, statusType: string) => (
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
@@ -47,14 +83,14 @@ const DataChangeRequests = () => {
               <td className="py-3 px-4">
                 <Badge
                   className={
-                    status === "open"
+                    statusType === "open"
                       ? "bg-yellow-100 text-yellow-700"
-                      : status === "approved"
+                      : statusType === "approved"
                       ? "bg-green-100 text-green-700"
                       : "bg-red-100 text-red-700"
                   }
                 >
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                  {statusType.charAt(0).toUpperCase() + statusType.slice(1)}
                 </Badge>
               </td>
               <td className="py-3 px-4 text-sm">
@@ -76,52 +112,14 @@ const DataChangeRequests = () => {
         <h1 className="text-3xl font-bold">Data Change Requests</h1>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="open">
-            Open ({openRequests.length})
-          </TabsTrigger>
-          <TabsTrigger value="approved">
-            Approved ({approvedRequests.length})
-          </TabsTrigger>
-          <TabsTrigger value="rejected">
-            Rejected ({rejectedRequests.length})
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="open" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Open Requests</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {renderTable(openRequests, "open")}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="approved" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Approved Requests</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {renderTable(approvedRequests, "approved")}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="rejected" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Rejected Requests</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {renderTable(rejectedRequests, "rejected")}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">{getTitle()}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {renderTable(requests, status)}
+        </CardContent>
+      </Card>
     </div>
   );
 };
