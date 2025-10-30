@@ -58,7 +58,7 @@ const Index = () => {
   const hcpMetrics = [
     { title: "Total Physician Accounts", value: "2,847", bgColor: "bg-blue-50" },
     { title: "Distinct Patients", value: "2,683", bgColor: "bg-green-50" },
-    { title: "Growth", value: "164", bgColor: "bg-gray-50" },
+    { title: "Growth", value: "6.1%", bgColor: "bg-gray-50" },
   ];
 
   const masterDataRecords = [
