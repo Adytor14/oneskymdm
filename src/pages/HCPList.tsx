@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { mockHCPs } from "@/lib/mockData";
-import { Search, Eye, Users, TrendingUp, AlertCircle, Clock, Download, FileJson, FileSpreadsheet, FileText } from "lucide-react";
+import { Search, Eye, Users, TrendingUp, AlertCircle, Clock, Download, FileJson, FileSpreadsheet, FileText, ArrowUpRight } from "lucide-react";
 import { exportToExcel, exportToJSON, exportHCPToPDF, prepareHCPForExport } from "@/lib/exportUtils";
 import {
   DropdownMenu,
@@ -265,11 +265,11 @@ const HCPList = () => {
         </CardContent>
       </Card>
 
-      {/* Master Data Records Table */}
+      {/* Physician Accounts Table */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Master Data</CardTitle>
+            <CardTitle className="text-lg">Physician Accounts</CardTitle>
             <div className="flex items-center gap-4">
               <p className="text-sm text-muted-foreground">Showing {filteredData.length} of {mockHCPs.length} records</p>
               <DropdownMenu>
@@ -309,48 +309,90 @@ const HCPList = () => {
                     />
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Identifiers</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">NPI Type</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">City</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">State</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">One ID</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Speciality</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Sub Speciality</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Assigned Identifiers</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Distinct Patients</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Growth</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Push</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredData.map((record, index) => (
-                  <tr 
-                    key={index} 
-                    className="border-b hover:bg-muted/50"
-                  >
-                    <td className="py-3 px-4">
-                      <Checkbox 
-                        checked={selectedRows.includes(record.id)}
-                        onCheckedChange={(checked) => handleSelectRow(record.id, checked as boolean)}
-                      />
-                    </td>
-                    <td className="py-3 px-4">Dr. {record.firstName} {record.lastName}</td>
-                    <td className="py-3 px-4 text-sm">{record.orgId}</td>
-                    <td className="py-3 px-4 text-sm">{record.mdmId}</td>
-                    <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
-                    <td className="py-3 px-4">
-                      <Badge className={
-                        record.status === "Active" 
-                          ? "bg-blue-600 text-white hover:bg-blue-700" 
-                          : "bg-gray-400 text-white hover:bg-gray-500"
-                      }>
-                        {record.status}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
-                    <td className="py-3 px-4">
-                      <Eye 
-                        className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
-                        onClick={() => navigate(`/hcp/${record.id}`)}
-                      />
-                    </td>
-                  </tr>
-                ))}
+                {filteredData.map((record, index) => {
+                  // Mock data for new columns
+                  const npiType = "Physician";
+                  const city = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5];
+                  const state = ["NY", "CA", "IL", "TX", "AZ"][index % 5];
+                  const subSpeciality = record.speciality[0] === "Cardiology" ? "Interventional" : "General";
+                  const distinctPatients = Math.floor(Math.random() * 500) + 100;
+                  const growth = `${Math.floor(Math.random() * 20) + 1}%`;
+                  
+                  return (
+                    <tr 
+                      key={index} 
+                      className="border-b hover:bg-muted/50"
+                    >
+                      <td className="py-3 px-4">
+                        <Checkbox 
+                          checked={selectedRows.includes(record.id)}
+                          onCheckedChange={(checked) => handleSelectRow(record.id, checked as boolean)}
+                        />
+                      </td>
+                      <td className="py-3 px-4">Dr. {record.firstName} {record.lastName}</td>
+                      <td className="py-3 px-4">
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                          {npiType}
+                        </Badge>
+                      </td>
+                      <td className="py-3 px-4 text-sm">{city}</td>
+                      <td className="py-3 px-4 text-sm">{state}</td>
+                      <td className="py-3 px-4 text-sm">{record.mdmId}</td>
+                      <td className="py-3 px-4 text-sm">{record.speciality[0]}</td>
+                      <td className="py-3 px-4 text-sm">{subSpeciality}</td>
+                      <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
+                      <td className="py-3 px-4 text-sm font-medium">{distinctPatients}</td>
+                      <td className="py-3 px-4 text-sm text-green-600 font-medium">{growth}</td>
+                      <td className="py-3 px-4">
+                        <Badge className={
+                          record.status === "Active" 
+                            ? "bg-blue-600 text-white hover:bg-blue-700" 
+                            : "bg-gray-400 text-white hover:bg-gray-500"
+                        }>
+                          {record.status}
+                        </Badge>
+                      </td>
+                      <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
+                      <td className="py-3 px-4">
+                        <Eye 
+                          className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
+                          onClick={() => navigate(`/hcp/${record.id}`)}
+                        />
+                      </td>
+                      <td className="py-3 px-4">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="h-8 px-3"
+                          onClick={() => {
+                            toast({
+                              title: "Push initiated",
+                              description: `Pushing data for Dr. ${record.firstName} ${record.lastName}`,
+                            });
+                          }}
+                        >
+                          <ArrowUpRight className="h-4 w-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
