@@ -94,7 +94,7 @@ const DCRList = () => {
       <div>
         <h1 className="text-3xl font-bold text-foreground">DCR Profiles</h1>
         <p className="text-muted-foreground mt-1">
-          Data collection reports - Manage and view DCR records, visit details, and outcomes
+          Data Change Requests - Manage and view DCR records, visit details, and outcomes
         </p>
       </div>
 
