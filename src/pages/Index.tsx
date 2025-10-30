@@ -19,8 +19,16 @@ const Index = () => {
 
   const topStats = [
     {
+      title: "Total Profiles",
+      value: "7,836",
+      subtitle: "All profile types",
+      icon: Database,
+      bgColor: "bg-blue-50",
+      iconColor: "text-blue-600",
+    },
+    {
       title: "Physician Accounts",
-      value: "2",
+      value: "2,847",
       subtitle: "Healthcare professionals",
       icon: Users,
       bgColor: "bg-blue-50",
@@ -28,16 +36,24 @@ const Index = () => {
     },
     {
       title: "Facility Accounts",
-      value: "4",
+      value: "468",
       subtitle: "Healthcare organizations",
       icon: Building2,
       bgColor: "bg-blue-50",
       iconColor: "text-blue-600",
     },
     {
+      title: "Address Profiles",
+      value: "4,521",
+
+      icon: MapPin,
+      bgColor: "bg-orange-50",
+      iconColor: "text-orange-600",
+    },
+    {
       title: "Data Change Requests",
-      value: "4",
-      subtitle: "Pending requests",
+      value: "342",
+
       icon: FileText,
       bgColor: "bg-green-50",
       iconColor: "text-green-600",
@@ -45,9 +61,9 @@ const Index = () => {
   ];
 
   const hcpMetrics = [
-    { title: "Total Physician Accounts", value: "2", bgColor: "bg-blue-50" },
-    { title: "Distinct Patients", value: "200", bgColor: "bg-green-50" },
-    { title: "Growth", value: "10%", bgColor: "bg-purple-50", icon: TrendingUp },
+    { title: "Total Physician Accounts", value: "2,847", bgColor: "bg-blue-50" },
+    { title: "Active Physicians", value: "2,683", bgColor: "bg-green-50" },
+    { title: "Inactive Physicians", value: "164", bgColor: "bg-gray-50" },
   ];
 
   const masterDataRecords = [
@@ -117,7 +133,7 @@ const Index = () => {
       </div>
 
       {/* Top Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-5">
         {topStats.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -159,33 +175,35 @@ const Index = () => {
             <Building2 className="h-4 w-4 mr-2" />
             Facility Accounts
           </TabsTrigger>
+          <TabsTrigger value="address">
+            <MapPin className="h-4 w-4 mr-2" />
+            Address Profiles
+          </TabsTrigger>
+          <TabsTrigger value="dcr">
+            <FileText className="h-4 w-4 mr-2" />
+            Data Change Requests
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="hcp" className="space-y-4">
           {/* HCP Metrics */}
           <div className="grid gap-4 md:grid-cols-3">
-            {hcpMetrics.map((metric, index) => {
-              const MetricIcon = metric.icon;
-              return (
-                <Card 
-                  key={index} 
-                  style={{ backgroundColor: currentTheme.colors.cardBg }}
-                >
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle 
-                        className="text-xl font-bold"
-                        style={{ color: currentTheme.colors.primary }}
-                      >
-                        {metric.value}
-                      </CardTitle>
-                      {MetricIcon && <MetricIcon className="h-5 w-5 text-muted-foreground" />}
-                    </div>
-                    <p className="text-sm text-muted-foreground">{metric.title}</p>
-                  </CardHeader>
-                </Card>
-              );
-            })}
+            {hcpMetrics.map((metric, index) => (
+              <Card 
+                key={index} 
+                style={{ backgroundColor: currentTheme.colors.cardBg }}
+              >
+                <CardHeader className="pb-2">
+                  <CardTitle 
+                    className="text-xl font-bold"
+                    style={{ color: currentTheme.colors.primary }}
+                  >
+                    {metric.value}
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">{metric.title}</p>
+                </CardHeader>
+              </Card>
+            ))}
           </div>
 
           {/* Filters */}
@@ -193,11 +211,18 @@ const Index = () => {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Database className="h-5 w-5" />
-                Filters for Analyze
+                Filters
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-5">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Search</label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input placeholder="Search by name, ID, or identifier..." className="pl-9" />
+                  </div>
+                </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Status</label>
                   <Select defaultValue="all">
@@ -208,60 +233,6 @@ const Index = () => {
                       <SelectItem value="all">All Status</SelectItem>
                       <SelectItem value="active">Active</SelectItem>
                       <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Countries</label>
-                  <Select defaultValue="all">
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Countries" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Countries</SelectItem>
-                      <SelectItem value="us">United States</SelectItem>
-                      <SelectItem value="uk">United Kingdom</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Type</label>
-                  <Select defaultValue="all">
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Types" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Types</SelectItem>
-                      <SelectItem value="physician">Physician</SelectItem>
-                      <SelectItem value="specialist">Specialist</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Time</label>
-                  <Select defaultValue="q1">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Quarter" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="q1">Q1</SelectItem>
-                      <SelectItem value="q2">Q2</SelectItem>
-                      <SelectItem value="q3">Q3</SelectItem>
-                      <SelectItem value="q4">Q4</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Payer Type</label>
-                  <Select defaultValue="all">
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Payers" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Payers</SelectItem>
-                      <SelectItem value="medicare">Medicare</SelectItem>
-                      <SelectItem value="medicaid">Medicaid</SelectItem>
-                      <SelectItem value="private">Private</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -401,73 +372,139 @@ const Index = () => {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
 
-      {/* Data Change Requests - Separate Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Data Change Requests
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">Showing 4 change requests</p>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Report ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Visit Type</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
-                </tr>
-              </thead>
-              <tbody>
-                {mockDCRs.slice(0, 4).map((record, index) => (
-                  <tr
-                    key={index}
-                    className="border-b hover:bg-muted/50 cursor-pointer"
-                    onClick={() => navigate(`/dcr/${record.id}`)}
-                  >
-                    <td className="py-3 px-4">DCR-{record.mdmId.slice(-6)}</td>
-                    <td className="py-3 px-4">
-                      <Badge className="bg-green-100 text-green-700 hover:bg-green-200">DCR</Badge>
-                    </td>
-                    <td className="py-3 px-4 text-sm">{record.orgId}</td>
-                    <td className="py-3 px-4 text-sm">{record.mdmId}</td>
-                    <td className="py-3 px-4 text-sm">Field Visit</td>
-                    <td className="py-3 px-4">
-                      <Badge
-                        style={{
-                          backgroundColor: record.status === "Active" 
-                            ? currentTheme.colors.primary 
-                            : "hsl(0, 0%, 60%)",
-                          color: "white"
-                        }}
+        <TabsContent value="address" className="space-y-4">
+          {/* Address Data Table */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">Address Master Data</CardTitle>
+                <p className="text-sm text-muted-foreground">Showing 4,521 profiles</p>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Address</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">City</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">State</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">ZIP Code</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mockAddresses.slice(0, 10).map((record, index) => (
+                      <tr
+                        key={index}
+                        className="border-b hover:bg-muted/50 cursor-pointer"
+                        onClick={() => navigate(`/address/${record.id}`)}
                       >
-                        {record.status}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4 text-sm">
-                      {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
-                    </td>
-                    <td className="py-3 px-4">
-                      <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+                        <td className="py-3 px-4">{record.street}</td>
+                        <td className="py-3 px-4">
+                          <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-200">Address</Badge>
+                        </td>
+                        <td className="py-3 px-4 text-sm">{record.city}</td>
+                        <td className="py-3 px-4 text-sm">{record.state}</td>
+                        <td className="py-3 px-4 text-sm">{record.zipCode}</td>
+                        <td className="py-3 px-4 text-sm">{record.mdmId}</td>
+                         <td className="py-3 px-4">
+                           <Badge
+                             style={{
+                               backgroundColor: record.status === "Active" 
+                                 ? currentTheme.colors.primary 
+                                 : "hsl(0, 0%, 60%)",
+                               color: "white"
+                             }}
+                           >
+                             {record.status}
+                           </Badge>
+                         </td>
+                        <td className="py-3 px-4 text-sm">
+                          {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
+                        </td>
+                        <td className="py-3 px-4">
+                          <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="dcr" className="space-y-4">
+          {/* DCR Data Table */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">Data Change Requests Master Data</CardTitle>
+                <p className="text-sm text-muted-foreground">Showing 342 change requests</p>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Report ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Visit Type</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mockDCRs.slice(0, 10).map((record, index) => (
+                      <tr
+                        key={index}
+                        className="border-b hover:bg-muted/50 cursor-pointer"
+                        onClick={() => navigate(`/dcr/${record.id}`)}
+                      >
+                        <td className="py-3 px-4">DCR-{record.mdmId.slice(-6)}</td>
+                        <td className="py-3 px-4">
+                          <Badge className="bg-green-100 text-green-700 hover:bg-green-200">DCR</Badge>
+                        </td>
+                        <td className="py-3 px-4 text-sm">{record.orgId}</td>
+                        <td className="py-3 px-4 text-sm">{record.mdmId}</td>
+                        <td className="py-3 px-4 text-sm">Field Visit</td>
+                         <td className="py-3 px-4">
+                           <Badge
+                             style={{
+                               backgroundColor: record.status === "Active" 
+                                 ? currentTheme.colors.primary 
+                                 : "hsl(0, 0%, 60%)",
+                               color: "white"
+                             }}
+                           >
+                             {record.status}
+                           </Badge>
+                         </td>
+                        <td className="py-3 px-4 text-sm">
+                          {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
+                        </td>
+                        <td className="py-3 px-4">
+                          <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
