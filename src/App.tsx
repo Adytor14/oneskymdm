@@ -17,6 +17,8 @@ import HCOList from "./pages/HCOList";
 import AddressList from "./pages/AddressList";
 import DCRList from "./pages/DCRList";
 import ChangeRequestList from "./pages/ChangeRequestList";
+import DataChangeRequests from "./pages/DataChangeRequests";
+import TopAgencies from "./pages/TopAgencies";
 import AdminApprovalDashboard from "./pages/AdminApprovalDashboard";
 import RulesManagement from "./pages/RulesManagement";
 import MergeMatchApproval from "./pages/MergeMatchApproval";
@@ -87,11 +89,12 @@ const App = () => (
                       <main className="flex-1">
                         <Routes>
                           <Route path="/" element={<Index />} />
+                          <Route path="/top-agencies" element={<TopAgencies />} />
                           <Route path="/hcp" element={<HCPList />} />
                           <Route path="/hco" element={<HCOList />} />
                           <Route path="/address" element={<AddressList />} />
                           <Route path="/dcr" element={<DCRList />} />
-                          <Route path="/change-requests" element={<ChangeRequestList />} />
+                          <Route path="/change-requests" element={<DataChangeRequests />} />
                           <Route path="/admin/approvals" element={<AdminApprovalDashboard />} />
                           <Route path="/rules" element={<RulesManagement />} />
                           <Route path="/merge-match-approval" element={<MergeMatchApproval />} />

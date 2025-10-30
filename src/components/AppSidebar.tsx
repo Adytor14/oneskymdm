@@ -1,4 +1,4 @@
-import { Building2, User, MapPin, FileText, LayoutDashboard, LogOut, FileEdit, CheckSquare, Layers, GitMerge, ClipboardList } from "lucide-react";
+import { Building2, User, FileText, LayoutDashboard, LogOut, FileEdit, CheckSquare, Layers, GitMerge, ClipboardList, TrendingUp } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -16,11 +16,17 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const items = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
+const marketAnalysisItems = [
+  { title: "Highlights", url: "/", icon: LayoutDashboard },
+  { title: "Top Agencies", url: "/top-agencies", icon: TrendingUp },
+];
+
+const myDataItems = [
   { title: "Physician Accounts", url: "/hcp", icon: User },
   { title: "Facility Accounts", url: "/hco", icon: Building2 },
-  { title: "Addresses", url: "/address", icon: MapPin },
+];
+
+const dcrItems = [
   { title: "Data Change Requests", url: "/change-requests", icon: FileEdit },
 ];
 
@@ -87,15 +93,56 @@ export function AppSidebar() {
         </div>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Master Data</SidebarGroupLabel>
+          <SidebarGroupLabel>Market Analysis</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {marketAnalysisItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
                       end={item.url === "/"}
+                      className={({ isActive }) => (isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "")}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>My Data</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {myDataItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={item.url}
+                      className={({ isActive }) => (isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "")}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {dcrItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={item.url}
                       className={({ isActive }) => (isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "")}
                     >
                       <item.icon className="h-4 w-4" />
