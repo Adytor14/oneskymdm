@@ -374,8 +374,9 @@ const Index = () => {
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Identifiers</th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Distinct Patients count</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Growth %</th>
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Addressable count</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
                     </tr>
                   </thead>
@@ -383,36 +384,31 @@ const Index = () => {
                     {mockHCOs
                       .filter((record) => record.status === "Active")
                       .slice(0, 10)
-                      .map((record, index) => (
-                        <tr
-                          key={index}
-                          className="border-b hover:bg-muted/50 cursor-pointer"
-                          onClick={() => navigate(`/hco/${record.id}`)}
-                        >
-                          <td className="py-3 px-4">{record.name}</td>
-                          <td className="py-3 px-4 text-sm">{record.orgId}</td>
-                          <td className="py-3 px-4 text-sm">{record.mdmId}</td>
-                          <td className="py-3 px-4 text-sm">NPI-{record.mdmId.slice(-6)}</td>
-                           <td className="py-3 px-4">
-                             <Badge
-                               style={{
-                                 backgroundColor: record.status === "Active" 
-                                   ? currentTheme.colors.primary 
-                                   : "hsl(0, 0%, 60%)",
-                                 color: "white"
-                               }}
-                             >
-                               {record.status}
-                             </Badge>
-                           </td>
-                          <td className="py-3 px-4 text-sm">
-                            {new Date(record.lastUpdated).toLocaleDateString("en-GB")}
-                          </td>
-                          <td className="py-3 px-4">
-                            <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
-                          </td>
-                        </tr>
-                      ))}
+                      .map((record, index) => {
+                        // Mock data for new columns
+                        const distinctPatients = Math.floor(Math.random() * 2000) + 500;
+                        const growth = Math.floor(Math.random() * 25) + 5;
+                        const addressableCount = Math.floor(Math.random() * 1000) + 200;
+                        
+                        return (
+                          <tr
+                            key={index}
+                            className="border-b hover:bg-muted/50 cursor-pointer"
+                            onClick={() => navigate(`/hco/${record.id}`)}
+                          >
+                            <td className="py-3 px-4">{record.name}</td>
+                            <td className="py-3 px-4 text-sm">{record.orgId}</td>
+                            <td className="py-3 px-4 text-sm">{record.mdmId}</td>
+                            <td className="py-3 px-4 text-sm">NPI-{record.mdmId.slice(-6)}</td>
+                            <td className="py-3 px-4 text-sm font-medium">{distinctPatients}</td>
+                            <td className="py-3 px-4 text-sm text-green-600 font-medium">{growth}%</td>
+                            <td className="py-3 px-4 text-sm font-medium">{addressableCount}</td>
+                            <td className="py-3 px-4">
+                              <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
+                            </td>
+                          </tr>
+                        );
+                      })}
                   </tbody>
                 </table>
               </div>
