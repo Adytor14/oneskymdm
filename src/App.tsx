@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
+import { ServiceLineSwitcher } from "@/components/ServiceLineSwitcher";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
@@ -92,6 +93,7 @@ const App = () => (
                           <SidebarTrigger />
                           <span className="text-xl font-bold">OneSky</span>
                           <div className="flex-1" />
+                          <ServiceLineSwitcher />
                           <RoleSwitcher />
                         </div>
                       </header>
