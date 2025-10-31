@@ -12,6 +12,7 @@ import { Session } from "@supabase/supabase-js";
 
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import ServiceLineSelection from "./pages/ServiceLineSelection";
 import HCPList from "./pages/HCPList";
 import HCOList from "./pages/HCOList";
 import AddressList from "./pages/AddressList";
@@ -70,6 +71,14 @@ const App = () => (
         <Sonner />
         <Routes>
           <Route path="/auth" element={<Auth />} />
+          <Route 
+            path="/select-service-line" 
+            element={
+              <ProtectedRoute>
+                <ServiceLineSelection />
+              </ProtectedRoute>
+            } 
+          />
           <Route
             path="/*"
             element={

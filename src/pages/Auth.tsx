@@ -24,14 +24,14 @@ const Auth = () => {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session) {
-        navigate("/");
+        navigate("/select-service-line");
       }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) {
-        navigate("/");
+        navigate("/select-service-line");
       }
     });
 
@@ -58,7 +58,7 @@ const Auth = () => {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: `${window.location.origin}/select-service-line`,
           },
         });
         if (error) throw error;
@@ -84,7 +84,7 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/select-service-line`,
         },
       });
       if (error) throw error;
