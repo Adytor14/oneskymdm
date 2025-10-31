@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { mockHCPs } from "@/lib/mockData";
-import { Database, Users, Eye, ArrowUpRight } from "lucide-react";
+import { Database, Users, Eye, ArrowUpRight, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const MarketAnalysisHCP = () => {
@@ -54,6 +56,103 @@ const MarketAnalysisHCP = () => {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
+              <label className="text-sm font-medium">Search</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="Search physicians..." className="pl-9" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">State</label>
+              <Select defaultValue="all">
+                <SelectTrigger>
+                  <SelectValue placeholder="All States" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All States</SelectItem>
+                  <SelectItem value="ny">New York</SelectItem>
+                  <SelectItem value="ca">California</SelectItem>
+                  <SelectItem value="il">Illinois</SelectItem>
+                  <SelectItem value="tx">Texas</SelectItem>
+                  <SelectItem value="az">Arizona</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Specialty</label>
+              <Select defaultValue="all">
+                <SelectTrigger>
+                  <SelectValue placeholder="All Specialties" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Specialties</SelectItem>
+                  <SelectItem value="cardiology">Cardiology</SelectItem>
+                  <SelectItem value="orthopedics">Orthopedics</SelectItem>
+                  <SelectItem value="neurology">Neurology</SelectItem>
+                  <SelectItem value="pediatrics">Pediatrics</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Sub Specialty</label>
+              <Select defaultValue="all">
+                <SelectTrigger>
+                  <SelectValue placeholder="All Sub Specialties" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Sub Specialties</SelectItem>
+                  <SelectItem value="interventional">Interventional</SelectItem>
+                  <SelectItem value="general">General</SelectItem>
+                  <SelectItem value="pediatric">Pediatric</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Affiliations</label>
+              <Select defaultValue="all">
+                <SelectTrigger>
+                  <SelectValue placeholder="All Affiliations" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Affiliations</SelectItem>
+                  <SelectItem value="hospital-a">Hospital A</SelectItem>
+                  <SelectItem value="hospital-b">Hospital B</SelectItem>
+                  <SelectItem value="clinic-network">Clinic Network</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Patient Volume</label>
+              <Select defaultValue="all">
+                <SelectTrigger>
+                  <SelectValue placeholder="All Volumes" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Volumes</SelectItem>
+                  <SelectItem value="0-100">0 - 100</SelectItem>
+                  <SelectItem value="100-300">100 - 300</SelectItem>
+                  <SelectItem value="300-500">300 - 500</SelectItem>
+                  <SelectItem value="500+">500+</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Star Rating</label>
+              <Select defaultValue="all">
+                <SelectTrigger>
+                  <SelectValue placeholder="All Ratings" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Ratings</SelectItem>
+                  <SelectItem value="5">5 Stars</SelectItem>
+                  <SelectItem value="4">4 Stars</SelectItem>
+                  <SelectItem value="3">3 Stars</SelectItem>
+                  <SelectItem value="2">2 Stars</SelectItem>
+                  <SelectItem value="1">1 Star</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <label className="text-sm font-medium">Countries</label>
               <Select defaultValue="all">
                 <SelectTrigger>
@@ -98,6 +197,15 @@ const MarketAnalysisHCP = () => {
                   <SelectItem value="private">Private Insurance</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex items-center space-x-2 pt-6">
+              <Checkbox id="deliberate-duplicates" />
+              <Label 
+                htmlFor="deliberate-duplicates" 
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Deliberate Duplicates
+              </Label>
             </div>
           </div>
         </CardContent>
