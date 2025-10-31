@@ -21,6 +21,8 @@ import DCRList from "./pages/DCRList";
 import ChangeRequestList from "./pages/ChangeRequestList";
 import DataChangeRequests from "./pages/DataChangeRequests";
 import TopAgencies from "./pages/TopAgencies";
+import MarketAnalysisHCP from "./pages/MarketAnalysisHCP";
+import MarketAnalysisHCO from "./pages/MarketAnalysisHCO";
 import AdminApprovalDashboard from "./pages/AdminApprovalDashboard";
 import RulesManagement from "./pages/RulesManagement";
 import MergeMatchApproval from "./pages/MergeMatchApproval";
@@ -101,6 +103,8 @@ const App = () => (
                         <Routes>
                           <Route path="/" element={<Index />} />
                           <Route path="/top-agencies" element={<TopAgencies />} />
+                          <Route path="/market-analysis/hcp" element={<MarketAnalysisHCP />} />
+                          <Route path="/market-analysis/hco" element={<MarketAnalysisHCO />} />
                           <Route path="/hcp" element={<HCPList />} />
                           <Route path="/hco" element={<HCOList />} />
                           <Route path="/address" element={<AddressList />} />

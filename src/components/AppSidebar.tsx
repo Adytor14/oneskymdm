@@ -27,6 +27,8 @@ import {
 const marketAnalysisItems = [
   { title: "Highlights", url: "/", icon: LayoutDashboard },
   { title: "Top Agencies", url: "/top-agencies", icon: TrendingUp },
+  { title: "Physician Accounts", url: "/market-analysis/hcp", icon: User },
+  { title: "Facility Accounts", url: "/market-analysis/hco", icon: Building2 },
 ];
 
 const myDataItems = [
