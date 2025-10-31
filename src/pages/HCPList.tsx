@@ -380,7 +380,6 @@ const HCPList = () => {
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Distinct Patients</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Growth</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Addressable Count</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Push</th>
                 </tr>
@@ -418,7 +417,6 @@ const HCPList = () => {
                       <td className="py-3 px-4 text-sm font-medium">{distinctPatients}</td>
                       <td className="py-3 px-4 text-sm text-green-600 font-medium">{growth}</td>
                       <td className="py-3 px-4 text-sm font-medium">{addressableCount}</td>
-                      <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
                       <td className="py-3 px-4">
                         <Eye 
                           className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
