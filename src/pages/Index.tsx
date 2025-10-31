@@ -38,9 +38,9 @@ const Index = () => {
       iconColor: "text-blue-600",
     },
     {
-      title: "Total District Patient Counts",
+      title: "Total Distinct Patient Counts",
       value: "4,521",
-      subtitle: "All districts",
+      subtitle: "All distinct",
       icon: MapPin,
       bgColor: "bg-orange-50",
       iconColor: "text-orange-600",
