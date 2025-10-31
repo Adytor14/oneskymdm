@@ -264,7 +264,7 @@ const HCOList = () => {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Master Data</CardTitle>
+            <CardTitle className="text-lg">Facility Accounts</CardTitle>
             <div className="flex items-center gap-4">
               <p className="text-sm text-muted-foreground">Showing {filteredData.length} of {mockHCOs.length} records</p>
               <DropdownMenu>
