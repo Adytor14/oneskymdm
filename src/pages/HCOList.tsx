@@ -21,14 +21,13 @@ const HCOList = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedFacilityType, setSelectedFacilityType] = useState("all");
   const [selectedCountry, setSelectedCountry] = useState("all");
   const [selectedState, setSelectedState] = useState("all");
   const [selectedZip, setSelectedZip] = useState("");
   const [selectedQuarter, setSelectedQuarter] = useState("all");
   const [selectedPayerType, setSelectedPayerType] = useState("all");
-  const [selectedServiceLine, setSelectedServiceLine] = useState("all");
+  const [selectedStarRating, setSelectedStarRating] = useState("all");
   const [affiliationsSearch, setAffiliationsSearch] = useState("");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
@@ -38,10 +37,7 @@ const HCOList = () => {
       item.mdmId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.orgId.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = selectedStatus === "all" || item.status === selectedStatus;
-    const isActive = item.status === "Active";
-
-    return matchesSearch && matchesStatus && isActive;
+    return matchesSearch;
   });
 
   const activeCount = mockHCOs.filter(hco => hco.status === "Active").length;
@@ -233,28 +229,18 @@ const HCOList = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Service Line</label>
-              <Select value={selectedServiceLine} onValueChange={setSelectedServiceLine}>
+              <label className="text-sm font-medium">Star Rating</label>
+              <Select value={selectedStarRating} onValueChange={setSelectedStarRating}>
                 <SelectTrigger>
-                  <SelectValue placeholder="All Service Lines" />
+                  <SelectValue placeholder="All Ratings" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Service Lines</SelectItem>
-                  <SelectItem value="Home Health">Home Health</SelectItem>
-                  <SelectItem value="Hospice">Hospice</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Status</label>
-              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Inactive">Inactive</SelectItem>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">All Ratings</SelectItem>
+                  <SelectItem value="1">1 Star</SelectItem>
+                  <SelectItem value="2">2 Stars</SelectItem>
+                  <SelectItem value="3">3 Stars</SelectItem>
+                  <SelectItem value="4">4 Stars</SelectItem>
+                  <SelectItem value="5">5 Stars</SelectItem>
                 </SelectContent>
               </Select>
             </div>
