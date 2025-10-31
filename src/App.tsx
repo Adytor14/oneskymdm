@@ -6,13 +6,13 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
-import { ServiceLineSwitcher } from "@/components/ServiceLineSwitcher";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import ServiceLineSelection from "./pages/ServiceLineSelection";
 import HCPList from "./pages/HCPList";
 import HCOList from "./pages/HCOList";
 import AddressList from "./pages/AddressList";
@@ -71,6 +71,14 @@ const App = () => (
         <Sonner />
         <Routes>
           <Route path="/auth" element={<Auth />} />
+          <Route 
+            path="/select-service-line" 
+            element={
+              <ProtectedRoute>
+                <ServiceLineSelection />
+              </ProtectedRoute>
+            } 
+          />
           <Route
             path="/*"
             element={
@@ -84,7 +92,6 @@ const App = () => (
                           <SidebarTrigger />
                           <span className="text-xl font-bold">OneSky</span>
                           <div className="flex-1" />
-                          <ServiceLineSwitcher />
                           <RoleSwitcher />
                         </div>
                       </header>
