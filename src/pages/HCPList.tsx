@@ -23,7 +23,11 @@ const HCPList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
-  const [selectedGeography, setSelectedGeography] = useState("all");
+  const [selectedCountry, setSelectedCountry] = useState("all");
+  const [selectedState, setSelectedState] = useState("all");
+  const [selectedZip, setSelectedZip] = useState("");
+  const [selectedQuarter, setSelectedQuarter] = useState("all");
+  const [selectedPayerType, setSelectedPayerType] = useState("all");
   const [selectedServiceLine, setSelectedServiceLine] = useState("all");
   const [affiliationsSearch, setAffiliationsSearch] = useState("");
   const [selectedPatientVolume, setSelectedPatientVolume] = useState("all");
@@ -147,17 +151,71 @@ const HCPList = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Geography</label>
-              <Select value={selectedGeography} onValueChange={setSelectedGeography}>
+              <label className="text-sm font-medium">Country</label>
+              <Select value={selectedCountry} onValueChange={setSelectedCountry}>
                 <SelectTrigger>
-                  <SelectValue placeholder="All Locations" />
+                  <SelectValue placeholder="All Countries" />
                 </SelectTrigger>
                 <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Locations</SelectItem>
-                  <SelectItem value="North">North</SelectItem>
-                  <SelectItem value="South">South</SelectItem>
-                  <SelectItem value="East">East</SelectItem>
-                  <SelectItem value="West">West</SelectItem>
+                  <SelectItem value="all">All Countries</SelectItem>
+                  <SelectItem value="USA">United States</SelectItem>
+                  <SelectItem value="Canada">Canada</SelectItem>
+                  <SelectItem value="Mexico">Mexico</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">State</label>
+              <Select value={selectedState} onValueChange={setSelectedState}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All States" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">All States</SelectItem>
+                  <SelectItem value="NY">New York</SelectItem>
+                  <SelectItem value="CA">California</SelectItem>
+                  <SelectItem value="TX">Texas</SelectItem>
+                  <SelectItem value="FL">Florida</SelectItem>
+                  <SelectItem value="IL">Illinois</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">ZIP</label>
+              <Input 
+                placeholder="Enter ZIP code..." 
+                value={selectedZip}
+                onChange={(e) => setSelectedZip(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Time (Quarters)</label>
+              <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Quarters" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">All Quarters</SelectItem>
+                  <SelectItem value="Q1-2024">Q1 2024</SelectItem>
+                  <SelectItem value="Q2-2024">Q2 2024</SelectItem>
+                  <SelectItem value="Q3-2024">Q3 2024</SelectItem>
+                  <SelectItem value="Q4-2024">Q4 2024</SelectItem>
+                  <SelectItem value="Q1-2025">Q1 2025</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Payer Type</label>
+              <Select value={selectedPayerType} onValueChange={setSelectedPayerType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Payer Types" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">All Payer Types</SelectItem>
+                  <SelectItem value="Medicare">Medicare</SelectItem>
+                  <SelectItem value="Medicaid">Medicaid</SelectItem>
+                  <SelectItem value="Commercial">Commercial</SelectItem>
+                  <SelectItem value="Self-Pay">Self-Pay</SelectItem>
                 </SelectContent>
               </Select>
             </div>
