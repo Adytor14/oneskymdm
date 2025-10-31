@@ -367,7 +367,7 @@ const HCPList = () => {
                     />
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">NPI Type</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">NPI</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">City</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">State</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">One ID</th>
@@ -385,7 +385,7 @@ const HCPList = () => {
               <tbody>
                 {filteredData.map((record, index) => {
                   // Mock data for new columns
-                  const npiType = "Physician";
+                  const npiId = `12345${6789 + index}0`;
                   const city = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5];
                   const state = ["NY", "CA", "IL", "TX", "AZ"][index % 5];
                   const subSpeciality = record.speciality[0] === "Cardiology" ? "Interventional" : "General";
@@ -404,11 +404,7 @@ const HCPList = () => {
                         />
                       </td>
                       <td className="py-3 px-4">Dr. {record.firstName} {record.lastName}</td>
-                      <td className="py-3 px-4">
-                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                          {npiType}
-                        </Badge>
-                      </td>
+                      <td className="py-3 px-4 text-sm">{npiId}</td>
                       <td className="py-3 px-4 text-sm">{city}</td>
                       <td className="py-3 px-4 text-sm">{state}</td>
                       <td className="py-3 px-4 text-sm">{record.mdmId}</td>
