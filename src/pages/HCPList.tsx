@@ -47,14 +47,17 @@ const HCPList = () => {
     return matchesSearch && matchesStatus && matchesSpecialty && isActive;
   });
 
-  const activeCount = mockHCPs.filter(hcp => hcp.status === "Active").length;
-  const inactiveCount = mockHCPs.filter(hcp => hcp.status === "Inactive").length;
-  const pendingCount = mockHCPs.filter(hcp => hcp.status === "Pending").length;
+  const totalDistinctPatients = mockHCPs.reduce((sum, hcp, index) => {
+    const distinctPatients = Math.floor(Math.random() * 500) + 100;
+    return sum + distinctPatients;
+  }, 0);
+  
+  const averageGrowth = Math.floor(Math.random() * 15) + 5;
 
   const metrics = [
     { title: "Total Physician Accounts", value: mockHCPs.length.toString(), icon: Users, bgColor: "bg-blue-50", iconColor: "text-blue-600" },
-    { title: "Active Physician Accounts", value: activeCount.toString(), icon: TrendingUp, bgColor: "bg-green-50", iconColor: "text-green-600" },
-    { title: "Inactive Physician Accounts", value: inactiveCount.toString(), icon: AlertCircle, bgColor: "bg-gray-50", iconColor: "text-gray-600" },
+    { title: "Distinct Patients", value: totalDistinctPatients.toLocaleString(), icon: TrendingUp, bgColor: "bg-green-50", iconColor: "text-green-600" },
+    { title: "Growth", value: `${averageGrowth}%`, icon: AlertCircle, bgColor: "bg-purple-50", iconColor: "text-purple-600" },
   ];
 
   const handleSelectAll = (checked: boolean) => {
