@@ -376,7 +376,7 @@ const HCPList = () => {
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Assigned Identifiers</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Distinct Patients</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Growth</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Addressable Count</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Push</th>
@@ -391,6 +391,7 @@ const HCPList = () => {
                   const subSpeciality = record.speciality[0] === "Cardiology" ? "Interventional" : "General";
                   const distinctPatients = Math.floor(Math.random() * 500) + 100;
                   const growth = `${Math.floor(Math.random() * 20) + 1}%`;
+                  const addressableCount = Math.floor(Math.random() * 300) + 50;
                   
                   return (
                     <tr 
@@ -413,15 +414,7 @@ const HCPList = () => {
                       <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
                       <td className="py-3 px-4 text-sm font-medium">{distinctPatients}</td>
                       <td className="py-3 px-4 text-sm text-green-600 font-medium">{growth}</td>
-                      <td className="py-3 px-4">
-                        <Badge className={
-                          record.status === "Active" 
-                            ? "bg-blue-600 text-white hover:bg-blue-700" 
-                            : "bg-gray-400 text-white hover:bg-gray-500"
-                        }>
-                          {record.status}
-                        </Badge>
-                      </td>
+                      <td className="py-3 px-4 text-sm font-medium">{addressableCount}</td>
                       <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
                       <td className="py-3 px-4">
                         <Eye 
