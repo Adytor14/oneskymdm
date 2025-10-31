@@ -63,6 +63,20 @@ const MarketAnalysisHCP = () => {
               </div>
             </div>
             <div className="space-y-2">
+              <label className="text-sm font-medium">Countries</label>
+              <Select defaultValue="all">
+                <SelectTrigger>
+                  <SelectValue placeholder="All Countries" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Countries</SelectItem>
+                  <SelectItem value="us">United States</SelectItem>
+                  <SelectItem value="uk">United Kingdom</SelectItem>
+                  <SelectItem value="ca">Canada</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <label className="text-sm font-medium">State</label>
               <Select defaultValue="all">
                 <SelectTrigger>
@@ -75,6 +89,38 @@ const MarketAnalysisHCP = () => {
                   <SelectItem value="il">Illinois</SelectItem>
                   <SelectItem value="tx">Texas</SelectItem>
                   <SelectItem value="az">Arizona</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">ZIP</label>
+              <Input placeholder="Enter ZIP code" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Time (Quarters)</label>
+              <Select defaultValue="q4-2024">
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Quarter" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="q4-2024">Q4 2024</SelectItem>
+                  <SelectItem value="q3-2024">Q3 2024</SelectItem>
+                  <SelectItem value="q2-2024">Q2 2024</SelectItem>
+                  <SelectItem value="q1-2024">Q1 2024</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Payer Type</label>
+              <Select defaultValue="all">
+                <SelectTrigger>
+                  <SelectValue placeholder="All Payers" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Payers</SelectItem>
+                  <SelectItem value="medicare">Medicare</SelectItem>
+                  <SelectItem value="medicaid">Medicaid</SelectItem>
+                  <SelectItem value="private">Private Insurance</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -149,52 +195,6 @@ const MarketAnalysisHCP = () => {
                   <SelectItem value="3">3 Stars</SelectItem>
                   <SelectItem value="2">2 Stars</SelectItem>
                   <SelectItem value="1">1 Star</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Countries</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All Countries" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Countries</SelectItem>
-                  <SelectItem value="us">United States</SelectItem>
-                  <SelectItem value="uk">United Kingdom</SelectItem>
-                  <SelectItem value="ca">Canada</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">ZIP</label>
-              <Input placeholder="Enter ZIP code" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Time (Quarters)</label>
-              <Select defaultValue="q4-2024">
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Quarter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="q4-2024">Q4 2024</SelectItem>
-                  <SelectItem value="q3-2024">Q3 2024</SelectItem>
-                  <SelectItem value="q2-2024">Q2 2024</SelectItem>
-                  <SelectItem value="q1-2024">Q1 2024</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Payer Type</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All Payers" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Payers</SelectItem>
-                  <SelectItem value="medicare">Medicare</SelectItem>
-                  <SelectItem value="medicaid">Medicaid</SelectItem>
-                  <SelectItem value="private">Private Insurance</SelectItem>
                 </SelectContent>
               </Select>
             </div>
