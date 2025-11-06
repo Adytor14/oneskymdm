@@ -65,6 +65,7 @@ const RulesManagement = () => {
   
   const [mergeMatchRules, setMergeMatchRules] = useState<MergeMatchRule[]>([]);
   const [survivorshipRules, setSurvivorshipRules] = useState<SurvivorshipRule[]>([]);
+  const [editedSurvivorshipRules, setEditedSurvivorshipRules] = useState<SurvivorshipRule[]>([]);
   const [editingRule, setEditingRule] = useState<MergeMatchRule | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -132,6 +133,7 @@ const RulesManagement = () => {
 
       if (survError) throw survError;
       setSurvivorshipRules(survData || []);
+      setEditedSurvivorshipRules(survData || []);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -141,6 +143,52 @@ const RulesManagement = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSaveSurvivorshipRules = async () => {
+    setSaving(true);
+    try {
+      // Update each edited rule
+      const updates = editedSurvivorshipRules.map(async (rule) => {
+        const { error } = await supabase
+          .from("survivorship_rules")
+          .update({
+            rule_type: rule.rule_type,
+            rule_value: rule.rule_value,
+          })
+          .eq("id", rule.id);
+        
+        if (error) throw error;
+      });
+
+      await Promise.all(updates);
+
+      toast({
+        title: "Success",
+        description: "Survivorship rules saved successfully",
+      });
+
+      fetchRules();
+      setIsSurvivorshipEditMode(false);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSurvivorshipRuleChange = (
+    idx: number,
+    field: "rule_type" | "rule_value",
+    value: string
+  ) => {
+    const newRules = [...editedSurvivorshipRules];
+    newRules[idx] = { ...newRules[idx], [field]: value };
+    setEditedSurvivorshipRules(newRules);
   };
 
   const handleCreateRule = async () => {
@@ -812,32 +860,24 @@ const RulesManagement = () => {
               <Card>
                 <CardHeader>
                   <div className="flex justify-between items-center">
-                    <CardTitle className="text-xl">Attribute-Level Survivorship</CardTitle>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setIsSurvivorshipEditMode(!isSurvivorshipEditMode)}
-                      >
-                        {isSurvivorshipEditMode ? (
-                          <>
-                            <X className="h-4 w-4 mr-2" />
-                            Cancel
-                          </>
-                        ) : (
-                          <>
-                            <Pencil className="h-4 w-4 mr-2" />
-                            Edit Rules
-                          </>
-                        )}
-                      </Button>
-                      {isSurvivorshipEditMode && (
-                        <Button size="sm" className="bg-primary hover:bg-primary/90">
-                          <Check className="h-4 w-4 mr-2" />
-                          Save Changes
-                        </Button>
+                    <CardTitle className="text-2xl">Attribute Level Survivorship</CardTitle>
+                    <Button
+                      onClick={handleSaveSurvivorshipRules}
+                      disabled={saving}
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      {saving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Database className="h-4 w-4 mr-2" />
+                          Save Rules
+                        </>
                       )}
-                    </div>
+                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -846,48 +886,50 @@ const RulesManagement = () => {
                       <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
                   ) : (
-                    <div className="border rounded-lg overflow-hidden">
-                      <div className="bg-primary text-primary-foreground grid grid-cols-3 p-4 font-semibold">
+                    <div className="border rounded-lg overflow-hidden bg-card">
+                      <div className="grid grid-cols-[2fr,1.5fr,3fr] gap-4 p-4 bg-muted/50 font-semibold border-b">
                         <div>Attribute Name</div>
                         <div>Rule Type</div>
                         <div>Value/Priority</div>
                       </div>
                       <div className="divide-y">
-                        {survivorshipRules.map((rule, idx) => (
+                        {editedSurvivorshipRules.map((rule, idx) => (
                           <div
-                            key={idx}
-                            className="grid grid-cols-3 p-4 items-center hover:bg-muted/50 transition-colors"
+                            key={rule.id}
+                            className="grid grid-cols-[2fr,1.5fr,3fr] gap-4 p-4 items-center hover:bg-muted/30 transition-colors"
                           >
-                            <div className="font-medium">{rule.attribute_name}</div>
+                            <div className="font-medium text-foreground">{rule.attribute_name}</div>
                             <div>
-                              {isSurvivorshipEditMode ? (
-                                <Select defaultValue={rule.rule_type}>
-                                  <SelectTrigger className="w-40">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="status">Status</SelectItem>
-                                    <SelectItem value="priority">Priority</SelectItem>
-                                    <SelectItem value="recency">Recency</SelectItem>
-                                    <SelectItem value="aggregation">Aggregation</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              ) : (
-                                <Badge variant="outline" className="capitalize">
-                                  {rule.rule_type}
-                                </Badge>
-                              )}
+                              <Select
+                                value={rule.rule_type}
+                                onValueChange={(value: any) =>
+                                  handleSurvivorshipRuleChange(idx, "rule_type", value)
+                                }
+                              >
+                                <SelectTrigger className="w-full bg-background">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="bg-background">
+                                  <SelectItem value="status">Status</SelectItem>
+                                  <SelectItem value="priority">Priority</SelectItem>
+                                  <SelectItem value="recency">Recency</SelectItem>
+                                  <SelectItem value="aggregation">Aggregation</SelectItem>
+                                </SelectContent>
+                              </Select>
                             </div>
-                            <div className="text-sm text-muted-foreground">
-                              {isSurvivorshipEditMode ? (
-                                <Input defaultValue={rule.rule_value} />
-                              ) : (
-                                rule.rule_value
-                              )}
+                            <div>
+                              <Input
+                                value={rule.rule_value}
+                                onChange={(e) =>
+                                  handleSurvivorshipRuleChange(idx, "rule_value", e.target.value)
+                                }
+                                className="bg-background text-foreground"
+                                placeholder="Enter value or priority"
+                              />
                             </div>
                           </div>
                         ))}
-                        {survivorshipRules.length === 0 && (
+                        {editedSurvivorshipRules.length === 0 && (
                           <div className="p-8 text-center text-muted-foreground">
                             No survivorship rules configured yet
                           </div>
