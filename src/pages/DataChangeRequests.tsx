@@ -127,7 +127,20 @@ const DataChangeRequests = () => {
             >
               <td className="py-3 px-4">{record.dcr_id || `DCR-${record.id.slice(0, 8)}`}</td>
               <td className="py-3 px-4">
-                <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">
+                <Badge 
+                  className="bg-blue-100 text-blue-700 hover:bg-blue-200 cursor-pointer transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const entityType = record.entity_type.toLowerCase();
+                    if (entityType === 'hcp') {
+                      navigate(`/hcp/${record.entity_id}`);
+                    } else if (entityType === 'hco') {
+                      navigate(`/hco/${record.entity_id}`);
+                    } else if (entityType === 'address') {
+                      navigate(`/address/${record.entity_id}`);
+                    }
+                  }}
+                >
                   {record.entity_type}
                 </Badge>
               </td>
