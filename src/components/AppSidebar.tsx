@@ -1,4 +1,4 @@
-import { Building2, User, FileText, LayoutDashboard, LogOut, FileEdit, CheckSquare, Layers, GitMerge, ClipboardList, TrendingUp, ChevronDown } from "lucide-react";
+import { Building2, User, FileText, LayoutDashboard, LogOut, FileEdit, CheckSquare, Layers, GitMerge, ClipboardList, TrendingUp, ChevronDown, MapPin, Hash, BarChart3 } from "lucide-react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -43,10 +43,16 @@ const dcrSubItems = [
 ];
 
 const adminItems = [
-  { title: "Rules Management", url: "/rules", icon: Layers },
-  { title: "Merge/Match Approval", url: "/merge-match-approval", icon: GitMerge },
-  { title: "Data Change Requests", url: "/data-change-requests", icon: ClipboardList },
-  { title: "Approval Requests", url: "/admin/approvals", icon: CheckSquare },
+  { title: "Overview", url: "/admin/overview", icon: LayoutDashboard },
+  { title: "Rules", url: "/rules", icon: Layers },
+  { title: "DCR", url: "/data-change-requests", icon: FileText },
+];
+
+const mergeMatchItems = [
+  { title: "Physician Accounts", url: "/merge-match-approval?type=hcp", icon: User },
+  { title: "Facility Account", url: "/merge-match-approval?type=hco", icon: Building2 },
+  { title: "Address", url: "/merge-match-approval?type=address", icon: MapPin },
+  { title: "SLN", url: "/merge-match-approval?type=sln", icon: Hash },
 ];
 
 export function AppSidebar() {
@@ -56,6 +62,7 @@ export function AppSidebar() {
   const location = useLocation();
   const [isAdmin, setIsAdmin] = useState(false);
   const [dcrOpen, setDcrOpen] = useState(true);
+  const [mergeMatchOpen, setMergeMatchOpen] = useState(false);
 
   useEffect(() => {
     checkAdminStatus();
@@ -184,28 +191,88 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {isAdmin && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Admin</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {adminItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
+          <>
+            <SidebarGroup>
+              <SidebarGroupLabel>Admin</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {adminItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <NavLink
+                          to={item.url}
+                          className={({ isActive }) =>
+                            isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
+                          }
+                        >
+                          <item.icon className="h-4 w-4" />
+                          <span>{item.title}</span>
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            <SidebarGroup>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <Collapsible open={mergeMatchOpen} onOpenChange={setMergeMatchOpen} className="group/collapsible">
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton>
+                          <GitMerge className="h-4 w-4" />
+                          <span>Merge/Match</span>
+                          <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {mergeMatchItems.map((item) => (
+                            <SidebarMenuSubItem key={item.title}>
+                              <SidebarMenuSubButton asChild>
+                                <NavLink
+                                  to={item.url}
+                                  className={({ isActive }) =>
+                                    isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
+                                  }
+                                >
+                                  <item.icon className="h-4 w-4" />
+                                  <span>{item.title}</span>
+                                </NavLink>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            <SidebarGroup>
+              <SidebarGroupLabel>Analytics</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                       <NavLink
-                        to={item.url}
+                        to="/admin/analytics"
                         className={({ isActive }) =>
                           isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
                         }
                       >
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
+                        <BarChart3 className="h-4 w-4" />
+                        <span>Analytics</span>
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </>
         )}
       </SidebarContent>
       <SidebarFooter>
