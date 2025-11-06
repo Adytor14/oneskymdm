@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { z } from "zod";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -54,14 +55,38 @@ interface SurvivorshipRule {
   created_at: string;
 }
 
+// Validation schema for survivorship rules
+const survivorshipRuleSchema = z.object({
+  attribute_name: z.string()
+    .trim()
+    .min(1, { message: "Attribute name is required" })
+    .max(100, { message: "Attribute name must be less than 100 characters" }),
+  rule_type: z.enum(["status", "priority", "recency", "aggregation"], {
+    errorMap: () => ({ message: "Please select a valid rule type" }),
+  }),
+  rule_value: z.string()
+    .trim()
+    .min(1, { message: "Value/Priority is required" })
+    .max(500, { message: "Value/Priority must be less than 500 characters" }),
+});
+
 const RulesManagement = () => {
   const [activeRuleTab, setActiveRuleTab] = useState("merge-match");
   const [activeEntityTab, setActiveEntityTab] = useState("hcp");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isSurvivorshipEditMode, setIsSurvivorshipEditMode] = useState(false);
+  const [isCreateSurvivorshipDialogOpen, setIsCreateSurvivorshipDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [ruleToDelete, setRuleToDelete] = useState<string | null>(null);
+  
+  // New survivorship rule form state
+  const [newSurvivorshipRule, setNewSurvivorshipRule] = useState({
+    attribute_name: "",
+    rule_type: "priority" as "status" | "priority" | "recency" | "aggregation",
+    rule_value: "",
+  });
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   
   const [mergeMatchRules, setMergeMatchRules] = useState<MergeMatchRule[]>([]);
   const [survivorshipRules, setSurvivorshipRules] = useState<SurvivorshipRule[]>([]);
@@ -189,6 +214,67 @@ const RulesManagement = () => {
     const newRules = [...editedSurvivorshipRules];
     newRules[idx] = { ...newRules[idx], [field]: value };
     setEditedSurvivorshipRules(newRules);
+  };
+
+  const handleCreateSurvivorshipRule = async () => {
+    // Clear previous validation errors
+    setValidationErrors({});
+
+    // Validate input
+    try {
+      survivorshipRuleSchema.parse(newSurvivorshipRule);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            errors[err.path[0] as string] = err.message;
+          }
+        });
+        setValidationErrors(errors);
+        return;
+      }
+    }
+
+    setSaving(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const entityType = activeEntityTab === "hcp" ? "HCP" : "HCO";
+
+      const { error } = await supabase
+        .from("survivorship_rules")
+        .insert({
+          entity_type: entityType,
+          attribute_name: newSurvivorshipRule.attribute_name.trim(),
+          rule_type: newSurvivorshipRule.rule_type,
+          rule_value: newSurvivorshipRule.rule_value.trim(),
+          created_by: userData.user?.id,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Survivorship rule created successfully",
+      });
+
+      // Reset form
+      setNewSurvivorshipRule({
+        attribute_name: "",
+        rule_type: "priority",
+        rule_value: "",
+      });
+      setIsCreateSurvivorshipDialogOpen(false);
+      fetchRules();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCreateRule = async () => {
@@ -861,23 +947,159 @@ const RulesManagement = () => {
                 <CardHeader>
                   <div className="flex justify-between items-center">
                     <CardTitle className="text-2xl">Attribute Level Survivorship</CardTitle>
-                    <Button
-                      onClick={handleSaveSurvivorshipRules}
-                      disabled={saving}
-                      className="bg-primary hover:bg-primary/90"
-                    >
-                      {saving ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Database className="h-4 w-4 mr-2" />
-                          Save Rules
-                        </>
-                      )}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Dialog
+                        open={isCreateSurvivorshipDialogOpen}
+                        onOpenChange={setIsCreateSurvivorshipDialogOpen}
+                      >
+                        <DialogTrigger asChild>
+                          <Button variant="outline" className="border-primary text-primary hover:bg-primary/10">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Rule
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle className="text-2xl flex items-center gap-2">
+                              <Database className="h-6 w-6 text-primary" />
+                              Create Survivorship Rule
+                            </DialogTitle>
+                          </DialogHeader>
+
+                          <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="attribute-name" className="text-sm font-semibold">
+                                Attribute Name *
+                              </Label>
+                              <Input
+                                id="attribute-name"
+                                placeholder="e.g., PDRP, First Name, Email"
+                                value={newSurvivorshipRule.attribute_name}
+                                onChange={(e) => {
+                                  setNewSurvivorshipRule({
+                                    ...newSurvivorshipRule,
+                                    attribute_name: e.target.value,
+                                  });
+                                  setValidationErrors({ ...validationErrors, attribute_name: "" });
+                                }}
+                                className={cn(validationErrors.attribute_name && "border-destructive")}
+                                maxLength={100}
+                              />
+                              {validationErrors.attribute_name && (
+                                <p className="text-sm text-destructive">{validationErrors.attribute_name}</p>
+                              )}
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label htmlFor="rule-type" className="text-sm font-semibold">
+                                Rule Type *
+                              </Label>
+                              <Select
+                                value={newSurvivorshipRule.rule_type}
+                                onValueChange={(value: any) => {
+                                  setNewSurvivorshipRule({
+                                    ...newSurvivorshipRule,
+                                    rule_type: value,
+                                  });
+                                  setValidationErrors({ ...validationErrors, rule_type: "" });
+                                }}
+                              >
+                                <SelectTrigger
+                                  id="rule-type"
+                                  className={cn(validationErrors.rule_type && "border-destructive")}
+                                >
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="bg-background">
+                                  <SelectItem value="status">Status</SelectItem>
+                                  <SelectItem value="priority">Priority</SelectItem>
+                                  <SelectItem value="recency">Recency</SelectItem>
+                                  <SelectItem value="aggregation">Aggregation</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              {validationErrors.rule_type && (
+                                <p className="text-sm text-destructive">{validationErrors.rule_type}</p>
+                              )}
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label htmlFor="rule-value" className="text-sm font-semibold">
+                                Value/Priority *
+                              </Label>
+                              <Input
+                                id="rule-value"
+                                placeholder="e.g., Yes, DCR, VEEVA Open Data (VOD)"
+                                value={newSurvivorshipRule.rule_value}
+                                onChange={(e) => {
+                                  setNewSurvivorshipRule({
+                                    ...newSurvivorshipRule,
+                                    rule_value: e.target.value,
+                                  });
+                                  setValidationErrors({ ...validationErrors, rule_value: "" });
+                                }}
+                                className={cn(validationErrors.rule_value && "border-destructive")}
+                                maxLength={500}
+                              />
+                              {validationErrors.rule_value && (
+                                <p className="text-sm text-destructive">{validationErrors.rule_value}</p>
+                              )}
+                            </div>
+                          </div>
+
+                          <DialogFooter>
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setIsCreateSurvivorshipDialogOpen(false);
+                                setNewSurvivorshipRule({
+                                  attribute_name: "",
+                                  rule_type: "priority",
+                                  rule_value: "",
+                                });
+                                setValidationErrors({});
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              onClick={handleCreateSurvivorshipRule}
+                              disabled={saving}
+                              className="bg-primary hover:bg-primary/90"
+                            >
+                              {saving ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  Creating...
+                                </>
+                              ) : (
+                                <>
+                                  <Check className="mr-2 h-4 w-4" />
+                                  Create Rule
+                                </>
+                              )}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+
+                      <Button
+                        onClick={handleSaveSurvivorshipRules}
+                        disabled={saving}
+                        className="bg-primary hover:bg-primary/90"
+                      >
+                        {saving ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Database className="h-4 w-4 mr-2" />
+                            Save Rules
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
