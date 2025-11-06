@@ -1,125 +1,492 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Plus } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Pencil, Plus, Trash2, Check, X, Settings, Database, GitMerge, Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+interface RuleAttribute {
+  id?: string;
+  attribute_name: string;
+  match_category: "exact" | "fuzzy";
+  weightage: number | null;
+}
+
+interface MergeMatchRule {
+  id: string;
+  rule_name: string;
+  entity_type: "HCP" | "HCO" | "Address" | "SLN";
+  match_type: "automatic" | "suspect" | "negative";
+  threshold_min: number | null;
+  threshold_max: number | null;
+  is_active: boolean;
+  created_at: string;
+  created_by: string | null;
+  attributes: RuleAttribute[];
+}
+
+interface SurvivorshipRule {
+  id: string;
+  entity_type: "HCP" | "HCO" | "Address" | "SLN";
+  attribute_name: string;
+  rule_type: "status" | "priority" | "recency" | "aggregation";
+  rule_value: string;
+  created_at: string;
+}
 
 const RulesManagement = () => {
   const [activeRuleTab, setActiveRuleTab] = useState("merge-match");
   const [activeEntityTab, setActiveEntityTab] = useState("hcp");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isSurvivorshipEditMode, setIsSurvivorshipEditMode] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [ruleToDelete, setRuleToDelete] = useState<string | null>(null);
+  
+  const [mergeMatchRules, setMergeMatchRules] = useState<MergeMatchRule[]>([]);
+  const [survivorshipRules, setSurvivorshipRules] = useState<SurvivorshipRule[]>([]);
+  const [editingRule, setEditingRule] = useState<MergeMatchRule | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  
+  const { toast } = useToast();
 
-  const mockRules = {
-    automatic: [
-      {
-        name: "Rule 1",
-        attributes: [
-          { name: "NPI", exact: true, fuzzy: false },
-          { name: "First Name", exact: true, fuzzy: false },
-          { name: "Last Name", exact: true, fuzzy: false },
-          { name: "ZIP", exact: true, fuzzy: false },
-        ],
-        createdDate: "20-10-2025",
-        createdBy: "Ujjwal Sirothia",
-      },
-      {
-        name: "Rule 2",
-        attributes: [
-          { name: "NPI", exact: true, fuzzy: false },
-          { name: "First Name", exact: true, fuzzy: false },
-          { name: "Last Name", exact: true, fuzzy: false },
-          { name: "ZIP", exact: true, fuzzy: false },
-        ],
-        createdDate: "21-10-2025",
-        createdBy: "Ujjwal Sirothia",
-      },
+  // Form state for creating/editing rules
+  const [formData, setFormData] = useState({
+    rule_name: "",
+    match_type: "automatic" as "automatic" | "suspect" | "negative",
+    threshold_min: 90,
+    threshold_max: 100,
+    is_active: true,
+    attributes: [
+      { attribute_name: "NPI", match_category: "exact" as "exact" | "fuzzy", weightage: null },
+      { attribute_name: "First Name", match_category: "fuzzy" as "exact" | "fuzzy", weightage: 25 },
+      { attribute_name: "Last Name", match_category: "fuzzy" as "exact" | "fuzzy", weightage: 25 },
+      { attribute_name: "ZIP", match_category: "exact" as "exact" | "fuzzy", weightage: null },
+      { attribute_name: "Address", match_category: "fuzzy" as "exact" | "fuzzy", weightage: 50 },
     ],
-    suspect: [
-      {
-        name: "Rule 1",
-        attributes: [
-          { name: "NPI", exact: true, fuzzy: false },
-          { name: "First Name", exact: true, fuzzy: false },
-          { name: "Last Name", exact: true, fuzzy: false },
-          { name: "ZIP", exact: true, fuzzy: false },
-        ],
-        createdDate: "22-10-2025",
-        createdBy: "Ujjwal Sirothia",
-      },
-    ],
-    negative: [
-      {
-        name: "Rule 1",
-        attributes: [
-          { name: "NPI", exact: true, fuzzy: false },
-          { name: "First Name", exact: true, fuzzy: false },
-          { name: "Last Name", exact: true, fuzzy: false },
-          { name: "ZIP", exact: true, fuzzy: false },
-        ],
-        createdDate: "22-10-2025",
-        createdBy: "Ujjwal Sirothia",
-      },
-    ],
+  });
+
+  useEffect(() => {
+    fetchRules();
+  }, [activeEntityTab]);
+
+  const fetchRules = async () => {
+    setLoading(true);
+    try {
+      // Convert entity tab to uppercase for database query
+      const entityType = activeEntityTab === "hcp" ? "HCP" : "HCO";
+      
+      // Fetch merge/match rules
+      const { data: rulesData, error: rulesError } = await supabase
+        .from("merge_match_rules")
+        .select("*")
+        .eq("entity_type", entityType)
+        .order("created_at", { ascending: false });
+
+      if (rulesError) throw rulesError;
+
+      // Fetch attributes for each rule
+      const rulesWithAttributes = await Promise.all(
+        (rulesData || []).map(async (rule) => {
+          const { data: attrsData } = await supabase
+            .from("rule_attributes")
+            .select("*")
+            .eq("rule_id", rule.id);
+
+          return {
+            ...rule,
+            attributes: attrsData || [],
+          };
+        })
+      );
+
+      setMergeMatchRules(rulesWithAttributes);
+
+      // Fetch survivorship rules
+      const { data: survData, error: survError } = await supabase
+        .from("survivorship_rules")
+        .select("*")
+        .eq("entity_type", entityType)
+        .order("attribute_name");
+
+      if (survError) throw survError;
+      setSurvivorshipRules(survData || []);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const RuleCard = ({ rule }: any) => (
-    <Card className="relative">
-      <Button variant="ghost" size="icon" className="absolute top-2 right-2">
-        <Pencil className="h-4 w-4" />
-      </Button>
-      <CardHeader>
-        <CardTitle className="text-base">{rule.name}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        {rule.attributes.map((attr: any, idx: number) => (
-          <div key={idx} className="flex justify-between text-sm">
-            <span className="text-muted-foreground">{attr.name}</span>
-            <div className="flex gap-2">
-              <Badge variant={attr.exact ? "default" : "outline"} className="text-xs">
-                Exact
-              </Badge>
-              <Badge variant={attr.fuzzy ? "default" : "outline"} className="text-xs">
-                Fuzzy
-              </Badge>
-            </div>
+  const handleCreateRule = async () => {
+    setSaving(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const entityType = activeEntityTab === "hcp" ? "HCP" : "HCO";
+      
+      const { data: ruleData, error: ruleError } = await supabase
+        .from("merge_match_rules")
+        .insert({
+          rule_name: formData.rule_name,
+          entity_type: entityType,
+          match_type: formData.match_type,
+          threshold_min: formData.threshold_min,
+          threshold_max: formData.threshold_max,
+          is_active: formData.is_active,
+          created_by: userData.user?.id,
+        })
+        .select()
+        .single();
+
+      if (ruleError) throw ruleError;
+
+      // Insert attributes
+      const attributesToInsert = formData.attributes.map((attr) => ({
+        rule_id: ruleData.id,
+        attribute_name: attr.attribute_name,
+        match_category: attr.match_category,
+        weightage: attr.weightage,
+      }));
+
+      const { error: attrsError } = await supabase
+        .from("rule_attributes")
+        .insert(attributesToInsert);
+
+      if (attrsError) throw attrsError;
+
+      toast({
+        title: "Success",
+        description: "Rule created successfully",
+      });
+
+      setIsCreateDialogOpen(false);
+      resetForm();
+      fetchRules();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleUpdateRule = async () => {
+    if (!editingRule) return;
+    
+    setSaving(true);
+    try {
+      const { error: ruleError } = await supabase
+        .from("merge_match_rules")
+        .update({
+          rule_name: formData.rule_name,
+          match_type: formData.match_type,
+          threshold_min: formData.threshold_min,
+          threshold_max: formData.threshold_max,
+          is_active: formData.is_active,
+        })
+        .eq("id", editingRule.id);
+
+      if (ruleError) throw ruleError;
+
+      // Delete old attributes
+      await supabase.from("rule_attributes").delete().eq("rule_id", editingRule.id);
+
+      // Insert new attributes
+      const attributesToInsert = formData.attributes.map((attr) => ({
+        rule_id: editingRule.id,
+        attribute_name: attr.attribute_name,
+        match_category: attr.match_category,
+        weightage: attr.weightage,
+      }));
+
+      const { error: attrsError } = await supabase
+        .from("rule_attributes")
+        .insert(attributesToInsert);
+
+      if (attrsError) throw attrsError;
+
+      toast({
+        title: "Success",
+        description: "Rule updated successfully",
+      });
+
+      setIsEditDialogOpen(false);
+      setEditingRule(null);
+      resetForm();
+      fetchRules();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteRule = async () => {
+    if (!ruleToDelete) return;
+
+    setSaving(true);
+    try {
+      // Delete attributes first (foreign key constraint)
+      await supabase.from("rule_attributes").delete().eq("rule_id", ruleToDelete);
+
+      // Delete rule
+      const { error } = await supabase
+        .from("merge_match_rules")
+        .delete()
+        .eq("id", ruleToDelete);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Rule deleted successfully",
+      });
+
+      setDeleteDialogOpen(false);
+      setRuleToDelete(null);
+      fetchRules();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleToggleRuleStatus = async (ruleId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("merge_match_rules")
+        .update({ is_active: !currentStatus })
+        .eq("id", ruleId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Rule ${!currentStatus ? "activated" : "deactivated"}`,
+      });
+
+      fetchRules();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      rule_name: "",
+      match_type: "automatic",
+      threshold_min: 90,
+      threshold_max: 100,
+      is_active: true,
+      attributes: [
+        { attribute_name: "NPI", match_category: "exact", weightage: null },
+        { attribute_name: "First Name", match_category: "fuzzy", weightage: 25 },
+        { attribute_name: "Last Name", match_category: "fuzzy", weightage: 25 },
+        { attribute_name: "ZIP", match_category: "exact", weightage: null },
+        { attribute_name: "Address", match_category: "fuzzy", weightage: 50 },
+      ],
+    });
+  };
+
+  const openEditDialog = (rule: MergeMatchRule) => {
+    setEditingRule(rule);
+    setFormData({
+      rule_name: rule.rule_name,
+      match_type: rule.match_type,
+      threshold_min: rule.threshold_min || 90,
+      threshold_max: rule.threshold_max || 100,
+      is_active: rule.is_active,
+      attributes: rule.attributes.map((attr) => ({
+        attribute_name: attr.attribute_name,
+        match_category: attr.match_category,
+        weightage: attr.weightage,
+      })),
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const RuleCard = ({ rule }: { rule: MergeMatchRule }) => (
+    <Card className={cn(
+      "group relative overflow-hidden transition-all duration-300 hover:shadow-lg border-2",
+      rule.is_active ? "border-primary/20" : "border-muted opacity-60"
+    )}>
+      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full" />
+      
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              {rule.rule_name}
+              {rule.is_active && (
+                <Badge variant="default" className="text-xs bg-green-500">
+                  Active
+                </Badge>
+              )}
+            </CardTitle>
+            <Badge variant="secondary" className="text-xs">
+              {rule.match_type.toUpperCase()}
+            </Badge>
           </div>
-        ))}
-        <div className="pt-2 text-xs text-muted-foreground border-t mt-4">
-          <p>Created on {rule.createdDate}, Created by {rule.createdBy}</p>
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => openEditDialog(rule)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive"
+              onClick={() => {
+                setRuleToDelete(rule.id);
+                setDeleteDialogOpen(true);
+              }}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-3">
+        <div className="space-y-2">
+          {rule.attributes.slice(0, 4).map((attr, idx) => (
+            <div
+              key={idx}
+              className="flex items-center justify-between p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+            >
+              <span className="text-sm font-medium">{attr.attribute_name}</span>
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant={attr.match_category === "exact" ? "default" : "outline"}
+                  className="text-xs"
+                >
+                  {attr.match_category === "exact" ? "Exact" : `Fuzzy ${attr.weightage}%`}
+                </Badge>
+              </div>
+            </div>
+          ))}
+          {rule.attributes.length > 4 && (
+            <p className="text-xs text-muted-foreground text-center">
+              +{rule.attributes.length - 4} more attributes
+            </p>
+          )}
+        </div>
+
+        {(rule.threshold_min !== null || rule.threshold_max !== null) && (
+          <div className="pt-2 border-t">
+            <p className="text-xs text-muted-foreground">
+              Threshold: {rule.threshold_min}% - {rule.threshold_max}%
+            </p>
+          </div>
+        )}
+
+        <div className="pt-2 border-t flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">
+            {new Date(rule.created_at).toLocaleDateString()}
+          </p>
+          <Switch
+            checked={rule.is_active}
+            onCheckedChange={() => handleToggleRuleStatus(rule.id, rule.is_active)}
+            className="scale-75"
+          />
         </div>
       </CardContent>
     </Card>
   );
 
-  const CreateRuleDialog = () => (
-    <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-primary hover:bg-primary/90">
-          <Plus className="h-4 w-4 mr-2" />
-          Create a New Rule
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+  const RuleDialog = ({ isEdit = false }: { isEdit?: boolean }) => (
+    <Dialog
+      open={isEdit ? isEditDialogOpen : isCreateDialogOpen}
+      onOpenChange={isEdit ? setIsEditDialogOpen : setIsCreateDialogOpen}
+    >
+      {!isEdit && (
+        <DialogTrigger asChild>
+          <Button className="bg-primary hover:bg-primary/90 shadow-md">
+            <Plus className="h-4 w-4 mr-2" />
+            Create New Rule
+          </Button>
+        </DialogTrigger>
+      )}
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Merge/Match Rule</DialogTitle>
+          <DialogTitle className="text-2xl flex items-center gap-2">
+            <Database className="h-6 w-6 text-primary" />
+            {isEdit ? "Edit" : "Create"} Merge/Match Rule
+          </DialogTitle>
         </DialogHeader>
-        <div className="space-y-6">
+
+        <div className="space-y-6 py-4">
+          {/* Rule Name */}
           <div className="space-y-2">
-            <Label>Rule Name</Label>
-            <Input placeholder="New HCP Merge/Match Rules" />
+            <Label htmlFor="rule-name" className="text-sm font-semibold">
+              Rule Name *
+            </Label>
+            <Input
+              id="rule-name"
+              placeholder="e.g., Primary HCP Matching Rule"
+              value={formData.rule_name}
+              onChange={(e) => setFormData({ ...formData, rule_name: e.target.value })}
+              className="text-base"
+            />
           </div>
+
+          {/* Match Type & Status */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Type of Match</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select" />
+              <Label htmlFor="match-type" className="text-sm font-semibold">
+                Match Type *
+              </Label>
+              <Select
+                value={formData.match_type}
+                onValueChange={(value: any) => setFormData({ ...formData, match_type: value })}
+              >
+                <SelectTrigger id="match-type">
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="automatic">Automatic</SelectItem>
@@ -128,249 +495,444 @@ const RulesManagement = () => {
                 </SelectContent>
               </Select>
             </div>
+
             <div className="space-y-2">
-              <Label>Attribute</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="npi">NPI</SelectItem>
-                  <SelectItem value="firstname">First Name</SelectItem>
-                  <SelectItem value="lastname">Last Name</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="border rounded-lg overflow-hidden">
-            <div className="bg-primary text-primary-foreground grid grid-cols-3 p-3 font-medium">
-              <div>Attributes</div>
-              <div>Category</div>
-              <div>Weightage</div>
-            </div>
-            {["NPI", "First Name", "Last Name", "ZIP", "Address"].map((attr, idx) => (
-              <div key={idx} className="grid grid-cols-3 p-3 border-t items-center">
-                <div className="text-muted-foreground">{attr}</div>
-                <div>
-                  <RadioGroup defaultValue={idx === 0 || idx === 3 ? "exact" : "fuzzy"} className="flex gap-4">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="exact" id={`exact-${idx}`} />
-                      <Label htmlFor={`exact-${idx}`}>Exact</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="fuzzy" id={`fuzzy-${idx}`} />
-                      <Label htmlFor={`fuzzy-${idx}`}>Fuzzy</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                <div>
-                  {attr === "NPI" || attr === "ZIP" ? (
-                    <span className="text-muted-foreground">NA</span>
-                  ) : (
-                    <Input type="number" defaultValue={attr === "Address" ? "50" : "25"} className="w-24" />
-                  )}
-                </div>
+              <Label className="text-sm font-semibold">Rule Status</Label>
+              <div className="flex items-center h-10 px-3 border rounded-md">
+                <Switch
+                  checked={formData.is_active}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                />
+                <span className="ml-2 text-sm">
+                  {formData.is_active ? "Active" : "Inactive"}
+                </span>
               </div>
-            ))}
+            </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <Label>Threshold (Fuzzy Match)</Label>
-            <Input type="number" defaultValue="90" className="w-24" />
-            <span>—</span>
-            <Input type="number" defaultValue="100" className="w-24" />
-          </div>
+          <Separator />
 
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-              Cancel
+          {/* Attributes Table */}
+          <div className="space-y-3">
+            <Label className="text-sm font-semibold flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Matching Attributes
+            </Label>
+            
+            <div className="border rounded-lg overflow-hidden">
+              <div className="bg-primary text-primary-foreground grid grid-cols-[2fr,2fr,1fr] gap-4 p-4 font-semibold text-sm">
+                <div>Attribute</div>
+                <div>Match Category</div>
+                <div className="text-center">Weight (%)</div>
+              </div>
+              
+              <div className="divide-y">
+                {formData.attributes.map((attr, idx) => (
+                  <div key={idx} className="grid grid-cols-[2fr,2fr,1fr] gap-4 p-4 items-center hover:bg-muted/50 transition-colors">
+                    <Input
+                      value={attr.attribute_name}
+                      onChange={(e) => {
+                        const newAttrs = [...formData.attributes];
+                        newAttrs[idx].attribute_name = e.target.value;
+                        setFormData({ ...formData, attributes: newAttrs });
+                      }}
+                      placeholder="Attribute name"
+                    />
+                    
+                    <RadioGroup
+                      value={attr.match_category}
+                      onValueChange={(value: any) => {
+                        const newAttrs = [...formData.attributes];
+                        newAttrs[idx].match_category = value;
+                        setFormData({ ...formData, attributes: newAttrs });
+                      }}
+                      className="flex gap-6"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="exact" id={`exact-${idx}`} />
+                        <Label htmlFor={`exact-${idx}`} className="font-normal cursor-pointer">
+                          Exact
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="fuzzy" id={`fuzzy-${idx}`} />
+                        <Label htmlFor={`fuzzy-${idx}`} className="font-normal cursor-pointer">
+                          Fuzzy
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                    
+                    <Input
+                      type="number"
+                      value={attr.weightage || ""}
+                      onChange={(e) => {
+                        const newAttrs = [...formData.attributes];
+                        newAttrs[idx].weightage = e.target.value ? parseInt(e.target.value) : null;
+                        setFormData({ ...formData, attributes: newAttrs });
+                      }}
+                      placeholder="N/A"
+                      disabled={attr.match_category === "exact"}
+                      className="text-center"
+                      min="0"
+                      max="100"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setFormData({
+                  ...formData,
+                  attributes: [
+                    ...formData.attributes,
+                    { attribute_name: "", match_category: "exact", weightage: null },
+                  ],
+                });
+              }}
+              className="w-full"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Attribute
             </Button>
-            <Button className="bg-primary hover:bg-primary/90">Submit</Button>
+          </div>
+
+          <Separator />
+
+          {/* Threshold */}
+          <div className="space-y-2">
+            <Label className="text-sm font-semibold">Fuzzy Match Threshold (%)</Label>
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <Input
+                  type="number"
+                  value={formData.threshold_min}
+                  onChange={(e) =>
+                    setFormData({ ...formData, threshold_min: parseInt(e.target.value) })
+                  }
+                  min="0"
+                  max="100"
+                  placeholder="Min"
+                />
+              </div>
+              <span className="text-muted-foreground">to</span>
+              <div className="flex-1">
+                <Input
+                  type="number"
+                  value={formData.threshold_max}
+                  onChange={(e) =>
+                    setFormData({ ...formData, threshold_max: parseInt(e.target.value) })
+                  }
+                  min="0"
+                  max="100"
+                  placeholder="Max"
+                />
+              </div>
+            </div>
           </div>
         </div>
+
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => {
+              isEdit ? setIsEditDialogOpen(false) : setIsCreateDialogOpen(false);
+              resetForm();
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={isEdit ? handleUpdateRule : handleCreateRule}
+            disabled={saving || !formData.rule_name}
+          >
+            {saving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Check className="mr-2 h-4 w-4" />
+                {isEdit ? "Update" : "Create"} Rule
+              </>
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 
+  const filteredRules = (type: "automatic" | "suspect" | "negative") =>
+    mergeMatchRules.filter((rule) => rule.match_type === type);
+
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Rules Management</h1>
-          <p className="text-muted-foreground mt-1">Configure merge/match and survivorship rules</p>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="space-y-6 p-6 animate-fade-in">
+        {/* Header */}
+        <div className="flex justify-between items-start">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Rules Management
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              Configure intelligent merge, match, and survivorship rules
+            </p>
+          </div>
         </div>
-      </div>
 
-      <Tabs value={activeRuleTab} onValueChange={setActiveRuleTab}>
-        <TabsList className="bg-muted">
-          <TabsTrigger value="merge-match" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-            Merge/Match Rules
-          </TabsTrigger>
-          <TabsTrigger value="survivorship" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-            Survivorship Rules
-          </TabsTrigger>
-        </TabsList>
+        {/* Main Tabs */}
+        <Tabs value={activeRuleTab} onValueChange={setActiveRuleTab} className="space-y-6">
+          <TabsList className="bg-muted p-1 h-auto">
+            <TabsTrigger
+              value="merge-match"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-6 py-3"
+            >
+              <GitMerge className="h-4 w-4 mr-2" />
+              Merge/Match Rules
+            </TabsTrigger>
+            <TabsTrigger
+              value="survivorship"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-6 py-3"
+            >
+              <Database className="h-4 w-4 mr-2" />
+              Survivorship Rules
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="merge-match" className="space-y-6">
-          <Tabs value={activeEntityTab} onValueChange={setActiveEntityTab}>
-            <div className="flex justify-between items-center">
+          {/* Merge/Match Rules Tab */}
+          <TabsContent value="merge-match" className="space-y-6">
+            <Tabs value={activeEntityTab} onValueChange={setActiveEntityTab}>
+              <div className="flex justify-between items-center">
+                <TabsList className="bg-muted">
+                  <TabsTrigger
+                    value="hcp"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
+                    Physician Accounts
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="hco"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
+                    Facility Accounts
+                  </TabsTrigger>
+                </TabsList>
+                <RuleDialog />
+              </div>
+
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : (
+                <div className="space-y-8">
+                  {/* Automatic Rules */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-1 bg-green-500 rounded-full" />
+                      <h3 className="text-xl font-semibold">Automatic Matches</h3>
+                      <Badge variant="secondary">{filteredRules("automatic").length}</Badge>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filteredRules("automatic").map((rule) => (
+                        <RuleCard key={rule.id} rule={rule} />
+                      ))}
+                      {filteredRules("automatic").length === 0 && (
+                        <Card className="border-dashed border-2 flex items-center justify-center min-h-[200px]">
+                          <p className="text-muted-foreground">No automatic rules yet</p>
+                        </Card>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Suspect Rules */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-1 bg-yellow-500 rounded-full" />
+                      <h3 className="text-xl font-semibold">Suspect Matches</h3>
+                      <Badge variant="secondary">{filteredRules("suspect").length}</Badge>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filteredRules("suspect").map((rule) => (
+                        <RuleCard key={rule.id} rule={rule} />
+                      ))}
+                      {filteredRules("suspect").length === 0 && (
+                        <Card className="border-dashed border-2 flex items-center justify-center min-h-[200px]">
+                          <p className="text-muted-foreground">No suspect rules yet</p>
+                        </Card>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Negative Rules */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-1 bg-red-500 rounded-full" />
+                      <h3 className="text-xl font-semibold">Negative Matches</h3>
+                      <Badge variant="secondary">{filteredRules("negative").length}</Badge>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filteredRules("negative").map((rule) => (
+                        <RuleCard key={rule.id} rule={rule} />
+                      ))}
+                      {filteredRules("negative").length === 0 && (
+                        <Card className="border-dashed border-2 flex items-center justify-center min-h-[200px]">
+                          <p className="text-muted-foreground">No negative rules yet</p>
+                        </Card>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </Tabs>
+          </TabsContent>
+
+          {/* Survivorship Rules Tab */}
+          <TabsContent value="survivorship" className="space-y-6">
+            <Tabs value={activeEntityTab} onValueChange={setActiveEntityTab}>
               <TabsList className="bg-muted">
-                <TabsTrigger value="hcp" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  HCP
+                <TabsTrigger
+                  value="hcp"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  Physician Accounts
                 </TabsTrigger>
-                <TabsTrigger value="hco" className="data-[state=active]:bg-muted-foreground">
-                  HCO
+                <TabsTrigger
+                  value="hco"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  Facility Accounts
                 </TabsTrigger>
               </TabsList>
-              <CreateRuleDialog />
-            </div>
 
-            <TabsContent value="hcp" className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-4">AUTOMATIC</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {mockRules.automatic.map((rule, idx) => (
-                    <RuleCard key={idx} rule={rule} />
-                  ))}
-                  <Card className="border-dashed border-2 flex items-center justify-center min-h-[200px]">
-                    <Button variant="ghost" className="text-muted-foreground">
-                      <Plus className="h-6 w-6 mr-2" />
-                      New HCP Merge/Match Rules
-                    </Button>
-                  </Card>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold mb-4">SUSPECT</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {mockRules.suspect.map((rule, idx) => (
-                    <RuleCard key={idx} rule={rule} />
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold mb-4">NEGATIVE</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {mockRules.negative.map((rule, idx) => (
-                    <RuleCard key={idx} rule={rule} />
-                  ))}
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="hco" className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-4">AUTOMATIC</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <RuleCard rule={mockRules.automatic[0]} />
-                  <Card className="border-dashed border-2 flex items-center justify-center min-h-[200px]">
-                    <Button variant="ghost" className="text-muted-foreground">
-                      <Plus className="h-6 w-6 mr-2" />
-                      New HCO Merge/Match Rules
-                    </Button>
-                  </Card>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-4">SUSPECT</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <RuleCard rule={mockRules.suspect[0]} />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-4">NEGATIVE</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <RuleCard rule={mockRules.negative[0]} />
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </TabsContent>
-
-        <TabsContent value="survivorship" className="space-y-6">
-          <Tabs value={activeEntityTab} onValueChange={setActiveEntityTab}>
-            <TabsList className="bg-muted">
-              <TabsTrigger value="hcp" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                HCP
-              </TabsTrigger>
-              <TabsTrigger value="hco" className="data-[state=active]:bg-muted-foreground">
-                HCO
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="hcp" className="space-y-4">
               <Card>
                 <CardHeader>
                   <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">Attribute Level</CardTitle>
+                    <CardTitle className="text-xl">Attribute-Level Survivorship</CardTitle>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">Edit</Button>
-                      <Button size="sm" className="bg-primary hover:bg-primary/90">Save</Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsSurvivorshipEditMode(!isSurvivorshipEditMode)}
+                      >
+                        {isSurvivorshipEditMode ? (
+                          <>
+                            <X className="h-4 w-4 mr-2" />
+                            Cancel
+                          </>
+                        ) : (
+                          <>
+                            <Pencil className="h-4 w-4 mr-2" />
+                            Edit Rules
+                          </>
+                        )}
+                      </Button>
+                      {isSurvivorshipEditMode && (
+                        <Button size="sm" className="bg-primary hover:bg-primary/90">
+                          <Check className="h-4 w-4 mr-2" />
+                          Save Changes
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="border rounded-lg overflow-hidden">
-                    <div className="bg-primary text-primary-foreground grid grid-cols-3 p-3 font-medium">
-                      <div>Attribute Name</div>
-                      <div>Rule</div>
-                      <div>Value</div>
+                  {loading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
-                    {[
-                      { name: "PDRP", rule: "Status", value: "Yes" },
-                      { name: "First Name", rule: "Priority", value: "DCR VEEVA Open Data (VOD) Definitive Health Care (DHC) AMA Transaction Data ConcertAI DSE Website" },
-                      { name: "Email", rule: "Recency", value: "NA" },
-                      { name: "Address", rule: "Aggregation", value: "Primary-DCR" },
-                      { name: "Last Name", rule: "Priority", value: "DCR VEEVA Open Data (VOD) Definitive Health Care (DHC) AMA Transaction Data ConcertAI DSE Website" },
-                    ].map((attr, idx) => (
-                      <div key={idx} className="grid grid-cols-3 p-3 border-t items-center">
-                        <div className="text-muted-foreground">{attr.name}</div>
-                        <div>
-                          <Select defaultValue={attr.rule.toLowerCase()}>
-                            <SelectTrigger className="w-40">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="status">Status</SelectItem>
-                              <SelectItem value="priority">Priority</SelectItem>
-                              <SelectItem value="recency">Recency</SelectItem>
-                              <SelectItem value="aggregation">Aggregation</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <Select defaultValue={attr.value}>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value={attr.value}>{attr.value}</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                  ) : (
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="bg-primary text-primary-foreground grid grid-cols-3 p-4 font-semibold">
+                        <div>Attribute Name</div>
+                        <div>Rule Type</div>
+                        <div>Value/Priority</div>
                       </div>
-                    ))}
-                  </div>
+                      <div className="divide-y">
+                        {survivorshipRules.map((rule, idx) => (
+                          <div
+                            key={idx}
+                            className="grid grid-cols-3 p-4 items-center hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="font-medium">{rule.attribute_name}</div>
+                            <div>
+                              {isSurvivorshipEditMode ? (
+                                <Select defaultValue={rule.rule_type}>
+                                  <SelectTrigger className="w-40">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="status">Status</SelectItem>
+                                    <SelectItem value="priority">Priority</SelectItem>
+                                    <SelectItem value="recency">Recency</SelectItem>
+                                    <SelectItem value="aggregation">Aggregation</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Badge variant="outline" className="capitalize">
+                                  {rule.rule_type}
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {isSurvivorshipEditMode ? (
+                                <Input defaultValue={rule.rule_value} />
+                              ) : (
+                                rule.rule_value
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                        {survivorshipRules.length === 0 && (
+                          <div className="p-8 text-center text-muted-foreground">
+                            No survivorship rules configured yet
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-            </TabsContent>
+            </Tabs>
+          </TabsContent>
+        </Tabs>
+      </div>
 
-            <TabsContent value="hco">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">HCO Survivorship Rules</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">Configure survivorship rules for HCO entities</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </TabsContent>
-      </Tabs>
+      {/* Edit Dialog */}
+      {isEditDialogOpen && <RuleDialog isEdit={true} />}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Rule</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this rule? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteRule}
+              className="bg-destructive hover:bg-destructive/90"
+              disabled={saving}
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
