@@ -173,26 +173,6 @@ const Index = () => {
         </TabsList>
 
         <TabsContent value="hcp" className="space-y-4">
-          {/* HCP Metrics */}
-          <div className="grid gap-4 md:grid-cols-3">
-            {hcpMetrics.map((metric, index) => (
-              <Card 
-                key={index} 
-                style={{ backgroundColor: currentTheme.colors.cardBg }}
-              >
-                <CardHeader className="pb-2">
-                  <CardTitle 
-                    className="text-xl font-bold"
-                    style={{ color: currentTheme.colors.primary }}
-                  >
-                    {metric.value}
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">{metric.title}</p>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
-
           {/* Filters for Analysis */}
           <Card>
             <CardHeader>
@@ -202,18 +182,34 @@ const Index = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Countries</label>
+                  <label className="text-sm font-medium">State</label>
                   <Select defaultValue="all">
                     <SelectTrigger>
-                      <SelectValue placeholder="All Countries" />
+                      <SelectValue placeholder="All States" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Countries</SelectItem>
-                      <SelectItem value="us">United States</SelectItem>
-                      <SelectItem value="uk">United Kingdom</SelectItem>
-                      <SelectItem value="ca">Canada</SelectItem>
+                      <SelectItem value="all">All States</SelectItem>
+                      <SelectItem value="ny">New York</SelectItem>
+                      <SelectItem value="ca">California</SelectItem>
+                      <SelectItem value="tx">Texas</SelectItem>
+                      <SelectItem value="fl">Florida</SelectItem>
+                      <SelectItem value="il">Illinois</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Counties</label>
+                  <Select defaultValue="all">
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Counties" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Counties</SelectItem>
+                      <SelectItem value="kings">Kings County</SelectItem>
+                      <SelectItem value="los-angeles">Los Angeles County</SelectItem>
+                      <SelectItem value="harris">Harris County</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -252,6 +248,26 @@ const Index = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* HCP Metrics */}
+          <div className="grid gap-4 md:grid-cols-3">
+            {hcpMetrics.map((metric, index) => (
+              <Card 
+                key={index} 
+                style={{ backgroundColor: currentTheme.colors.cardBg }}
+              >
+                <CardHeader className="pb-2">
+                  <CardTitle 
+                    className="text-xl font-bold"
+                    style={{ color: currentTheme.colors.primary }}
+                  >
+                    {metric.value}
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">{metric.title}</p>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
 
           {/* Physician Accounts Table */}
           <Card>
