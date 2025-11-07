@@ -6,10 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { mockHCPs, mockHCOs, mockAddresses, mockDCRs } from "@/lib/mockData";
-import { Database, Users, Building2, MapPin, FileText, Search, Eye, TrendingUp, ArrowUpRight } from "lucide-react";
+import { Database, Users, Building2, MapPin, FileText, Search, Eye, TrendingUp, ArrowUpRight, Check, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { getOrganizationTheme } from "@/lib/organizationThemes";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -17,8 +20,53 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("hcp");
   const [selectedOrganization, setSelectedOrganization] = useState("all");
   
+  // Filter states
+  const [selectedStates, setSelectedStates] = useState<string[]>([]);
+  const [selectedCounties, setSelectedCounties] = useState<string[]>([]);
+  const [selectedQuarters, setSelectedQuarters] = useState<string[]>([]);
+  const [selectedPayers, setSelectedPayers] = useState<string[]>([]);
+  
   // Get current organization theme
   const currentTheme = getOrganizationTheme(selectedOrganization);
+  
+  // Filter options
+  const states = [
+    { value: "ny", label: "New York" },
+    { value: "ca", label: "California" },
+    { value: "tx", label: "Texas" },
+    { value: "fl", label: "Florida" },
+    { value: "il", label: "Illinois" },
+  ];
+  
+  const counties = [
+    { value: "kings", label: "Kings County" },
+    { value: "los-angeles", label: "Los Angeles County" },
+    { value: "harris", label: "Harris County" },
+    { value: "miami-dade", label: "Miami-Dade County" },
+    { value: "cook", label: "Cook County" },
+  ];
+  
+  const quarters = [
+    { value: "q4-2024", label: "Q4 2024" },
+    { value: "q3-2024", label: "Q3 2024" },
+    { value: "q2-2024", label: "Q2 2024" },
+    { value: "q1-2024", label: "Q1 2024" },
+  ];
+  
+  const payers = [
+    { value: "medicare", label: "Medicare" },
+    { value: "medicaid", label: "Medicaid" },
+    { value: "private", label: "Private Insurance" },
+    { value: "commercial", label: "Commercial" },
+  ];
+  
+  const toggleSelection = (value: string, selected: string[], setSelected: (values: string[]) => void) => {
+    if (selected.includes(value)) {
+      setSelected(selected.filter(v => v !== value));
+    } else {
+      setSelected([...selected, value]);
+    }
+  };
 
   const topStats = [
     {
@@ -139,33 +187,71 @@ const Index = () => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
             <div className="space-y-2">
               <label className="text-sm font-medium">State</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All States" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All States</SelectItem>
-                  <SelectItem value="ny">New York</SelectItem>
-                  <SelectItem value="ca">California</SelectItem>
-                  <SelectItem value="tx">Texas</SelectItem>
-                  <SelectItem value="fl">Florida</SelectItem>
-                  <SelectItem value="il">Illinois</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between font-normal"
+                  >
+                    {selectedStates.length === 0
+                      ? "All States"
+                      : `${selectedStates.length} selected`}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0 bg-popover z-50" align="start">
+                  <div className="max-h-64 overflow-auto p-2">
+                    {states.map((state) => (
+                      <div
+                        key={state.value}
+                        className="flex items-center space-x-2 p-2 hover:bg-accent rounded cursor-pointer"
+                        onClick={() => toggleSelection(state.value, selectedStates, setSelectedStates)}
+                      >
+                        <Checkbox
+                          checked={selectedStates.includes(state.value)}
+                          onCheckedChange={() => toggleSelection(state.value, selectedStates, setSelectedStates)}
+                        />
+                        <label className="flex-1 cursor-pointer">{state.label}</label>
+                      </div>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Counties</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All Counties" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Counties</SelectItem>
-                  <SelectItem value="kings">Kings County</SelectItem>
-                  <SelectItem value="los-angeles">Los Angeles County</SelectItem>
-                  <SelectItem value="harris">Harris County</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between font-normal"
+                  >
+                    {selectedCounties.length === 0
+                      ? "All Counties"
+                      : `${selectedCounties.length} selected`}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0 bg-popover z-50" align="start">
+                  <div className="max-h-64 overflow-auto p-2">
+                    {counties.map((county) => (
+                      <div
+                        key={county.value}
+                        className="flex items-center space-x-2 p-2 hover:bg-accent rounded cursor-pointer"
+                        onClick={() => toggleSelection(county.value, selectedCounties, setSelectedCounties)}
+                      >
+                        <Checkbox
+                          checked={selectedCounties.includes(county.value)}
+                          onCheckedChange={() => toggleSelection(county.value, selectedCounties, setSelectedCounties)}
+                        />
+                        <label className="flex-1 cursor-pointer">{county.label}</label>
+                      </div>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">ZIP</label>
@@ -173,31 +259,71 @@ const Index = () => {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Time (Quarters)</label>
-              <Select defaultValue="q4-2024">
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Quarter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="q4-2024">Q4 2024</SelectItem>
-                  <SelectItem value="q3-2024">Q3 2024</SelectItem>
-                  <SelectItem value="q2-2024">Q2 2024</SelectItem>
-                  <SelectItem value="q1-2024">Q1 2024</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between font-normal"
+                  >
+                    {selectedQuarters.length === 0
+                      ? "All Quarters"
+                      : `${selectedQuarters.length} selected`}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0 bg-popover z-50" align="start">
+                  <div className="max-h-64 overflow-auto p-2">
+                    {quarters.map((quarter) => (
+                      <div
+                        key={quarter.value}
+                        className="flex items-center space-x-2 p-2 hover:bg-accent rounded cursor-pointer"
+                        onClick={() => toggleSelection(quarter.value, selectedQuarters, setSelectedQuarters)}
+                      >
+                        <Checkbox
+                          checked={selectedQuarters.includes(quarter.value)}
+                          onCheckedChange={() => toggleSelection(quarter.value, selectedQuarters, setSelectedQuarters)}
+                        />
+                        <label className="flex-1 cursor-pointer">{quarter.label}</label>
+                      </div>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Payer Type</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All Payers" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Payers</SelectItem>
-                  <SelectItem value="medicare">Medicare</SelectItem>
-                  <SelectItem value="medicaid">Medicaid</SelectItem>
-                  <SelectItem value="private">Private Insurance</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between font-normal"
+                  >
+                    {selectedPayers.length === 0
+                      ? "All Payers"
+                      : `${selectedPayers.length} selected`}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0 bg-popover z-50" align="start">
+                  <div className="max-h-64 overflow-auto p-2">
+                    {payers.map((payer) => (
+                      <div
+                        key={payer.value}
+                        className="flex items-center space-x-2 p-2 hover:bg-accent rounded cursor-pointer"
+                        onClick={() => toggleSelection(payer.value, selectedPayers, setSelectedPayers)}
+                      >
+                        <Checkbox
+                          checked={selectedPayers.includes(payer.value)}
+                          onCheckedChange={() => toggleSelection(payer.value, selectedPayers, setSelectedPayers)}
+                        />
+                        <label className="flex-1 cursor-pointer">{payer.label}</label>
+                      </div>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </CardContent>
