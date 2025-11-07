@@ -127,6 +127,82 @@ const Index = () => {
         </div>
       </div>
 
+      {/* Filters for Analysis */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Database className="h-5 w-5" />
+            Filters for Analysis
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">State</label>
+              <Select defaultValue="all">
+                <SelectTrigger>
+                  <SelectValue placeholder="All States" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All States</SelectItem>
+                  <SelectItem value="ny">New York</SelectItem>
+                  <SelectItem value="ca">California</SelectItem>
+                  <SelectItem value="tx">Texas</SelectItem>
+                  <SelectItem value="fl">Florida</SelectItem>
+                  <SelectItem value="il">Illinois</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Counties</label>
+              <Select defaultValue="all">
+                <SelectTrigger>
+                  <SelectValue placeholder="All Counties" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Counties</SelectItem>
+                  <SelectItem value="kings">Kings County</SelectItem>
+                  <SelectItem value="los-angeles">Los Angeles County</SelectItem>
+                  <SelectItem value="harris">Harris County</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">ZIP</label>
+              <Input placeholder="Enter ZIP code" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Time (Quarters)</label>
+              <Select defaultValue="q4-2024">
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Quarter" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="q4-2024">Q4 2024</SelectItem>
+                  <SelectItem value="q3-2024">Q3 2024</SelectItem>
+                  <SelectItem value="q2-2024">Q2 2024</SelectItem>
+                  <SelectItem value="q1-2024">Q1 2024</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Payer Type</label>
+              <Select defaultValue="all">
+                <SelectTrigger>
+                  <SelectValue placeholder="All Payers" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Payers</SelectItem>
+                  <SelectItem value="medicare">Medicare</SelectItem>
+                  <SelectItem value="medicaid">Medicaid</SelectItem>
+                  <SelectItem value="private">Private Insurance</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Top Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         {topStats.map((stat, index) => {
@@ -173,82 +249,6 @@ const Index = () => {
         </TabsList>
 
         <TabsContent value="hcp" className="space-y-4">
-          {/* Filters for Analysis */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Database className="h-5 w-5" />
-                Filters for Analysis
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">State</label>
-                  <Select defaultValue="all">
-                    <SelectTrigger>
-                      <SelectValue placeholder="All States" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All States</SelectItem>
-                      <SelectItem value="ny">New York</SelectItem>
-                      <SelectItem value="ca">California</SelectItem>
-                      <SelectItem value="tx">Texas</SelectItem>
-                      <SelectItem value="fl">Florida</SelectItem>
-                      <SelectItem value="il">Illinois</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Counties</label>
-                  <Select defaultValue="all">
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Counties" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Counties</SelectItem>
-                      <SelectItem value="kings">Kings County</SelectItem>
-                      <SelectItem value="los-angeles">Los Angeles County</SelectItem>
-                      <SelectItem value="harris">Harris County</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">ZIP</label>
-                  <Input placeholder="Enter ZIP code" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Time (Quarters)</label>
-                  <Select defaultValue="q4-2024">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Quarter" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="q4-2024">Q4 2024</SelectItem>
-                      <SelectItem value="q3-2024">Q3 2024</SelectItem>
-                      <SelectItem value="q2-2024">Q2 2024</SelectItem>
-                      <SelectItem value="q1-2024">Q1 2024</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Payer Type</label>
-                  <Select defaultValue="all">
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Payers" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Payers</SelectItem>
-                      <SelectItem value="medicare">Medicare</SelectItem>
-                      <SelectItem value="medicaid">Medicaid</SelectItem>
-                      <SelectItem value="private">Private Insurance</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* HCP Metrics */}
           <div className="grid gap-4 md:grid-cols-3">
             {hcpMetrics.map((metric, index) => (
