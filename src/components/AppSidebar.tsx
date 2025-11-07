@@ -32,6 +32,7 @@ const marketAnalysisItems = [
 ];
 
 const myDataItems = [
+  { title: "Highlights", url: "/my-data/highlights", icon: LayoutDashboard },
   { title: "Physician Accounts", url: "/hcp", icon: User },
   { title: "Facility Accounts", url: "/hco", icon: Building2 },
 ];
