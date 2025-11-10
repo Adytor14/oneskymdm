@@ -367,9 +367,9 @@ const MarketAnalysisHCO = () => {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto max-w-full">
+            <table className="w-full min-w-max">
               <thead>
                 <tr className="border-b">
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Rank</th>
