@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { mockHCPs, mockHCOs, mockAddresses, mockDCRs } from "@/lib/mockData";
-import { Database, Users, Building2, MapPin, FileText, Search, Eye, TrendingUp, ArrowUpRight, Check, ChevronsUpDown, ChevronUp, ChevronDown, ChevronsUpDown as ArrowUpDown, Download, FileSpreadsheet } from "lucide-react";
+import { Database, Users, Building2, MapPin, FileText, Search, Eye, TrendingUp, ArrowUpRight, Check, ChevronsUpDown, ChevronUp, ChevronDown, ChevronsUpDown as ArrowUpDown, Download, FileSpreadsheet, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { getOrganizationTheme } from "@/lib/organizationThemes";
@@ -121,6 +121,31 @@ const Index = () => {
       <ChevronDown className="h-3 w-3 ml-1 inline" />;
   };
 
+  // Clear all filters function
+  const handleClearFilters = () => {
+    setSelectedStates([]);
+    setSelectedCounties([]);
+    setSelectedQuarters([]);
+    setSelectedPayers([]);
+    setHcpSearchQuery("");
+    setHcoSearchQuery("");
+    setHcpCurrentPage(1);
+    setHcoCurrentPage(1);
+    toast({
+      title: "Filters cleared",
+      description: "All filters and search queries have been reset",
+    });
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = 
+    selectedStates.length > 0 || 
+    selectedCounties.length > 0 || 
+    selectedQuarters.length > 0 || 
+    selectedPayers.length > 0 || 
+    hcpSearchQuery.length > 0 || 
+    hcoSearchQuery.length > 0;
+
   const topStats = [
     {
       title: "Physician Accounts",
@@ -231,10 +256,23 @@ const Index = () => {
       {/* Filters for Analysis */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Database className="h-5 w-5" />
-            Filters for Analysis
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Database className="h-5 w-5" />
+              Filters for Analysis
+            </CardTitle>
+            {hasActiveFilters && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleClearFilters}
+                className="flex items-center gap-2"
+              >
+                <X className="h-4 w-4" />
+                Clear Filters
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
