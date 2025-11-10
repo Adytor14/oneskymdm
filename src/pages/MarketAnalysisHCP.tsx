@@ -221,22 +221,6 @@ const MarketAnalysisHCP = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Star Rating</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All Ratings" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Ratings</SelectItem>
-                  <SelectItem value="5">5 Stars</SelectItem>
-                  <SelectItem value="4">4 Stars</SelectItem>
-                  <SelectItem value="3">3 Stars</SelectItem>
-                  <SelectItem value="2">2 Stars</SelectItem>
-                  <SelectItem value="1">1 Star</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
             <div className="flex items-center space-x-2 pt-6">
               <Checkbox id="deliberate-duplicates" />
               <Label 
