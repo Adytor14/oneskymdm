@@ -284,7 +284,7 @@ const MarketAnalysisHCP = () => {
                     'One ID': record.mdmId,
                     Speciality: record.speciality[0],
                     'Sub Speciality': record.speciality[0] === "Cardiology" ? "Interventional" : "General",
-                    'Assigned Identifiers': record.identifiers.join(", "),
+                    'Assigned Accounts': `EMR-${Math.floor(Math.random() * 9000) + 1000}, EMR-${Math.floor(Math.random() * 9000) + 1000}`,
                     'Distinct Patients': Math.floor(Math.random() * 500) + 100,
                     'Growth %': Math.floor(Math.random() * 20) + 1,
                     'Addressable Count': Math.floor(Math.random() * 300) + 50,
@@ -312,7 +312,7 @@ const MarketAnalysisHCP = () => {
                     mdmId: record.mdmId,
                     speciality: record.speciality[0],
                     subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
-                    assignedIdentifiers: record.identifiers.join(", "),
+                    assignedAccounts: `EMR-${Math.floor(Math.random() * 9000) + 1000}, EMR-${Math.floor(Math.random() * 9000) + 1000}`,
                     distinctPatients: Math.floor(Math.random() * 500) + 100,
                     growth: Math.floor(Math.random() * 20) + 1,
                     addressableCount: Math.floor(Math.random() * 300) + 50,
@@ -408,10 +408,10 @@ const MarketAnalysisHCP = () => {
                   </th>
                   <th 
                     className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                    onClick={() => handleSort('assignedIdentifiers')}
+                    onClick={() => handleSort('assignedAccounts')}
                   >
-                    Assigned Identifiers
-                    <SortIcon column="assignedIdentifiers" currentColumn={sortColumn} direction={sortDirection} />
+                    Assigned Accounts
+                    <SortIcon column="assignedAccounts" currentColumn={sortColumn} direction={sortDirection} />
                   </th>
                   <th 
                     className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
@@ -450,7 +450,7 @@ const MarketAnalysisHCP = () => {
                     city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
                     state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
                     subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
-                    assignedIdentifiers: record.identifiers.join(", "),
+                    assignedAccounts: `EMR-${Math.floor(Math.random() * 9000) + 1000}, EMR-${Math.floor(Math.random() * 9000) + 1000}`,
                     distinctPatients: Math.floor(Math.random() * 500) + 100,
                     growth: Math.floor(Math.random() * 20) + 1,
                     addressableCount: Math.floor(Math.random() * 300) + 50,
@@ -514,7 +514,7 @@ const MarketAnalysisHCP = () => {
                       <td className="py-3 px-4 text-sm">{record.mdmId}</td>
                       <td className="py-3 px-4 text-sm">{record.speciality[0]}</td>
                       <td className="py-3 px-4 text-sm">{record.subSpeciality}</td>
-                      <td className="py-3 px-4 text-sm">{record.assignedIdentifiers}</td>
+                      <td className="py-3 px-4 text-sm">{record.assignedAccounts}</td>
                       <td className="py-3 px-4 text-sm font-medium">{record.distinctPatients}</td>
                       <td className="py-3 px-4 text-sm text-green-600 font-medium">{record.growth}%</td>
                       <td className="py-3 px-4 text-sm font-medium">{record.addressableCount}</td>
