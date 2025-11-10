@@ -238,7 +238,7 @@ const MarketAnalysisHCP = () => {
       </div>
 
       {/* Physician Accounts Table */}
-      <Card>
+      <Card className="max-w-[1400px]">
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
             <CardTitle className="text-lg">Physician Accounts</CardTitle>
