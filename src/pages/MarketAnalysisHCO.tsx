@@ -585,7 +585,7 @@ const MarketAnalysisHCO = () => {
                     
                     return 0;
                   })
-                  .slice(0, 10)
+                  .slice(0, 20)
                   .map((data, index) => {
                     return (
                       <tr
