@@ -6,13 +6,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { mockHCPs, mockHCOs, mockAddresses, mockDCRs } from "@/lib/mockData";
-import { Database, Users, Building2, MapPin, FileText, Search, Eye, TrendingUp, ArrowUpRight, Check, ChevronsUpDown, ChevronUp, ChevronDown, ChevronsUpDown as ArrowUpDown } from "lucide-react";
+import { Database, Users, Building2, MapPin, FileText, Search, Eye, TrendingUp, ArrowUpRight, Check, ChevronsUpDown, ChevronUp, ChevronDown, ChevronsUpDown as ArrowUpDown, Download, FileSpreadsheet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { getOrganizationTheme } from "@/lib/organizationThemes";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import { exportToExcel } from "@/lib/exportUtils";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -41,6 +42,10 @@ const Index = () => {
   // Pagination states for HCO
   const [hcoCurrentPage, setHcoCurrentPage] = useState(1);
   const [hcoRowsPerPage, setHcoRowsPerPage] = useState(10);
+  
+  // Search states
+  const [hcpSearchQuery, setHcpSearchQuery] = useState("");
+  const [hcoSearchQuery, setHcoSearchQuery] = useState("");
   
   // Get current organization theme
   const currentTheme = getOrganizationTheme(selectedOrganization);
@@ -446,11 +451,63 @@ const Index = () => {
           {/* Physician Accounts Table */}
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <CardTitle className="text-lg">Physician Accounts</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Showing {Math.min((hcpCurrentPage - 1) * hcpRowsPerPage + 1, mockHCPs.filter((record) => record.status === "Active").length)}-{Math.min(hcpCurrentPage * hcpRowsPerPage, mockHCPs.filter((record) => record.status === "Active").length)} of {mockHCPs.filter((record) => record.status === "Active").length} profiles
-                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const activeRecords = mockHCPs.filter((record) => record.status === "Active");
+                      const preparedData = activeRecords.map((record, index) => {
+                        const npiId = `12345${6789 + index}0`;
+                        const city = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5];
+                        const state = ["NY", "CA", "IL", "TX", "AZ"][index % 5];
+                        const subSpeciality = record.speciality[0] === "Cardiology" ? "Interventional" : "General";
+                        const distinctPatients = Math.floor(Math.random() * 500) + 100;
+                        const growth = Math.floor(Math.random() * 20) + 1;
+                        const addressableCount = Math.floor(Math.random() * 300) + 50;
+                        
+                        return {
+                          'Name': `Dr. ${record.firstName} ${record.lastName}`,
+                          'NPI': npiId,
+                          'City': city,
+                          'State': state,
+                          'One ID': record.mdmId,
+                          'Speciality': record.speciality[0],
+                          'Sub Speciality': subSpeciality,
+                          'Assigned Identifiers': record.identifiers.join(', '),
+                          'Distinct Patients': distinctPatients,
+                          'Growth %': `${growth}%`,
+                          'Addressable Count': addressableCount,
+                        };
+                      });
+                      
+                      exportToExcel(preparedData, `Physician_Accounts_${new Date().toISOString().split('T')[0]}`);
+                      toast({
+                        title: "Export successful",
+                        description: "Physician accounts data has been exported to Excel",
+                      });
+                    }}
+                  >
+                    <FileSpreadsheet className="h-4 w-4 mr-2" />
+                    Export to Excel
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Search Input */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name, NPI, city, specialty..."
+                  value={hcpSearchQuery}
+                  onChange={(e) => {
+                    setHcpSearchQuery(e.target.value);
+                    setHcpCurrentPage(1); // Reset to first page on search
+                  }}
+                  className="pl-10"
+                />
               </div>
             </CardHeader>
             <CardContent>
@@ -537,8 +594,29 @@ const Index = () => {
                         addressableCount: Math.floor(Math.random() * 300) + 50,
                       }));
                       
+                      // Filter data based on search query
+                      let filteredData = preparedData;
+                      if (hcpSearchQuery) {
+                        const query = hcpSearchQuery.toLowerCase();
+                        filteredData = preparedData.filter((record) => {
+                          const name = `Dr. ${record.firstName} ${record.lastName}`.toLowerCase();
+                          const npi = record.npiId.toLowerCase();
+                          const city = record.city.toLowerCase();
+                          const state = record.state.toLowerCase();
+                          const specialty = record.speciality[0].toLowerCase();
+                          const subSpecialty = record.subSpeciality.toLowerCase();
+                          
+                          return name.includes(query) || 
+                                 npi.includes(query) || 
+                                 city.includes(query) || 
+                                 state.includes(query) || 
+                                 specialty.includes(query) || 
+                                 subSpecialty.includes(query);
+                        });
+                      }
+                      
                       // Sort data
-                      let sortedData = [...preparedData];
+                      let sortedData = [...filteredData];
                       if (hcpSortColumn) {
                         sortedData.sort((a: any, b: any) => {
                           let aVal = a[hcpSortColumn];
@@ -658,13 +736,100 @@ const Index = () => {
                     Previous
                   </Button>
                   <span className="text-sm text-muted-foreground">
-                    Page {hcpCurrentPage} of {Math.ceil(mockHCPs.filter((record) => record.status === "Active").length / hcpRowsPerPage)}
+                    Page {hcpCurrentPage} of {Math.ceil((() => {
+                      const activeRecords = mockHCPs.filter((record) => record.status === "Active");
+                      const preparedData = activeRecords.map((record, index) => ({
+                        ...record,
+                        npiId: `12345${6789 + index}0`,
+                        city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
+                        state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
+                        subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
+                      }));
+                      
+                      if (!hcpSearchQuery) return preparedData.length;
+                      
+                      const query = hcpSearchQuery.toLowerCase();
+                      return preparedData.filter((record) => {
+                        const name = `Dr. ${record.firstName} ${record.lastName}`.toLowerCase();
+                        const npi = record.npiId.toLowerCase();
+                        const city = record.city.toLowerCase();
+                        const state = record.state.toLowerCase();
+                        const specialty = record.speciality[0].toLowerCase();
+                        const subSpecialty = record.subSpeciality.toLowerCase();
+                        
+                        return name.includes(query) || 
+                               npi.includes(query) || 
+                               city.includes(query) || 
+                               state.includes(query) || 
+                               specialty.includes(query) || 
+                               subSpecialty.includes(query);
+                      }).length;
+                    })() / hcpRowsPerPage)}
                   </span>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setHcpCurrentPage(prev => Math.min(Math.ceil(mockHCPs.filter((record) => record.status === "Active").length / hcpRowsPerPage), prev + 1))}
-                    disabled={hcpCurrentPage >= Math.ceil(mockHCPs.filter((record) => record.status === "Active").length / hcpRowsPerPage)}
+                    onClick={() => setHcpCurrentPage(prev => {
+                      const activeRecords = mockHCPs.filter((record) => record.status === "Active");
+                      const preparedData = activeRecords.map((record, index) => ({
+                        ...record,
+                        npiId: `12345${6789 + index}0`,
+                        city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
+                        state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
+                        subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
+                      }));
+                      
+                      let filteredCount = preparedData.length;
+                      if (hcpSearchQuery) {
+                        const query = hcpSearchQuery.toLowerCase();
+                        filteredCount = preparedData.filter((record) => {
+                          const name = `Dr. ${record.firstName} ${record.lastName}`.toLowerCase();
+                          const npi = record.npiId.toLowerCase();
+                          const city = record.city.toLowerCase();
+                          const state = record.state.toLowerCase();
+                          const specialty = record.speciality[0].toLowerCase();
+                          const subSpecialty = record.subSpeciality.toLowerCase();
+                          
+                          return name.includes(query) || 
+                                 npi.includes(query) || 
+                                 city.includes(query) || 
+                                 state.includes(query) || 
+                                 specialty.includes(query) || 
+                                 subSpecialty.includes(query);
+                        }).length;
+                      }
+                      
+                      return Math.min(Math.ceil(filteredCount / hcpRowsPerPage), prev + 1);
+                    })}
+                    disabled={hcpCurrentPage >= Math.ceil((() => {
+                      const activeRecords = mockHCPs.filter((record) => record.status === "Active");
+                      const preparedData = activeRecords.map((record, index) => ({
+                        ...record,
+                        npiId: `12345${6789 + index}0`,
+                        city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
+                        state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
+                        subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
+                      }));
+                      
+                      if (!hcpSearchQuery) return preparedData.length;
+                      
+                      const query = hcpSearchQuery.toLowerCase();
+                      return preparedData.filter((record) => {
+                        const name = `Dr. ${record.firstName} ${record.lastName}`.toLowerCase();
+                        const npi = record.npiId.toLowerCase();
+                        const city = record.city.toLowerCase();
+                        const state = record.state.toLowerCase();
+                        const specialty = record.speciality[0].toLowerCase();
+                        const subSpecialty = record.subSpeciality.toLowerCase();
+                        
+                        return name.includes(query) || 
+                               npi.includes(query) || 
+                               city.includes(query) || 
+                               state.includes(query) || 
+                               specialty.includes(query) || 
+                               subSpecialty.includes(query);
+                      }).length;
+                    })() / hcpRowsPerPage)}
                   >
                     Next
                   </Button>
@@ -678,11 +843,55 @@ const Index = () => {
           {/* HCO Data Table */}
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <CardTitle className="text-lg">Facility Accounts Master Data</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Showing {Math.min((hcoCurrentPage - 1) * hcoRowsPerPage + 1, mockHCOs.filter((record) => record.status === "Active").length)}-{Math.min(hcoCurrentPage * hcoRowsPerPage, mockHCOs.filter((record) => record.status === "Active").length)} of {mockHCOs.filter((record) => record.status === "Active").length} profiles
-                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const activeRecords = mockHCOs.filter((record) => record.status === "Active");
+                      const preparedData = activeRecords.map((record, index) => {
+                        const distinctPatients = Math.floor(Math.random() * 2000) + 500;
+                        const growth = Math.floor(Math.random() * 25) + 5;
+                        const addressableCount = Math.floor(Math.random() * 1000) + 200;
+                        
+                        return {
+                          'Name': record.name,
+                          'Org ID': record.orgId,
+                          'Skyra MDM ID': record.mdmId,
+                          'Identifiers': `NPI-${record.mdmId.slice(-6)}`,
+                          'Distinct Patients': distinctPatients,
+                          'Growth %': `${growth}%`,
+                          'Addressable Count': addressableCount,
+                        };
+                      });
+                      
+                      exportToExcel(preparedData, `Facility_Accounts_${new Date().toISOString().split('T')[0]}`);
+                      toast({
+                        title: "Export successful",
+                        description: "Facility accounts data has been exported to Excel",
+                      });
+                    }}
+                  >
+                    <FileSpreadsheet className="h-4 w-4 mr-2" />
+                    Export to Excel
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Search Input */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name, org ID, MDM ID..."
+                  value={hcoSearchQuery}
+                  onChange={(e) => {
+                    setHcoSearchQuery(e.target.value);
+                    setHcoCurrentPage(1); // Reset to first page on search
+                  }}
+                  className="pl-10"
+                />
               </div>
             </CardHeader>
             <CardContent>
@@ -736,8 +945,23 @@ const Index = () => {
                         addressableCount: Math.floor(Math.random() * 1000) + 200,
                       }));
                       
+                      // Filter data based on search query
+                      let filteredData = preparedData;
+                      if (hcoSearchQuery) {
+                        const query = hcoSearchQuery.toLowerCase();
+                        filteredData = preparedData.filter((record) => {
+                          const name = record.name.toLowerCase();
+                          const orgId = record.orgId.toLowerCase();
+                          const mdmId = record.mdmId.toLowerCase();
+                          
+                          return name.includes(query) || 
+                                 orgId.includes(query) || 
+                                 mdmId.includes(query);
+                        });
+                      }
+                      
                       // Sort data
-                      let sortedData = [...preparedData];
+                      let sortedData = [...filteredData];
                       if (hcoSortColumn) {
                         sortedData.sort((a: any, b: any) => {
                           let aVal = a[hcoSortColumn];
@@ -815,13 +1039,79 @@ const Index = () => {
                     Previous
                   </Button>
                   <span className="text-sm text-muted-foreground">
-                    Page {hcoCurrentPage} of {Math.ceil(mockHCOs.filter((record) => record.status === "Active").length / hcoRowsPerPage)}
+                    Page {hcoCurrentPage} of {Math.ceil((() => {
+                      const activeRecords = mockHCOs.filter((record) => record.status === "Active");
+                      const preparedData = activeRecords.map((record, index) => ({
+                        ...record,
+                        distinctPatients: Math.floor(Math.random() * 2000) + 500,
+                        growth: Math.floor(Math.random() * 25) + 5,
+                        addressableCount: Math.floor(Math.random() * 1000) + 200,
+                      }));
+                      
+                      if (!hcoSearchQuery) return preparedData.length;
+                      
+                      const query = hcoSearchQuery.toLowerCase();
+                      return preparedData.filter((record) => {
+                        const name = record.name.toLowerCase();
+                        const orgId = record.orgId.toLowerCase();
+                        const mdmId = record.mdmId.toLowerCase();
+                        
+                        return name.includes(query) || 
+                               orgId.includes(query) || 
+                               mdmId.includes(query);
+                      }).length;
+                    })() / hcoRowsPerPage)}
                   </span>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setHcoCurrentPage(prev => Math.min(Math.ceil(mockHCOs.filter((record) => record.status === "Active").length / hcoRowsPerPage), prev + 1))}
-                    disabled={hcoCurrentPage >= Math.ceil(mockHCOs.filter((record) => record.status === "Active").length / hcoRowsPerPage)}
+                    onClick={() => setHcoCurrentPage(prev => {
+                      const activeRecords = mockHCOs.filter((record) => record.status === "Active");
+                      const preparedData = activeRecords.map((record, index) => ({
+                        ...record,
+                        distinctPatients: Math.floor(Math.random() * 2000) + 500,
+                        growth: Math.floor(Math.random() * 25) + 5,
+                        addressableCount: Math.floor(Math.random() * 1000) + 200,
+                      }));
+                      
+                      let filteredCount = preparedData.length;
+                      if (hcoSearchQuery) {
+                        const query = hcoSearchQuery.toLowerCase();
+                        filteredCount = preparedData.filter((record) => {
+                          const name = record.name.toLowerCase();
+                          const orgId = record.orgId.toLowerCase();
+                          const mdmId = record.mdmId.toLowerCase();
+                          
+                          return name.includes(query) || 
+                                 orgId.includes(query) || 
+                                 mdmId.includes(query);
+                        }).length;
+                      }
+                      
+                      return Math.min(Math.ceil(filteredCount / hcoRowsPerPage), prev + 1);
+                    })}
+                    disabled={hcoCurrentPage >= Math.ceil((() => {
+                      const activeRecords = mockHCOs.filter((record) => record.status === "Active");
+                      const preparedData = activeRecords.map((record, index) => ({
+                        ...record,
+                        distinctPatients: Math.floor(Math.random() * 2000) + 500,
+                        growth: Math.floor(Math.random() * 25) + 5,
+                        addressableCount: Math.floor(Math.random() * 1000) + 200,
+                      }));
+                      
+                      if (!hcoSearchQuery) return preparedData.length;
+                      
+                      const query = hcoSearchQuery.toLowerCase();
+                      return preparedData.filter((record) => {
+                        const name = record.name.toLowerCase();
+                        const orgId = record.orgId.toLowerCase();
+                        const mdmId = record.mdmId.toLowerCase();
+                        
+                        return name.includes(query) || 
+                               orgId.includes(query) || 
+                               mdmId.includes(query);
+                      }).length;
+                    })() / hcoRowsPerPage)}
                   >
                     Next
                   </Button>
