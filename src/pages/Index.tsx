@@ -656,7 +656,13 @@ const Index = () => {
                         State
                         <SortIcon column="state" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
                       </th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">One ID</th>
+                      <th 
+                        className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
+                        onClick={() => handleHcpSort('mdmId')}
+                      >
+                        One ID
+                        <SortIcon column="mdmId" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
+                      </th>
                       <th 
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
                         onClick={() => handleHcpSort('speciality')}
@@ -664,8 +670,20 @@ const Index = () => {
                         Speciality
                         <SortIcon column="speciality" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
                       </th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Sub Speciality</th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Assigned Accounts</th>
+                      <th 
+                        className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
+                        onClick={() => handleHcpSort('subSpeciality')}
+                      >
+                        Sub Speciality
+                        <SortIcon column="subSpeciality" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
+                      </th>
+                      <th 
+                        className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
+                        onClick={() => handleHcpSort('assignedAccounts')}
+                      >
+                        Assigned Accounts
+                        <SortIcon column="assignedAccounts" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
+                      </th>
                       <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
                         onClick={() => handleHcpSort('distinctPatients')}
@@ -702,6 +720,7 @@ const Index = () => {
                         city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
                         state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
                         subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
+                        assignedAccounts: `EMR-${String(index + 1).padStart(6, '0')}`,
                         distinctPatients: Math.floor(Math.random() * 500) + 100,
                         growth: Math.floor(Math.random() * 20) + 1,
                         addressableCount: Math.floor(Math.random() * 300) + 50,
@@ -783,7 +802,7 @@ const Index = () => {
                           <td className="py-3 px-4 text-sm">{record.mdmId}</td>
                           <td className="py-3 px-4 text-sm">{record.speciality[0]}</td>
                           <td className="py-3 px-4 text-sm">{record.subSpeciality}</td>
-                          <td className="py-3 px-4 text-sm">EMR-{String(index + 1).padStart(6, '0')}</td>
+                          <td className="py-3 px-4 text-sm">{record.assignedAccounts}</td>
                           <td className="py-3 px-4 text-sm font-medium">{record.distinctPatients}</td>
                           <td className="py-3 px-4 text-sm text-green-600 font-medium">{record.growth}%</td>
                           <td className="py-3 px-4 text-sm font-medium">{record.addressableCount}</td>
