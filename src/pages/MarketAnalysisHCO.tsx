@@ -1,12 +1,20 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { mockHCOs } from "@/lib/mockData";
-import { Database, Building2, Eye } from "lucide-react";
+import { Database, Building2, Eye, Search, FileSpreadsheet, FileText } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { exportToExcel } from "@/lib/exportUtils";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const MarketAnalysisHCO = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState("");
 
   const hcoMetrics = [
     { title: "Total Facility Accounts", value: "468", bgColor: "bg-blue-50" },
@@ -101,11 +109,87 @@ const MarketAnalysisHCO = () => {
       {/* Facility Accounts Table */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-4">
             <CardTitle className="text-lg">Facility Accounts</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Showing 441 of 468 profiles
-            </p>
+            <div className="flex items-center gap-2">
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="Search by name or ID..." 
+                  className="pl-9"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const activeRecords = mockHCOs.filter((record) => record.status === "Active");
+                  const preparedData = activeRecords.map((record) => ({
+                    Name: record.name,
+                    'Org ID': record.orgId,
+                    'Skyra MDM ID': record.mdmId,
+                    Identifiers: record.identifiers.join(", "),
+                    'Distinct Patients': Math.floor(Math.random() * 2000) + 500,
+                    'Growth %': Math.floor(Math.random() * 25) + 5,
+                    'Addressable Count': Math.floor(Math.random() * 1000) + 200,
+                  }));
+                  exportToExcel(preparedData, 'Market_Analysis_Facilities');
+                  toast({
+                    title: "Export successful",
+                    description: "Data exported to Excel",
+                  });
+                }}
+              >
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Excel
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const activeRecords = mockHCOs.filter((record) => record.status === "Active");
+                  const preparedData = activeRecords.map((record) => ({
+                    name: record.name,
+                    orgId: record.orgId,
+                    mdmId: record.mdmId,
+                    identifiers: record.identifiers.join(", "),
+                    distinctPatients: Math.floor(Math.random() * 2000) + 500,
+                    growth: Math.floor(Math.random() * 25) + 5,
+                    addressableCount: Math.floor(Math.random() * 1000) + 200,
+                  }));
+
+                  const doc = new jsPDF();
+                  doc.setFontSize(16);
+                  doc.text('Market Analysis - Facility Accounts', 14, 15);
+                  
+                  autoTable(doc, {
+                    startY: 25,
+                    head: [['Name', 'Org ID', 'MDM ID', 'Distinct Patients', 'Growth %', 'Addressable Count']],
+                    body: preparedData.map(d => [
+                      d.name,
+                      d.orgId,
+                      d.mdmId,
+                      d.distinctPatients,
+                      `${d.growth}%`,
+                      d.addressableCount
+                    ]),
+                    theme: 'striped',
+                    headStyles: { fillColor: [33, 150, 243] },
+                  });
+                  
+                  doc.save('Market_Analysis_Facilities.pdf');
+                  toast({
+                    title: "Export successful",
+                    description: "Data exported to PDF",
+                  });
+                }}
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                PDF
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -125,7 +209,16 @@ const MarketAnalysisHCO = () => {
               </thead>
               <tbody>
                 {mockHCOs
-                  .filter((record) => record.status === "Active")
+                  .filter((record) => {
+                    if (record.status !== "Active") return false;
+                    if (!searchTerm) return true;
+                    const search = searchTerm.toLowerCase();
+                    return (
+                      record.name.toLowerCase().includes(search) ||
+                      record.orgId.toLowerCase().includes(search) ||
+                      record.mdmId.toLowerCase().includes(search)
+                    );
+                  })
                   .slice(0, 10)
                   .map((record, index) => {
                     // Mock data for new columns
