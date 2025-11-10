@@ -665,8 +665,8 @@ const Index = () => {
                         <SortIcon column="speciality" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
                       </th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Sub Speciality</th>
-                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Assigned Identifiers</th>
-                      <th 
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Assigned Accounts</th>
+                      <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
                         onClick={() => handleHcpSort('distinctPatients')}
                       >
@@ -783,7 +783,7 @@ const Index = () => {
                           <td className="py-3 px-4 text-sm">{record.mdmId}</td>
                           <td className="py-3 px-4 text-sm">{record.speciality[0]}</td>
                           <td className="py-3 px-4 text-sm">{record.subSpeciality}</td>
-                          <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
+                          <td className="py-3 px-4 text-sm">EMR-{String(index + 1).padStart(6, '0')}</td>
                           <td className="py-3 px-4 text-sm font-medium">{record.distinctPatients}</td>
                           <td className="py-3 px-4 text-sm text-green-600 font-medium">{record.growth}%</td>
                           <td className="py-3 px-4 text-sm font-medium">{record.addressableCount}</td>
