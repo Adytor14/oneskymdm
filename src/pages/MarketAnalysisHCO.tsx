@@ -65,7 +65,7 @@ const MarketAnalysisHCO = () => {
 
   return (
     <div className="w-full space-y-6 p-6">
-      <div className="max-w-[1400px] mx-auto space-y-6">
+      <div className="max-w-[1400px] space-y-6">
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-foreground">Market Analysis - Facility Accounts</h1>
@@ -242,7 +242,7 @@ const MarketAnalysisHCO = () => {
       </div>
 
       {/* Facility Accounts Table - Full Width */}
-      <div className="max-w-[1400px] mx-auto">
+      <div className="max-w-[1400px]">
         <Card className="overflow-hidden">
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
