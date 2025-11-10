@@ -253,9 +253,21 @@ const MarketAnalysisHCP = () => {
       {/* Physician Accounts Table */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-4">
             <CardTitle className="text-lg">Physician Accounts</CardTitle>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-1 max-w-md">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="Search by name, NPI, or specialty..." 
+                  className="pl-9"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                />
+              </div>
               <Button
                 variant="outline"
                 size="sm"
