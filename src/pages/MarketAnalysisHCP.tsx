@@ -8,12 +8,43 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { mockHCPs } from "@/lib/mockData";
-import { Database, Users, Eye, ArrowUpRight, Search } from "lucide-react";
+import { Database, Users, Eye, ArrowUpRight, Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+type SortDirection = "asc" | "desc" | null;
+
+const SortIcon = ({ column, currentColumn, direction }: { 
+  column: string; 
+  currentColumn: string | null; 
+  direction: SortDirection;
+}) => {
+  if (column !== currentColumn) {
+    return <ArrowUpDown className="inline-block ml-1 h-3 w-3" />;
+  }
+  return direction === "asc" ? 
+    <ArrowUp className="inline-block ml-1 h-3 w-3" /> : 
+    <ArrowDown className="inline-block ml-1 h-3 w-3" />;
+};
 
 const MarketAnalysisHCP = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      if (sortDirection === "asc") {
+        setSortDirection("desc");
+      } else if (sortDirection === "desc") {
+        setSortColumn(null);
+        setSortDirection(null);
+      }
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
 
   const hcpMetrics = [
     { title: "Total Physician Accounts", value: "2,847", bgColor: "bg-blue-50" },
@@ -226,78 +257,175 @@ const MarketAnalysisHCP = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">NPI</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">City</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">State</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">One ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Speciality</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Sub Speciality</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Assigned Identifiers</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Distinct Patients count</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Growth %</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Addressable count</th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
+                    onClick={() => handleSort('name')}
+                  >
+                    Name
+                    <SortIcon column="name" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
+                    onClick={() => handleSort('npi')}
+                  >
+                    NPI
+                    <SortIcon column="npi" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
+                    onClick={() => handleSort('city')}
+                  >
+                    City
+                    <SortIcon column="city" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
+                    onClick={() => handleSort('state')}
+                  >
+                    State
+                    <SortIcon column="state" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
+                    onClick={() => handleSort('mdmId')}
+                  >
+                    One ID
+                    <SortIcon column="mdmId" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
+                    onClick={() => handleSort('speciality')}
+                  >
+                    Speciality
+                    <SortIcon column="speciality" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
+                    onClick={() => handleSort('subSpeciality')}
+                  >
+                    Sub Speciality
+                    <SortIcon column="subSpeciality" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
+                    onClick={() => handleSort('assignedIdentifiers')}
+                  >
+                    Assigned Identifiers
+                    <SortIcon column="assignedIdentifiers" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
+                    onClick={() => handleSort('distinctPatients')}
+                  >
+                    Distinct Patients count
+                    <SortIcon column="distinctPatients" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
+                    onClick={() => handleSort('growth')}
+                  >
+                    Growth %
+                    <SortIcon column="growth" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
+                    onClick={() => handleSort('addressableCount')}
+                  >
+                    Addressable count
+                    <SortIcon column="addressableCount" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Push</th>
                 </tr>
               </thead>
               <tbody>
-                {mockHCPs
-                  .filter((record) => record.status === "Active")
-                  .slice(0, 10)
-                  .map((record, index) => {
-                    // Mock data for new columns
-                    const npiId = `12345${6789 + index}0`;
-                    const city = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5];
-                    const state = ["NY", "CA", "IL", "TX", "AZ"][index % 5];
-                    const subSpeciality = record.speciality[0] === "Cardiology" ? "Interventional" : "General";
-                    const distinctPatients = Math.floor(Math.random() * 500) + 100;
-                    const growth = Math.floor(Math.random() * 20) + 1;
-                    const addressableCount = Math.floor(Math.random() * 300) + 50;
+                {(() => {
+                  const activeRecords = mockHCPs.filter((record) => record.status === "Active");
+                  
+                  // Prepare data with computed columns
+                  const preparedData = activeRecords.slice(0, 10).map((record, index) => ({
+                    ...record,
+                    name: `Dr. ${record.firstName} ${record.lastName}`,
+                    npi: `12345${6789 + index}0`,
+                    city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
+                    state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
+                    subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
+                    assignedIdentifiers: record.identifiers.join(", "),
+                    distinctPatients: Math.floor(Math.random() * 500) + 100,
+                    growth: Math.floor(Math.random() * 20) + 1,
+                    addressableCount: Math.floor(Math.random() * 300) + 50,
+                  }));
+
+                  // Apply sorting
+                  const sortedData = [...preparedData].sort((a, b) => {
+                    if (!sortColumn || !sortDirection) return 0;
+
+                    let aValue: any = a[sortColumn as keyof typeof a];
+                    let bValue: any = b[sortColumn as keyof typeof b];
+
+                    // Handle speciality array
+                    if (sortColumn === 'speciality') {
+                      aValue = a.speciality[0];
+                      bValue = b.speciality[0];
+                    }
+
+                    // Handle numeric sorting
+                    if (typeof aValue === 'number' && typeof bValue === 'number') {
+                      return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+                    }
+
+                    // Handle string sorting
+                    const aStr = String(aValue).toLowerCase();
+                    const bStr = String(bValue).toLowerCase();
                     
-                    return (
-                      <tr
-                        key={index}
-                        className="border-b hover:bg-muted/50"
-                      >
-                        <td className="py-3 px-4">
-                          Dr. {record.firstName} {record.lastName}
-                        </td>
-                        <td className="py-3 px-4 text-sm">{npiId}</td>
-                        <td className="py-3 px-4 text-sm">{city}</td>
-                        <td className="py-3 px-4 text-sm">{state}</td>
-                        <td className="py-3 px-4 text-sm">{record.mdmId}</td>
-                        <td className="py-3 px-4 text-sm">{record.speciality[0]}</td>
-                        <td className="py-3 px-4 text-sm">{subSpeciality}</td>
-                        <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
-                        <td className="py-3 px-4 text-sm font-medium">{distinctPatients}</td>
-                        <td className="py-3 px-4 text-sm text-green-600 font-medium">{growth}%</td>
-                        <td className="py-3 px-4 text-sm font-medium">{addressableCount}</td>
-                        <td className="py-3 px-4">
-                          <Eye 
-                            className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
-                            onClick={() => navigate(`/hcp/${record.id}`)}
-                          />
-                        </td>
-                        <td className="py-3 px-4">
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            className="h-8 px-3"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toast({
-                                title: "Push initiated",
-                                description: `Pushing data for Dr. ${record.firstName} ${record.lastName}`,
-                              });
-                            }}
-                          >
-                            <ArrowUpRight className="h-4 w-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                    if (sortDirection === 'asc') {
+                      return aStr.localeCompare(bStr);
+                    } else {
+                      return bStr.localeCompare(aStr);
+                    }
+                  });
+
+                  return sortedData.map((record, index) => (
+                    <tr
+                      key={index}
+                      className="border-b hover:bg-muted/50"
+                    >
+                      <td className="py-3 px-4">{record.name}</td>
+                      <td className="py-3 px-4 text-sm">{record.npi}</td>
+                      <td className="py-3 px-4 text-sm">{record.city}</td>
+                      <td className="py-3 px-4 text-sm">{record.state}</td>
+                      <td className="py-3 px-4 text-sm">{record.mdmId}</td>
+                      <td className="py-3 px-4 text-sm">{record.speciality[0]}</td>
+                      <td className="py-3 px-4 text-sm">{record.subSpeciality}</td>
+                      <td className="py-3 px-4 text-sm">{record.assignedIdentifiers}</td>
+                      <td className="py-3 px-4 text-sm font-medium">{record.distinctPatients}</td>
+                      <td className="py-3 px-4 text-sm text-green-600 font-medium">{record.growth}%</td>
+                      <td className="py-3 px-4 text-sm font-medium">{record.addressableCount}</td>
+                      <td className="py-3 px-4">
+                        <Eye 
+                          className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
+                          onClick={() => navigate(`/hcp/${record.id}`)}
+                        />
+                      </td>
+                      <td className="py-3 px-4">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="h-8 px-3"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toast({
+                              title: "Push initiated",
+                              description: `Pushing data for ${record.name}`,
+                            });
+                          }}
+                        >
+                          <ArrowUpRight className="h-4 w-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ));
+                })()}
               </tbody>
             </table>
           </div>
