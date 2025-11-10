@@ -258,17 +258,34 @@ const MarketAnalysisHCP = () => {
                 onClick={() => {
                   const activeRecords = mockHCPs.filter((record) => record.status === "Active");
                   const preparedData = activeRecords.map((record, index) => ({
-                    Name: `Dr. ${record.firstName} ${record.lastName}`,
+                    'L4QTR Rank': index + 1,
+                    'Physician Name': `Dr. ${record.firstName} ${record.lastName}`,
                     NPI: `12345${6789 + index}0`,
+                    County: ["Kings County", "Los Angeles County", "Cook County", "Harris County", "Maricopa County"][index % 5],
                     City: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
                     State: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
-                    'One ID': record.mdmId,
                     Speciality: record.speciality[0],
-                    'Sub Speciality': record.speciality[0] === "Cardiology" ? "Interventional" : "General",
-                    'Assigned Accounts': `EMR-${Math.floor(Math.random() * 9000) + 1000}, EMR-${Math.floor(Math.random() * 9000) + 1000}`,
-                    'Distinct Patients': Math.floor(Math.random() * 500) + 100,
-                    'Growth %': Math.floor(Math.random() * 20) + 1,
-                    'Addressable Count': Math.floor(Math.random() * 300) + 50,
+                    'ONE ID': record.mdmId,
+                    'Annual Patient Count (FFS)': Math.floor(Math.random() * 2000) + 500,
+                    'L4QTR HH Patient / HOS Patients Count': Math.floor(Math.random() * 500) + 100,
+                    'L4QTR Growth %': Math.floor(Math.random() * 20) + 1,
+                    'Medical Director': ["Dr. Smith", "Dr. Johnson", "Dr. Williams", "Dr. Brown", "Dr. Davis"][index % 5],
+                    'MD - Agency': ["Skyra Medical", "OneSky Home Health", "JetHealth Agency", "OpusCare Services", "Choice Healthcare"][index % 5],
+                    'L4QTR Top Referring Agency': ["Skyra Medical", "OneSky Home Health", "JetHealth Agency", "OpusCare Services", "Choice Healthcare"][index % 5],
+                    'L4QTR Patient Count_1': Math.floor(Math.random() * 200) + 50,
+                    '% of Total Patients_1': (Math.random() * 30 + 10).toFixed(1) + '%',
+                    'L4QTR Second Highest Referring Agency': ["OneSky Home Health", "JetHealth Agency", "OpusCare Services", "Choice Healthcare", "Skyra Medical"][index % 5],
+                    'L4QTR Patient Count_2': Math.floor(Math.random() * 150) + 40,
+                    '% of Total Patients_2': (Math.random() * 20 + 8).toFixed(1) + '%',
+                    'L4QTR Third Referring Agency': ["JetHealth Agency", "OpusCare Services", "Choice Healthcare", "Skyra Medical", "OneSky Home Health"][index % 5],
+                    'L4QTR Patient Count_3': Math.floor(Math.random() * 100) + 30,
+                    '% of Total Patients_3': (Math.random() * 15 + 5).toFixed(1) + '%',
+                    'L4QTR Forth Highest Referring Agency': ["OpusCare Services", "Choice Healthcare", "Skyra Medical", "OneSky Home Health", "JetHealth Agency"][index % 5],
+                    'L4QTR Patient Count_4': Math.floor(Math.random() * 80) + 20,
+                    '% of Total Patients_4': (Math.random() * 10 + 3).toFixed(1) + '%',
+                    'L4QTR Fifth Referring Agency': ["Choice Healthcare", "Skyra Medical", "OneSky Home Health", "JetHealth Agency", "OpusCare Services"][index % 5],
+                    'L4QTR Patient Count_5': Math.floor(Math.random() * 60) + 15,
+                    '% of Total Patients_5': (Math.random() * 8 + 2).toFixed(1) + '%',
                   }));
                   exportToExcel(preparedData, 'Market_Analysis_Physicians');
                   toast({
@@ -286,34 +303,39 @@ const MarketAnalysisHCP = () => {
                 onClick={() => {
                   const activeRecords = mockHCPs.filter((record) => record.status === "Active");
                   const preparedData = activeRecords.map((record, index) => ({
+                    rank: index + 1,
                     name: `Dr. ${record.firstName} ${record.lastName}`,
                     npi: `12345${6789 + index}0`,
+                    county: ["Kings County", "Los Angeles County", "Cook County", "Harris County", "Maricopa County"][index % 5],
                     city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
                     state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
-                    mdmId: record.mdmId,
                     speciality: record.speciality[0],
-                    subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
-                    assignedAccounts: `EMR-${Math.floor(Math.random() * 9000) + 1000}, EMR-${Math.floor(Math.random() * 9000) + 1000}`,
-                    distinctPatients: Math.floor(Math.random() * 500) + 100,
+                    mdmId: record.mdmId,
+                    annualPatientCount: Math.floor(Math.random() * 2000) + 500,
+                    l4qtrPatientCount: Math.floor(Math.random() * 500) + 100,
                     growth: Math.floor(Math.random() * 20) + 1,
-                    addressableCount: Math.floor(Math.random() * 300) + 50,
+                    medicalDirector: ["Dr. Smith", "Dr. Johnson", "Dr. Williams", "Dr. Brown", "Dr. Davis"][index % 5],
+                    mdAgency: ["Skyra Medical", "OneSky Home Health", "JetHealth Agency", "OpusCare Services", "Choice Healthcare"][index % 5],
                   }));
 
-                  const doc = new jsPDF();
+                  const doc = new jsPDF('landscape');
                   doc.setFontSize(16);
                   doc.text('Market Analysis - Physician Accounts', 14, 15);
                   
                   autoTable(doc, {
                     startY: 25,
-                    head: [['Name', 'NPI', 'City', 'State', 'One ID', 'Specialty', 'Distinct Patients', 'Growth %']],
+                    head: [['Rank', 'Name', 'NPI', 'County', 'City', 'State', 'Specialty', 'ONE ID', 'Annual Patient Count', 'L4QTR Patient Count', 'Growth %']],
                     body: preparedData.map(d => [
+                      d.rank,
                       d.name,
                       d.npi,
+                      d.county,
                       d.city,
                       d.state,
-                      d.mdmId,
                       d.speciality,
-                      d.distinctPatients,
+                      d.mdmId,
+                      d.annualPatientCount,
+                      d.l4qtrPatientCount,
                       `${d.growth}%`
                     ]),
                     theme: 'striped',
@@ -338,85 +360,34 @@ const MarketAnalysisHCP = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th 
-                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                    onClick={() => handleSort('name')}
-                  >
-                    Name
-                    <SortIcon column="name" currentColumn={sortColumn} direction={sortDirection} />
-                  </th>
-                  <th 
-                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                    onClick={() => handleSort('npi')}
-                  >
-                    NPI
-                    <SortIcon column="npi" currentColumn={sortColumn} direction={sortDirection} />
-                  </th>
-                  <th 
-                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                    onClick={() => handleSort('city')}
-                  >
-                    City
-                    <SortIcon column="city" currentColumn={sortColumn} direction={sortDirection} />
-                  </th>
-                  <th 
-                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                    onClick={() => handleSort('state')}
-                  >
-                    State
-                    <SortIcon column="state" currentColumn={sortColumn} direction={sortDirection} />
-                  </th>
-                  <th 
-                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                    onClick={() => handleSort('mdmId')}
-                  >
-                    One ID
-                    <SortIcon column="mdmId" currentColumn={sortColumn} direction={sortDirection} />
-                  </th>
-                  <th 
-                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                    onClick={() => handleSort('speciality')}
-                  >
-                    Speciality
-                    <SortIcon column="speciality" currentColumn={sortColumn} direction={sortDirection} />
-                  </th>
-                  <th 
-                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                    onClick={() => handleSort('subSpeciality')}
-                  >
-                    Sub Speciality
-                    <SortIcon column="subSpeciality" currentColumn={sortColumn} direction={sortDirection} />
-                  </th>
-                  <th 
-                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                    onClick={() => handleSort('assignedAccounts')}
-                  >
-                    Assigned Accounts
-                    <SortIcon column="assignedAccounts" currentColumn={sortColumn} direction={sortDirection} />
-                  </th>
-                  <th 
-                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                    onClick={() => handleSort('distinctPatients')}
-                  >
-                    Distinct Patients count
-                    <SortIcon column="distinctPatients" currentColumn={sortColumn} direction={sortDirection} />
-                  </th>
-                  <th 
-                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                    onClick={() => handleSort('growth')}
-                  >
-                    Growth %
-                    <SortIcon column="growth" currentColumn={sortColumn} direction={sortDirection} />
-                  </th>
-                  <th 
-                    className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                    onClick={() => handleSort('addressableCount')}
-                  >
-                    Addressable count
-                    <SortIcon column="addressableCount" currentColumn={sortColumn} direction={sortDirection} />
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Push</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Rank</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Physician Name</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">NPI</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">County</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">City</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">State</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Speciality</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">ONE ID</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Annual Patient Count (FFS)</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR HH Patient / HOS Patients Count</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Growth %</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Medical Director</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">MD - Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Top Referring Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_1</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_1</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Second Highest Referring Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_2</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_2</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Third Referring Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_3</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_3</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Forth Highest Referring Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_4</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_4</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Fifth Referring Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_5</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_5</th>
                 </tr>
               </thead>
               <tbody>
@@ -426,15 +397,32 @@ const MarketAnalysisHCP = () => {
                   // Prepare data with computed columns
                   const preparedData = activeRecords.map((record, index) => ({
                     ...record,
+                    rank: index + 1 + (currentPage - 1) * itemsPerPage,
                     name: `Dr. ${record.firstName} ${record.lastName}`,
                     npi: `12345${6789 + index}0`,
+                    county: ["Kings County", "Los Angeles County", "Cook County", "Harris County", "Maricopa County"][index % 5],
                     city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
                     state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
-                    subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
-                    assignedAccounts: `EMR-${Math.floor(Math.random() * 9000) + 1000}, EMR-${Math.floor(Math.random() * 9000) + 1000}`,
-                    distinctPatients: Math.floor(Math.random() * 500) + 100,
+                    annualPatientCount: Math.floor(Math.random() * 2000) + 500,
+                    l4qtrPatientCount: Math.floor(Math.random() * 500) + 100,
                     growth: Math.floor(Math.random() * 20) + 1,
-                    addressableCount: Math.floor(Math.random() * 300) + 50,
+                    medicalDirector: ["Dr. Smith", "Dr. Johnson", "Dr. Williams", "Dr. Brown", "Dr. Davis"][index % 5],
+                    mdAgency: ["Skyra Medical", "OneSky Home Health", "JetHealth Agency", "OpusCare Services", "Choice Healthcare"][index % 5],
+                    topReferralAgency: ["Skyra Medical", "OneSky Home Health", "JetHealth Agency", "OpusCare Services", "Choice Healthcare"][index % 5],
+                    patientCount1: Math.floor(Math.random() * 200) + 50,
+                    percentTotal1: (Math.random() * 30 + 10).toFixed(1),
+                    referralAgency2: ["OneSky Home Health", "JetHealth Agency", "OpusCare Services", "Choice Healthcare", "Skyra Medical"][index % 5],
+                    patientCount2: Math.floor(Math.random() * 150) + 40,
+                    percentTotal2: (Math.random() * 20 + 8).toFixed(1),
+                    referralAgency3: ["JetHealth Agency", "OpusCare Services", "Choice Healthcare", "Skyra Medical", "OneSky Home Health"][index % 5],
+                    patientCount3: Math.floor(Math.random() * 100) + 30,
+                    percentTotal3: (Math.random() * 15 + 5).toFixed(1),
+                    referralAgency4: ["OpusCare Services", "Choice Healthcare", "Skyra Medical", "OneSky Home Health", "JetHealth Agency"][index % 5],
+                    patientCount4: Math.floor(Math.random() * 80) + 20,
+                    percentTotal4: (Math.random() * 10 + 3).toFixed(1),
+                    referralAgency5: ["Choice Healthcare", "Skyra Medical", "OneSky Home Health", "JetHealth Agency", "OpusCare Services"][index % 5],
+                    patientCount5: Math.floor(Math.random() * 60) + 15,
+                    percentTotal5: (Math.random() * 8 + 2).toFixed(1),
                   }));
 
                   // Apply search filter
@@ -488,39 +476,34 @@ const MarketAnalysisHCP = () => {
                       key={index}
                       className="border-b hover:bg-muted/50"
                     >
-                      <td className="py-3 px-4">{record.name}</td>
+                      <td className="py-3 px-4 text-sm">{record.rank}</td>
+                      <td className="py-3 px-4 whitespace-nowrap">{record.name}</td>
                       <td className="py-3 px-4 text-sm">{record.npi}</td>
+                      <td className="py-3 px-4 text-sm whitespace-nowrap">{record.county}</td>
                       <td className="py-3 px-4 text-sm">{record.city}</td>
                       <td className="py-3 px-4 text-sm">{record.state}</td>
-                      <td className="py-3 px-4 text-sm">{record.mdmId}</td>
                       <td className="py-3 px-4 text-sm">{record.speciality[0]}</td>
-                      <td className="py-3 px-4 text-sm">{record.subSpeciality}</td>
-                      <td className="py-3 px-4 text-sm">{record.assignedAccounts}</td>
-                      <td className="py-3 px-4 text-sm font-medium">{record.distinctPatients}</td>
+                      <td className="py-3 px-4 text-sm">{record.mdmId}</td>
+                      <td className="py-3 px-4 text-sm font-medium">{record.annualPatientCount}</td>
+                      <td className="py-3 px-4 text-sm font-medium">{record.l4qtrPatientCount}</td>
                       <td className="py-3 px-4 text-sm text-green-600 font-medium">{record.growth}%</td>
-                      <td className="py-3 px-4 text-sm font-medium">{record.addressableCount}</td>
-                      <td className="py-3 px-4">
-                        <Eye 
-                          className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
-                          onClick={() => navigate(`/hcp/${record.id}`)}
-                        />
-                      </td>
-                      <td className="py-3 px-4">
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          className="h-8 px-3"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toast({
-                              title: "Push initiated",
-                              description: `Pushing data for ${record.name}`,
-                            });
-                          }}
-                        >
-                          <ArrowUpRight className="h-4 w-4" />
-                        </Button>
-                      </td>
+                      <td className="py-3 px-4 text-sm whitespace-nowrap">{record.medicalDirector}</td>
+                      <td className="py-3 px-4 text-sm whitespace-nowrap">{record.mdAgency}</td>
+                      <td className="py-3 px-4 text-sm whitespace-nowrap">{record.topReferralAgency}</td>
+                      <td className="py-3 px-4 text-sm font-medium">{record.patientCount1}</td>
+                      <td className="py-3 px-4 text-sm">{record.percentTotal1}%</td>
+                      <td className="py-3 px-4 text-sm whitespace-nowrap">{record.referralAgency2}</td>
+                      <td className="py-3 px-4 text-sm font-medium">{record.patientCount2}</td>
+                      <td className="py-3 px-4 text-sm">{record.percentTotal2}%</td>
+                      <td className="py-3 px-4 text-sm whitespace-nowrap">{record.referralAgency3}</td>
+                      <td className="py-3 px-4 text-sm font-medium">{record.patientCount3}</td>
+                      <td className="py-3 px-4 text-sm">{record.percentTotal3}%</td>
+                      <td className="py-3 px-4 text-sm whitespace-nowrap">{record.referralAgency4}</td>
+                      <td className="py-3 px-4 text-sm font-medium">{record.patientCount4}</td>
+                      <td className="py-3 px-4 text-sm">{record.percentTotal4}%</td>
+                      <td className="py-3 px-4 text-sm whitespace-nowrap">{record.referralAgency5}</td>
+                      <td className="py-3 px-4 text-sm font-medium">{record.patientCount5}</td>
+                      <td className="py-3 px-4 text-sm">{record.percentTotal5}%</td>
                     </tr>
                   ));
                 })()}
