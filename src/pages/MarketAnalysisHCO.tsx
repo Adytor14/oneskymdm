@@ -242,15 +242,47 @@ const MarketAnalysisHCO = () => {
                 size="sm"
                 onClick={() => {
                   const activeRecords = mockHCOs.filter((record) => record.status === "Active");
-                  const preparedData = activeRecords.map((record) => ({
-                    Name: record.name,
-                    'Org ID': record.orgId,
-                    'Skyra MDM ID': record.mdmId,
-                    Identifiers: record.identifiers.join(", "),
-                    'Distinct Patients': Math.floor(Math.random() * 2000) + 500,
-                    'Growth %': Math.floor(Math.random() * 25) + 5,
-                    'Addressable Count': Math.floor(Math.random() * 1000) + 200,
-                  }));
+                  const preparedData = activeRecords.map((record, index) => {
+                    const agencies = [
+                      { name: "Healthcare Partners", count: Math.floor(Math.random() * 200) + 50 },
+                      { name: "Medical Associates", count: Math.floor(Math.random() * 180) + 40 },
+                      { name: "Premier Health Group", count: Math.floor(Math.random() * 150) + 30 },
+                      { name: "Unity Medical", count: Math.floor(Math.random() * 120) + 25 },
+                      { name: "Community Health Network", count: Math.floor(Math.random() * 100) + 20 },
+                    ];
+                    const totalAgencyPatients = agencies.reduce((sum, a) => sum + a.count, 0);
+                    
+                    return {
+                      'L4QTR Rank': index + 1,
+                      'Facility Name': record.name,
+                      'NPI': `NPI${Math.floor(Math.random() * 9000000000) + 1000000000}`,
+                      'County': ["Los Angeles", "Harris", "Miami-Dade"][Math.floor(Math.random() * 3)],
+                      'City': ["Los Angeles", "Houston", "Miami"][Math.floor(Math.random() * 3)],
+                      'State': ["CA", "TX", "FL"][Math.floor(Math.random() * 3)],
+                      'Parent Facility': `Parent ${record.name.split(" ")[0]}`,
+                      'ONE ID': `ONE-${Math.floor(Math.random() * 90000) + 10000}`,
+                      'Annual Patient Count (FFS)': Math.floor(Math.random() * 5000) + 1000,
+                      [`L4QTR ${serviceLine} Patient Count`]: Math.floor(Math.random() * 1500) + 300,
+                      'L4QTR Growth %': (Math.random() * 25 + 5).toFixed(1),
+                      'Facility Type': ["Acute Care", "SNF", "IRF"][Math.floor(Math.random() * 3)],
+                      'MD - Agency': `MD Agency ${Math.floor(Math.random() * 100) + 1}`,
+                      'L4QTR Top Referring Agency': agencies[0].name,
+                      'L4QTR Patient Count_1': agencies[0].count,
+                      '% of Total Patients_1': ((agencies[0].count / totalAgencyPatients) * 100).toFixed(1),
+                      'L4QTR Second Highest Referring Agency': agencies[1].name,
+                      'L4QTR Patient Count_2': agencies[1].count,
+                      '% of Total Patients_2': ((agencies[1].count / totalAgencyPatients) * 100).toFixed(1),
+                      'L4QTR Third Referring Agency': agencies[2].name,
+                      'L4QTR Patient Count_3': agencies[2].count,
+                      '% of Total Patients_3': ((agencies[2].count / totalAgencyPatients) * 100).toFixed(1),
+                      'L4QTR Fourth Highest Referring Agency': agencies[3].name,
+                      'L4QTR Patient Count_4': agencies[3].count,
+                      '% of Total Patients_4': ((agencies[3].count / totalAgencyPatients) * 100).toFixed(1),
+                      'L4QTR Fifth Referring Agency': agencies[4].name,
+                      'L4QTR Patient Count_5': agencies[4].count,
+                      '% of Total Patients_5': ((agencies[4].count / totalAgencyPatients) * 100).toFixed(1),
+                    };
+                  });
                   exportToExcel(preparedData, 'Market_Analysis_Facilities');
                   toast({
                     title: "Export successful",
@@ -266,33 +298,60 @@ const MarketAnalysisHCO = () => {
                 size="sm"
                 onClick={() => {
                   const activeRecords = mockHCOs.filter((record) => record.status === "Active");
-                  const preparedData = activeRecords.map((record) => ({
-                    name: record.name,
-                    orgId: record.orgId,
-                    mdmId: record.mdmId,
-                    identifiers: record.identifiers.join(", "),
-                    distinctPatients: Math.floor(Math.random() * 2000) + 500,
-                    growth: Math.floor(Math.random() * 25) + 5,
-                    addressableCount: Math.floor(Math.random() * 1000) + 200,
-                  }));
+                  const preparedData = activeRecords.map((record, index) => {
+                    const agencies = [
+                      { name: "Healthcare Partners", count: Math.floor(Math.random() * 200) + 50 },
+                      { name: "Medical Associates", count: Math.floor(Math.random() * 180) + 40 },
+                      { name: "Premier Health Group", count: Math.floor(Math.random() * 150) + 30 },
+                      { name: "Unity Medical", count: Math.floor(Math.random() * 120) + 25 },
+                      { name: "Community Health Network", count: Math.floor(Math.random() * 100) + 20 },
+                    ];
+                    
+                    return {
+                      rank: index + 1,
+                      name: record.name,
+                      npi: `NPI${Math.floor(Math.random() * 9000000000) + 1000000000}`,
+                      county: ["Los Angeles", "Harris", "Miami-Dade"][Math.floor(Math.random() * 3)],
+                      city: ["Los Angeles", "Houston", "Miami"][Math.floor(Math.random() * 3)],
+                      state: ["CA", "TX", "FL"][Math.floor(Math.random() * 3)],
+                      parentFacility: `Parent ${record.name.split(" ")[0]}`,
+                      oneId: `ONE-${Math.floor(Math.random() * 90000) + 10000}`,
+                      annualPatientCount: Math.floor(Math.random() * 5000) + 1000,
+                      l4qtrPatientCount: Math.floor(Math.random() * 1500) + 300,
+                      growth: (Math.random() * 25 + 5).toFixed(1),
+                      facilityType: ["Acute Care", "SNF", "IRF"][Math.floor(Math.random() * 3)],
+                      topAgency: agencies[0].name,
+                      topAgencyCount: agencies[0].count,
+                    };
+                  });
 
-                  const doc = new jsPDF();
+                  const doc = new jsPDF('landscape');
                   doc.setFontSize(16);
                   doc.text('Market Analysis - Facility Accounts', 14, 15);
                   
                   autoTable(doc, {
                     startY: 25,
-                    head: [['Name', 'Org ID', 'MDM ID', 'Distinct Patients', 'Growth %', 'Addressable Count']],
+                    head: [['Rank', 'Facility Name', 'NPI', 'County', 'City', 'State', 'Parent', 'ONE ID', 'Annual Count', 'L4QTR Count', 'Growth %', 'Type', 'Top Agency', 'Agency Count']],
                     body: preparedData.map(d => [
+                      d.rank,
                       d.name,
-                      d.orgId,
-                      d.mdmId,
-                      d.distinctPatients,
+                      d.npi,
+                      d.county,
+                      d.city,
+                      d.state,
+                      d.parentFacility,
+                      d.oneId,
+                      d.annualPatientCount,
+                      d.l4qtrPatientCount,
                       `${d.growth}%`,
-                      d.addressableCount
+                      d.facilityType,
+                      d.topAgency,
+                      d.topAgencyCount
                     ]),
                     theme: 'striped',
-                    headStyles: { fillColor: [33, 150, 243] },
+                    headStyles: { fillColor: [33, 150, 243], fontSize: 8 },
+                    bodyStyles: { fontSize: 7 },
+                    styles: { cellPadding: 1 },
                   });
                   
                   doc.save('Market_Analysis_Facilities.pdf');
@@ -313,14 +372,34 @@ const MarketAnalysisHCO = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Identifiers</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Distinct Patients count</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Growth %</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Addressable count</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Rank</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Facility Name</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">NPI</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">County</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">City</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">State</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Parent Facility</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">ONE ID</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Annual Patient Count (FFS)</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR {serviceLine === "HH" ? "HH Patient" : "HOS Patient"} Count</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Growth %</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Facility Type</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">MD - Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Top Referring Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_1</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_1</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Second Highest Referring Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_2</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_2</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Third Referring Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_3</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_3</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Fourth Highest Referring Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_4</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_4</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Fifth Referring Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_5</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_5</th>
                 </tr>
               </thead>
               <tbody>
@@ -337,10 +416,33 @@ const MarketAnalysisHCO = () => {
                   })
                   .slice(0, 10)
                   .map((record, index) => {
-                    // Mock data for new columns
-                    const distinctPatients = Math.floor(Math.random() * 2000) + 500;
-                    const growth = Math.floor(Math.random() * 25) + 5;
-                    const addressableCount = Math.floor(Math.random() * 1000) + 200;
+                    // Mock data for all columns
+                    const rank = index + 1;
+                    const npi = `NPI${Math.floor(Math.random() * 9000000000) + 1000000000}`;
+                    const counties = ["Los Angeles", "Harris", "Miami-Dade", "Kings", "Cook"];
+                    const cities = ["Los Angeles", "Houston", "Miami", "Brooklyn", "Chicago"];
+                    const states = ["CA", "TX", "FL", "NY", "IL"];
+                    const county = counties[Math.floor(Math.random() * counties.length)];
+                    const city = cities[Math.floor(Math.random() * cities.length)];
+                    const state = states[Math.floor(Math.random() * states.length)];
+                    const parentFacility = `Parent ${record.name.split(" ")[0]}`;
+                    const oneId = `ONE-${Math.floor(Math.random() * 90000) + 10000}`;
+                    const annualPatientCount = Math.floor(Math.random() * 5000) + 1000;
+                    const l4qtrPatientCount = Math.floor(Math.random() * 1500) + 300;
+                    const growth = (Math.random() * 25 + 5).toFixed(1);
+                    const facilityTypes = ["Acute Care", "SNF", "IRF", "LTACH"];
+                    const facilityType = facilityTypes[Math.floor(Math.random() * facilityTypes.length)];
+                    const mdAgency = `MD Agency ${Math.floor(Math.random() * 100) + 1}`;
+                    
+                    // Referring agencies data
+                    const agencies = [
+                      { name: "Healthcare Partners", count: Math.floor(Math.random() * 200) + 50 },
+                      { name: "Medical Associates", count: Math.floor(Math.random() * 180) + 40 },
+                      { name: "Premier Health Group", count: Math.floor(Math.random() * 150) + 30 },
+                      { name: "Unity Medical", count: Math.floor(Math.random() * 120) + 25 },
+                      { name: "Community Health Network", count: Math.floor(Math.random() * 100) + 20 },
+                    ];
+                    const totalAgencyPatients = agencies.reduce((sum, a) => sum + a.count, 0);
                     
                     return (
                       <tr
@@ -348,22 +450,26 @@ const MarketAnalysisHCO = () => {
                         className="border-b hover:bg-muted/50 cursor-pointer"
                         onClick={() => navigate(`/hco/${record.id}`)}
                       >
-                        <td className="py-3 px-4">{record.name}</td>
-                        <td className="py-3 px-4 text-sm">{record.orgId}</td>
-                        <td className="py-3 px-4 text-sm">{record.mdmId}</td>
-                        <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
-                        <td className="py-3 px-4 text-sm font-medium">{distinctPatients}</td>
+                        <td className="py-3 px-4 text-sm">{rank}</td>
+                        <td className="py-3 px-4 text-sm font-medium">{record.name}</td>
+                        <td className="py-3 px-4 text-sm">{npi}</td>
+                        <td className="py-3 px-4 text-sm">{county}</td>
+                        <td className="py-3 px-4 text-sm">{city}</td>
+                        <td className="py-3 px-4 text-sm">{state}</td>
+                        <td className="py-3 px-4 text-sm">{parentFacility}</td>
+                        <td className="py-3 px-4 text-sm">{oneId}</td>
+                        <td className="py-3 px-4 text-sm font-medium">{annualPatientCount.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-sm font-medium">{l4qtrPatientCount.toLocaleString()}</td>
                         <td className="py-3 px-4 text-sm text-green-600 font-medium">{growth}%</td>
-                        <td className="py-3 px-4 text-sm font-medium">{addressableCount}</td>
-                        <td className="py-3 px-4">
-                          <Eye 
-                            className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/hco/${record.id}`);
-                            }}
-                          />
-                        </td>
+                        <td className="py-3 px-4 text-sm">{facilityType}</td>
+                        <td className="py-3 px-4 text-sm">{mdAgency}</td>
+                        {agencies.map((agency, agencyIndex) => (
+                          <>
+                            <td key={`agency-${agencyIndex}`} className="py-3 px-4 text-sm">{agency.name}</td>
+                            <td key={`count-${agencyIndex}`} className="py-3 px-4 text-sm font-medium">{agency.count}</td>
+                            <td key={`percent-${agencyIndex}`} className="py-3 px-4 text-sm">{((agency.count / totalAgencyPatients) * 100).toFixed(1)}%</td>
+                          </>
+                        ))}
                       </tr>
                     );
                   })}
