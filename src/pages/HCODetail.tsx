@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Mail, Phone, MapPin, Building2, Users, Download, FileJson, FileSpreadsheet, FileText, Award } from "lucide-react";
 import { ChangeRequestDialog } from "@/components/ChangeRequestDialog";
+import { ProfilePhotoUpload } from "@/components/ProfilePhotoUpload";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +26,7 @@ const HCODetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const hco = mockHCOs.find((h) => h.id === id);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
 
   const handleExportExcel = () => {
     if (hco) {
@@ -70,11 +73,14 @@ const HCODetail = () => {
         <Card className="shadow-card">
           <CardContent className="pt-6">
             <div className="flex gap-6 items-start">
-              {/* Avatar */}
+              {/* Avatar with Photo Upload */}
               <div className="flex-shrink-0">
-                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Building2 className="h-10 w-10 text-primary" />
-                </div>
+                <ProfilePhotoUpload
+                  currentPhotoUrl={profilePhotoUrl || undefined}
+                  entityId={hco.id}
+                  entityType="HCO"
+                  onPhotoUpdate={setProfilePhotoUrl}
+                />
               </div>
               
               {/* Header Info */}

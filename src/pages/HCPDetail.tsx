@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Mail, Phone, MapPin, GraduationCap, Building2, Download, Award, FileJson, FileSpreadsheet, FileText, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,12 +14,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { exportToExcel, exportToJSON, exportHCPToPDF, prepareHCPForExport } from "@/lib/exportUtils";
 import { ChangeRequestDialog } from "@/components/ChangeRequestDialog";
+import { ProfilePhotoUpload } from "@/components/ProfilePhotoUpload";
 import { format } from "date-fns";
 
 const HCPDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const hcp = mockHCPs.find((h) => h.id === id);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
 
   const handleExportExcel = () => {
     if (hcp) {
@@ -65,11 +68,14 @@ const HCPDetail = () => {
         <Card className="shadow-card">
           <CardContent className="pt-6">
             <div className="flex gap-6 items-start">
-              {/* Avatar */}
+              {/* Avatar with Photo Upload */}
               <div className="flex-shrink-0">
-                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="h-10 w-10 text-primary" />
-                </div>
+                <ProfilePhotoUpload
+                  currentPhotoUrl={profilePhotoUrl || undefined}
+                  entityId={hcp.id}
+                  entityType="HCP"
+                  onPhotoUpdate={setProfilePhotoUrl}
+                />
               </div>
               
               {/* Header Info */}
