@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { mockHCPs } from "@/lib/mockData";
 import { Database, Users, Eye, ArrowUpRight, Search, ArrowUpDown, ArrowUp, ArrowDown, FileSpreadsheet, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -358,8 +359,8 @@ const MarketAnalysisHCP = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <ScrollArea className="w-full">
+            <table className="w-full min-w-max">
               <thead>
                 <tr className="border-b">
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Rank</th>
@@ -511,7 +512,8 @@ const MarketAnalysisHCP = () => {
                 })()}
               </tbody>
             </table>
-          </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
           
           {/* Pagination */}
           {(() => {
