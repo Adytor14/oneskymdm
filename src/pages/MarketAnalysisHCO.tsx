@@ -242,7 +242,8 @@ const MarketAnalysisHCO = () => {
       </div>
 
       {/* Facility Accounts Table - Full Width */}
-      <Card className="overflow-hidden">
+      <div className="max-w-[1400px] mx-auto">
+        <Card className="overflow-hidden">
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
             <CardTitle className="text-lg">Facility Accounts</CardTitle>
@@ -621,6 +622,7 @@ const MarketAnalysisHCO = () => {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };
