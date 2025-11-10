@@ -27,6 +27,7 @@ const MarketAnalysisHCO = () => {
   const [showRightShadow, setShowRightShadow] = useState(true);
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [zipCode, setZipCode] = useState("");
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
@@ -83,7 +84,7 @@ const MarketAnalysisHCO = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
             <div className="space-y-2">
               <label className="text-sm font-medium">State</label>
               <Popover>
@@ -161,6 +162,14 @@ const MarketAnalysisHCO = () => {
                   </Command>
                 </PopoverContent>
               </Popover>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">ZIP</label>
+              <Input 
+                placeholder="Enter ZIP code" 
+                value={zipCode}
+                onChange={(e) => setZipCode(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Time (Quarters)</label>
