@@ -5,20 +5,31 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { mockHCOs } from "@/lib/mockData";
-import { Database, Building2, Eye, Search, FileSpreadsheet, FileText } from "lucide-react";
+import { Database, Building2, Eye, Search, FileSpreadsheet, FileText, Check, ChevronsUpDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { exportToExcel } from "@/lib/exportUtils";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 const MarketAnalysisHCO = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStates, setSelectedStates] = useState<string[]>([]);
+  const [selectedCounties, setSelectedCounties] = useState<string[]>([]);
+  const [selectedPayers, setSelectedPayers] = useState<string[]>([]);
+
+  const states = ["California", "Texas", "Florida", "New York", "Illinois"];
+  const counties = ["Los Angeles", "Harris", "Miami-Dade", "Kings", "Cook"];
+  const payers = ["Medicare", "Medicaid", "Private Insurance", "Uninsured"];
 
   const hcoMetrics = [
     { title: "Total Facility Accounts", value: "468", bgColor: "bg-blue-50" },
-    { title: "Active Facilities", value: "441", bgColor: "bg-green-50" },
+    { title: "Total Patients Count", value: "441", label: "HH", bgColor: "bg-green-50" },
     { title: "Growth", value: "8.3%", bgColor: "bg-gray-50" },
   ];
 
@@ -32,20 +43,6 @@ const MarketAnalysisHCO = () => {
         </p>
       </div>
 
-      {/* HCO Metrics */}
-      <div className="grid gap-4 md:grid-cols-3">
-        {hcoMetrics.map((metric, index) => (
-          <Card key={index} className={metric.bgColor}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl font-bold text-blue-600">
-                {metric.value}
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">{metric.title}</p>
-            </CardHeader>
-          </Card>
-        ))}
-      </div>
-
       {/* Filters for Analysis */}
       <Card>
         <CardHeader>
@@ -57,22 +54,82 @@ const MarketAnalysisHCO = () => {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Countries</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All Countries" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Countries</SelectItem>
-                  <SelectItem value="us">United States</SelectItem>
-                  <SelectItem value="uk">United Kingdom</SelectItem>
-                  <SelectItem value="ca">Canada</SelectItem>
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium">State</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between">
+                    {selectedStates.length > 0 ? `${selectedStates.length} selected` : "Select states"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search states..." />
+                    <CommandEmpty>No state found.</CommandEmpty>
+                    <CommandGroup className="max-h-64 overflow-auto">
+                      {states.map((state) => (
+                        <CommandItem
+                          key={state}
+                          onSelect={() => {
+                            setSelectedStates(
+                              selectedStates.includes(state)
+                                ? selectedStates.filter((s) => s !== state)
+                                : [...selectedStates, state]
+                            );
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedStates.includes(state) ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {state}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">ZIP</label>
-              <Input placeholder="Enter ZIP code" />
+              <label className="text-sm font-medium">Counties</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between">
+                    {selectedCounties.length > 0 ? `${selectedCounties.length} selected` : "Select counties"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search counties..." />
+                    <CommandEmpty>No county found.</CommandEmpty>
+                    <CommandGroup className="max-h-64 overflow-auto">
+                      {counties.map((county) => (
+                        <CommandItem
+                          key={county}
+                          onSelect={() => {
+                            setSelectedCounties(
+                              selectedCounties.includes(county)
+                                ? selectedCounties.filter((c) => c !== county)
+                                : [...selectedCounties, county]
+                            );
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedCounties.includes(county) ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {county}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Time (Quarters)</label>
@@ -90,21 +147,67 @@ const MarketAnalysisHCO = () => {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Payer Type</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All Payers" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Payers</SelectItem>
-                  <SelectItem value="medicare">Medicare</SelectItem>
-                  <SelectItem value="medicaid">Medicaid</SelectItem>
-                  <SelectItem value="private">Private Insurance</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between">
+                    {selectedPayers.length > 0 ? `${selectedPayers.length} selected` : "Select payers"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search payers..." />
+                    <CommandEmpty>No payer found.</CommandEmpty>
+                    <CommandGroup className="max-h-64 overflow-auto">
+                      {payers.map((payer) => (
+                        <CommandItem
+                          key={payer}
+                          onSelect={() => {
+                            setSelectedPayers(
+                              selectedPayers.includes(payer)
+                                ? selectedPayers.filter((p) => p !== payer)
+                                : [...selectedPayers, payer]
+                            );
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedPayers.includes(payer) ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {payer}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* HCO Metrics */}
+      <div className="grid gap-4 md:grid-cols-3">
+        {hcoMetrics.map((metric, index) => (
+          <Card key={index} className={metric.bgColor}>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-xl font-bold text-blue-600">
+                  {metric.value}
+                </CardTitle>
+                {metric.label && (
+                  <Badge variant="secondary" className="text-xs">
+                    {metric.label}
+                  </Badge>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">{metric.title}</p>
+            </CardHeader>
+          </Card>
+        ))}
+      </div>
 
       {/* Facility Accounts Table */}
       <Card>
