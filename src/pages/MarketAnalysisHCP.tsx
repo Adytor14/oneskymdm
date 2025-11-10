@@ -102,21 +102,6 @@ const MarketAnalysisHCP = () => {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Search</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Search by name, NPI, or specialty..." 
-                  className="pl-9"
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage(1); // Reset to first page on search
-                  }}
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
               <label className="text-sm font-medium">Countries</label>
               <Select defaultValue="all">
                 <SelectTrigger>
