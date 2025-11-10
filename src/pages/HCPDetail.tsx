@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Mail, Phone, MapPin, GraduationCap, Building2, Download, Award, FileJson, FileSpreadsheet, FileText } from "lucide-react";
+import { ArrowLeft, Mail, Phone, MapPin, GraduationCap, Building2, Download, Award, FileJson, FileSpreadsheet, FileText, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -68,7 +68,7 @@ const HCPDetail = () => {
               {/* Avatar */}
               <div className="flex-shrink-0">
                 <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Building2 className="h-10 w-10 text-primary" />
+                  <User className="h-10 w-10 text-primary" />
                 </div>
               </div>
               
