@@ -234,7 +234,7 @@ const MarketAnalysisHCO = () => {
       </div>
 
       {/* Facility Accounts Table */}
-      <Card>
+      <Card className="overflow-hidden">
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
             <CardTitle className="text-lg">Facility Accounts</CardTitle>
@@ -378,10 +378,10 @@ const MarketAnalysisHCO = () => {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-hidden">
           <div className="relative">
             <div 
-              className="overflow-x-auto max-w-full"
+              className="overflow-x-auto"
               onScroll={handleScroll}
             >
               {showLeftShadow && (
