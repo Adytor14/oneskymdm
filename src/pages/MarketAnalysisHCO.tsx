@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { mockHCOs } from "@/lib/mockData";
-import { Database, Building2, Eye, Search, FileSpreadsheet, FileText, Check, ChevronsUpDown } from "lucide-react";
+import { Database, Building2, Eye, Search, FileSpreadsheet, FileText, Check, ChevronsUpDown, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { exportToExcel } from "@/lib/exportUtils";
 import jsPDF from "jspdf";
@@ -25,6 +25,8 @@ const MarketAnalysisHCO = () => {
   const [serviceLine, setServiceLine] = useState<"HH" | "HOS">("HH");
   const [showLeftShadow, setShowLeftShadow] = useState(false);
   const [showRightShadow, setShowRightShadow] = useState(true);
+  const [sortBy, setSortBy] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
@@ -33,6 +35,22 @@ const MarketAnalysisHCO = () => {
     
     setShowLeftShadow(scrollLeft > 0);
     setShowRightShadow(scrollLeft < maxScroll - 1);
+  };
+
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(column);
+      setSortOrder("asc");
+    }
+  };
+
+  const SortIcon = ({ column }: { column: string }) => {
+    if (sortBy !== column) return <ArrowUpDown className="h-4 w-4 ml-1 opacity-40" />;
+    return sortOrder === "asc" ? 
+      <ArrowUp className="h-4 w-4 ml-1" /> : 
+      <ArrowDown className="h-4 w-4 ml-1" />;
   };
 
   const states = ["California", "Texas", "Florida", "New York", "Illinois"];
@@ -393,33 +411,103 @@ const MarketAnalysisHCO = () => {
               <table className="w-full min-w-max">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Rank</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Facility Name</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("rank")} className="flex items-center hover:text-foreground">
+                      L4QTR Rank
+                      <SortIcon column="rank" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("name")} className="flex items-center hover:text-foreground">
+                      Facility Name
+                      <SortIcon column="name" />
+                    </button>
+                  </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">NPI</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">County</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">City</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">State</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("county")} className="flex items-center hover:text-foreground">
+                      County
+                      <SortIcon column="county" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("city")} className="flex items-center hover:text-foreground">
+                      City
+                      <SortIcon column="city" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("state")} className="flex items-center hover:text-foreground">
+                      State
+                      <SortIcon column="state" />
+                    </button>
+                  </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Parent Facility</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">ONE ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Annual Patient Count (FFS)</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR {serviceLine === "HH" ? "HH Patient" : "HOS Patient"} Count</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Growth %</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Facility Type</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("annualPatientCount")} className="flex items-center hover:text-foreground">
+                      Annual Patient Count (FFS)
+                      <SortIcon column="annualPatientCount" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("l4qtrPatientCount")} className="flex items-center hover:text-foreground">
+                      L4QTR {serviceLine === "HH" ? "HH Patient" : "HOS Patient"} Count
+                      <SortIcon column="l4qtrPatientCount" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("growth")} className="flex items-center hover:text-foreground">
+                      L4QTR Growth %
+                      <SortIcon column="growth" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("facilityType")} className="flex items-center hover:text-foreground">
+                      Facility Type
+                      <SortIcon column="facilityType" />
+                    </button>
+                  </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">MD - Agency</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Top Referring Agency</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_1</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("agency1Count")} className="flex items-center hover:text-foreground">
+                      L4QTR Patient Count_1
+                      <SortIcon column="agency1Count" />
+                    </button>
+                  </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_1</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Second Highest Referring Agency</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_2</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("agency2Count")} className="flex items-center hover:text-foreground">
+                      L4QTR Patient Count_2
+                      <SortIcon column="agency2Count" />
+                    </button>
+                  </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_2</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Third Referring Agency</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_3</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("agency3Count")} className="flex items-center hover:text-foreground">
+                      L4QTR Patient Count_3
+                      <SortIcon column="agency3Count" />
+                    </button>
+                  </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_3</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Fourth Highest Referring Agency</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_4</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("agency4Count")} className="flex items-center hover:text-foreground">
+                      L4QTR Patient Count_4
+                      <SortIcon column="agency4Count" />
+                    </button>
+                  </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_4</th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Fifth Referring Agency</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_5</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("agency5Count")} className="flex items-center hover:text-foreground">
+                      L4QTR Patient Count_5
+                      <SortIcon column="agency5Count" />
+                    </button>
+                  </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_5</th>
                 </tr>
               </thead>
@@ -435,7 +523,6 @@ const MarketAnalysisHCO = () => {
                       record.mdmId.toLowerCase().includes(search)
                     );
                   })
-                  .slice(0, 10)
                   .map((record, index) => {
                     // Mock data for all columns
                     const rank = index + 1;
@@ -450,7 +537,7 @@ const MarketAnalysisHCO = () => {
                     const oneId = `ONE-${Math.floor(Math.random() * 90000) + 10000}`;
                     const annualPatientCount = Math.floor(Math.random() * 5000) + 1000;
                     const l4qtrPatientCount = Math.floor(Math.random() * 1500) + 300;
-                    const growth = (Math.random() * 25 + 5).toFixed(1);
+                    const growth = parseFloat((Math.random() * 25 + 5).toFixed(1));
                     const facilityTypes = ["Acute Care", "SNF", "IRF", "LTACH"];
                     const facilityType = facilityTypes[Math.floor(Math.random() * facilityTypes.length)];
                     const mdAgency = `MD Agency ${Math.floor(Math.random() * 100) + 1}`;
@@ -465,30 +552,74 @@ const MarketAnalysisHCO = () => {
                     ];
                     const totalAgencyPatients = agencies.reduce((sum, a) => sum + a.count, 0);
                     
+                    return {
+                      record,
+                      rank,
+                      npi,
+                      county,
+                      city,
+                      state,
+                      parentFacility,
+                      oneId,
+                      annualPatientCount,
+                      l4qtrPatientCount,
+                      growth,
+                      facilityType,
+                      mdAgency,
+                      agencies,
+                      totalAgencyPatients,
+                      name: record.name,
+                      agency1Count: agencies[0].count,
+                      agency2Count: agencies[1].count,
+                      agency3Count: agencies[2].count,
+                      agency4Count: agencies[3].count,
+                      agency5Count: agencies[4].count,
+                    };
+                  })
+                  .sort((a, b) => {
+                    if (!sortBy) return 0;
+                    
+                    let aVal = a[sortBy as keyof typeof a];
+                    let bVal = b[sortBy as keyof typeof b];
+                    
+                    if (typeof aVal === 'string' && typeof bVal === 'string') {
+                      return sortOrder === 'asc' 
+                        ? aVal.localeCompare(bVal)
+                        : bVal.localeCompare(aVal);
+                    }
+                    
+                    if (typeof aVal === 'number' && typeof bVal === 'number') {
+                      return sortOrder === 'asc' ? aVal - bVal : bVal - aVal;
+                    }
+                    
+                    return 0;
+                  })
+                  .slice(0, 10)
+                  .map((data, index) => {
                     return (
                       <tr
                         key={index}
                         className="border-b hover:bg-muted/50 cursor-pointer"
-                        onClick={() => navigate(`/hco/${record.id}`)}
+                        onClick={() => navigate(`/hco/${data.record.id}`)}
                       >
-                        <td className="py-3 px-4 text-sm">{rank}</td>
-                        <td className="py-3 px-4 text-sm font-medium">{record.name}</td>
-                        <td className="py-3 px-4 text-sm">{npi}</td>
-                        <td className="py-3 px-4 text-sm">{county}</td>
-                        <td className="py-3 px-4 text-sm">{city}</td>
-                        <td className="py-3 px-4 text-sm">{state}</td>
-                        <td className="py-3 px-4 text-sm">{parentFacility}</td>
-                        <td className="py-3 px-4 text-sm">{oneId}</td>
-                        <td className="py-3 px-4 text-sm font-medium">{annualPatientCount.toLocaleString()}</td>
-                        <td className="py-3 px-4 text-sm font-medium">{l4qtrPatientCount.toLocaleString()}</td>
-                        <td className="py-3 px-4 text-sm text-green-600 font-medium">{growth}%</td>
-                        <td className="py-3 px-4 text-sm">{facilityType}</td>
-                        <td className="py-3 px-4 text-sm">{mdAgency}</td>
-                        {agencies.map((agency, agencyIndex) => (
+                        <td className="py-3 px-4 text-sm">{data.rank}</td>
+                        <td className="py-3 px-4 text-sm font-medium">{data.name}</td>
+                        <td className="py-3 px-4 text-sm">{data.npi}</td>
+                        <td className="py-3 px-4 text-sm">{data.county}</td>
+                        <td className="py-3 px-4 text-sm">{data.city}</td>
+                        <td className="py-3 px-4 text-sm">{data.state}</td>
+                        <td className="py-3 px-4 text-sm">{data.parentFacility}</td>
+                        <td className="py-3 px-4 text-sm">{data.oneId}</td>
+                        <td className="py-3 px-4 text-sm font-medium">{data.annualPatientCount.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-sm font-medium">{data.l4qtrPatientCount.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-sm text-green-600 font-medium">{data.growth}%</td>
+                        <td className="py-3 px-4 text-sm">{data.facilityType}</td>
+                        <td className="py-3 px-4 text-sm">{data.mdAgency}</td>
+                        {data.agencies.map((agency, agencyIndex) => (
                           <>
                             <td key={`agency-${agencyIndex}`} className="py-3 px-4 text-sm">{agency.name}</td>
                             <td key={`count-${agencyIndex}`} className="py-3 px-4 text-sm font-medium">{agency.count}</td>
-                            <td key={`percent-${agencyIndex}`} className="py-3 px-4 text-sm">{((agency.count / totalAgencyPatients) * 100).toFixed(1)}%</td>
+                            <td key={`percent-${agencyIndex}`} className="py-3 px-4 text-sm">{((agency.count / data.totalAgencyPatients) * 100).toFixed(1)}%</td>
                           </>
                         ))}
                       </tr>
