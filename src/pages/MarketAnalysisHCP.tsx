@@ -255,8 +255,8 @@ const MarketAnalysisHCP = () => {
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
             <CardTitle className="text-lg">Physician Accounts</CardTitle>
-            <div className="flex items-center gap-2 flex-1 max-w-md">
-              <div className="relative flex-1">
+            <div className="flex items-center gap-2">
+              <div className="relative w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input 
                   placeholder="Search by name, NPI, or specialty..." 
