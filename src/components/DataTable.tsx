@@ -13,6 +13,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MDMEntity } from "@/types/mdm";
 import { ChangeRequestDialog } from "./ChangeRequestDialog";
+import { ArrowUpDown, ChevronUp, ChevronDown, FileText, FileSpreadsheet } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { exportToExcel } from "@/lib/exportUtils";
 import {
   Pagination,
   PaginationContent,
@@ -30,13 +35,105 @@ interface DataTableProps {
 
 export function DataTable({ data, title }: DataTableProps) {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  // Sorting handler
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1);
+  };
+
+  // Sort icon component
+  const SortIcon = ({ column }: { column: string }) => {
+    if (sortColumn !== column) {
+      return <ArrowUpDown className="h-3 w-3 ml-1 inline opacity-30" />;
+    }
+    return sortDirection === 'asc' ? 
+      <ChevronUp className="h-3 w-3 ml-1 inline" /> : 
+      <ChevronDown className="h-3 w-3 ml-1 inline" />;
+  };
+
+  // Export to PDF
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    const tableData = data.map((entity) => [
+      entity.type,
+      entity.orgId,
+      entity.mdmId,
+      entity.identifiers.join(", "),
+      entity.status,
+      entity.lastUpdated,
+    ]);
+
+    autoTable(doc, {
+      head: [["Type", "Org ID", "MDM ID", "Identifiers", "Status", "Last Updated"]],
+      body: tableData,
+      theme: "striped",
+      headStyles: { fillColor: [59, 130, 246] },
+    });
+
+    doc.save(`${title.replace(/\s+/g, "_")}_${new Date().toISOString().split("T")[0]}.pdf`);
+    toast({
+      title: "Export successful",
+      description: "Data has been exported to PDF",
+    });
+  };
+
+  // Export to Excel
+  const handleExportExcel = () => {
+    const excelData = data.map((entity) => ({
+      "Entity Type": entity.type,
+      "Org ID": entity.orgId,
+      "Skyra MDM ID": entity.mdmId,
+      "Identifiers": entity.identifiers.join(", "),
+      "Status": entity.status,
+      "Last Updated": entity.lastUpdated,
+    }));
+
+    exportToExcel(excelData, `${title.replace(/\s+/g, "_")}_${new Date().toISOString().split("T")[0]}`);
+    toast({
+      title: "Export successful",
+      description: "Data has been exported to Excel",
+    });
+  };
+
+  // Sort data
+  let sortedData = [...data];
+  if (sortColumn) {
+    sortedData.sort((a: any, b: any) => {
+      let aVal = a[sortColumn];
+      let bVal = b[sortColumn];
+
+      if (sortColumn === 'identifiers') {
+        aVal = a.identifiers.join(", ");
+        bVal = b.identifiers.join(", ");
+      }
+
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sortDirection === 'asc' 
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal);
+      }
+
+      return sortDirection === 'asc' 
+        ? (aVal > bVal ? 1 : -1)
+        : (bVal > aVal ? 1 : -1);
+    });
+  }
+
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedData = data.slice(startIndex, endIndex);
+  const paginatedData = sortedData.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -93,19 +190,77 @@ export function DataTable({ data, title }: DataTableProps) {
   return (
     <Card className="shadow-card">
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle>{title}</CardTitle>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportPDF}
+              className="flex items-center gap-2"
+            >
+              <FileText className="h-4 w-4" />
+              Export to PDF
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportExcel}
+              className="flex items-center gap-2"
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Export to Excel
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Entity Type</TableHead>
-                <TableHead>Org ID</TableHead>
-                <TableHead>Skyra MDM ID</TableHead>
-                <TableHead>Identifiers</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Last Updated</TableHead>
+                <TableHead 
+                  className="cursor-pointer hover:text-foreground"
+                  onClick={() => handleSort('type')}
+                >
+                  Entity Type
+                  <SortIcon column="type" />
+                </TableHead>
+                <TableHead 
+                  className="cursor-pointer hover:text-foreground"
+                  onClick={() => handleSort('orgId')}
+                >
+                  Org ID
+                  <SortIcon column="orgId" />
+                </TableHead>
+                <TableHead 
+                  className="cursor-pointer hover:text-foreground"
+                  onClick={() => handleSort('mdmId')}
+                >
+                  Skyra MDM ID
+                  <SortIcon column="mdmId" />
+                </TableHead>
+                <TableHead 
+                  className="cursor-pointer hover:text-foreground"
+                  onClick={() => handleSort('identifiers')}
+                >
+                  Identifiers
+                  <SortIcon column="identifiers" />
+                </TableHead>
+                <TableHead 
+                  className="cursor-pointer hover:text-foreground"
+                  onClick={() => handleSort('status')}
+                >
+                  Status
+                  <SortIcon column="status" />
+                </TableHead>
+                <TableHead 
+                  className="cursor-pointer hover:text-foreground"
+                  onClick={() => handleSort('lastUpdated')}
+                >
+                  Last Updated
+                  <SortIcon column="lastUpdated" />
+                </TableHead>
                 <TableHead className="w-[100px]">View</TableHead>
               </TableRow>
             </TableHeader>
