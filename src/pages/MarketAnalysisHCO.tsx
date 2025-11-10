@@ -64,7 +64,7 @@ const MarketAnalysisHCO = () => {
   ];
 
   return (
-    <div className="container mx-auto max-w-[1400px] space-y-6 p-6">
+    <div className="w-full space-y-6 p-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Market Analysis - Facility Accounts</h1>
