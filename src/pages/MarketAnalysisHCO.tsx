@@ -23,6 +23,17 @@ const MarketAnalysisHCO = () => {
   const [selectedCounties, setSelectedCounties] = useState<string[]>([]);
   const [selectedPayers, setSelectedPayers] = useState<string[]>([]);
   const [serviceLine, setServiceLine] = useState<"HH" | "HOS">("HH");
+  const [showLeftShadow, setShowLeftShadow] = useState(false);
+  const [showRightShadow, setShowRightShadow] = useState(true);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.currentTarget;
+    const scrollLeft = target.scrollLeft;
+    const maxScroll = target.scrollWidth - target.clientWidth;
+    
+    setShowLeftShadow(scrollLeft > 0);
+    setShowRightShadow(scrollLeft < maxScroll - 1);
+  };
 
   const states = ["California", "Texas", "Florida", "New York", "Illinois"];
   const counties = ["Los Angeles", "Harris", "Miami-Dade", "Kings", "Cook"];
@@ -368,8 +379,18 @@ const MarketAnalysisHCO = () => {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto max-w-full">
-            <table className="w-full min-w-max">
+          <div className="relative">
+            <div 
+              className="overflow-x-auto max-w-full"
+              onScroll={handleScroll}
+            >
+              {showLeftShadow && (
+                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10" />
+              )}
+              {showRightShadow && (
+                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10" />
+              )}
+              <table className="w-full min-w-max">
               <thead>
                 <tr className="border-b">
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Rank</th>
@@ -474,7 +495,8 @@ const MarketAnalysisHCO = () => {
                     );
                   })}
               </tbody>
-            </table>
+              </table>
+            </div>
           </div>
         </CardContent>
       </Card>
