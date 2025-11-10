@@ -1,9 +1,5 @@
-import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Mail, Phone, MapPin, Building2, Users, Download, FileJson, FileSpreadsheet, FileText, Award } from "lucide-react";
-import { ChangeRequestDialog } from "@/components/ChangeRequestDialog";
-import { ProfilePhotoUpload } from "@/components/ProfilePhotoUpload";
-import { format } from "date-fns";
+import { ArrowLeft, Mail, Phone, MapPin, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,29 +11,16 @@ import {
   exportHCOToPDF,
   prepareHCOForExport,
 } from "@/lib/exportUtils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 const HCODetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const hco = mockHCOs.find((h) => h.id === id);
-  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
 
   const handleExportExcel = () => {
     if (hco) {
       const exportData = prepareHCOForExport(hco);
       exportToExcel([exportData], `HCO_${hco.name.replace(/\s+/g, '_')}_${hco.mdmId}`);
-    }
-  };
-
-  const handleExportJSON = () => {
-    if (hco) {
-      exportToJSON(hco, `HCO_${hco.name.replace(/\s+/g, '_')}_${hco.mdmId}`);
     }
   };
 
@@ -63,326 +46,400 @@ const HCODetail = () => {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <div className="container mx-auto p-6 space-y-6">
-        <Button variant="ghost" onClick={() => navigate("/hco")} className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-
-        {/* Profile Header Card */}
-        <Card className="shadow-card">
-          <CardContent className="pt-6">
-            <div className="flex gap-6 items-start">
-              {/* Avatar with Photo Upload */}
-              <div className="flex-shrink-0">
-                <ProfilePhotoUpload
-                  currentPhotoUrl={profilePhotoUrl || undefined}
-                  entityId={hco.id}
-                  entityType="HCO"
-                  onPhotoUpdate={setProfilePhotoUrl}
-                />
+      <div className="container mx-auto p-6 space-y-6 max-w-[1400px]">
+        {/* Header */}
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/hco")}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold">{hco.name}</h1>
+                <Badge variant="secondary">Facility Account</Badge>
               </div>
-              
-              {/* Header Info */}
-              <div className="flex-1">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h1 className="text-2xl font-bold mb-1">{hco.name}</h1>
-                    <Badge variant="secondary" className="mb-2">Facility Account</Badge>
-                    <div className="space-y-1 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4" />
-                        <span>{hco.email}</span>
-                      </div>
-                      <div>FACILITY TYPE: {hco.organizationType}</div>
-                      <div>ORG ID: {hco.orgId}</div>
-                      <div>SOURCE: {hco.source}</div>
-                    </div>
-                  </div>
-                  
-                  <div className="text-right space-y-1 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4" />
-                      <span>{hco.phone}</span>
-                    </div>
-                    <div>Skyra MDM ID: {hco.mdmId}</div>
-                    <div>TYPE: {hco.organizationType}</div>
-                  </div>
+              <div className="space-y-1 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  <span>{hco.email}</span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  <span>{hco.phone}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4" />
+                  <span>FACILITY TYPE: {hco.organizationType}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  <span>{hco.address.street}, {hco.address.city}, {hco.address.state} {hco.address.zipCode}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleExportExcel}>
+              Export to Excel
+            </Button>
+            <Button variant="outline" onClick={handleExportPDF}>
+              Export to PDF
+            </Button>
+          </div>
+        </div>
 
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={handleExportExcel}>
-                    <FileSpreadsheet className="mr-2 h-4 w-4" />
-                    Export to Excel
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleExportPDF}>
-                    <FileText className="mr-2 h-4 w-4" />
-                    Export to PDF
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <FileJson className="mr-2 h-4 w-4" />
-                    DCR History
-                  </Button>
-                  <ChangeRequestDialog entityType="HCO" entityId={hco.id} entityData={hco} />
+        {/* Primary Information */}
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle>Primary Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-x-16 gap-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Facility Name</p>
+                <p className="font-semibold">{hco.name}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">NPI</p>
+                <p className="font-semibold">{hco.npiId}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">CMS Provider Number</p>
+                <p className="font-semibold">100234</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Facility Type</p>
+                <p className="font-semibold">{hco.organizationType}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Phone</p>
+                <p className="font-semibold">{hco.phone}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Address</p>
+                <p className="font-semibold">{hco.address.street}, {hco.address.city}, {hco.address.state} {hco.address.zipCode}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Medical Director NPI</p>
+                <p className="font-semibold">1578137394</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Owner NPI</p>
+                <p className="font-semibold">9876543210</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Addresses */}
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle>Addresses</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-4 border rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <Badge variant="secondary">Primary</Badge>
+                <Badge className="bg-success text-white">Active</Badge>
+              </div>
+              <p className="font-semibold mb-1">{hco.address.street}, {hco.address.city}, {hco.address.state} {hco.address.zipCode}</p>
+              <p className="text-sm text-muted-foreground">Business Address</p>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <Badge variant="secondary">Mailing</Badge>
+                <Badge className="bg-success text-white">Active</Badge>
+              </div>
+              <p className="font-semibold mb-1">P.O. Box 5200, {hco.address.city}, {hco.address.state} 34239</p>
+              <p className="text-sm text-muted-foreground">Mailing Address</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Identifiers */}
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle>Identifiers</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex justify-between items-center py-2 border-b">
+              <span className="text-sm text-muted-foreground">Skyra MDM ID</span>
+              <span className="font-medium">{hco.mdmId}</span>
+            </div>
+            <div className="flex justify-between items-center py-2 border-b">
+              <span className="text-sm text-muted-foreground">ORG ID</span>
+              <span className="font-medium">{hco.orgId}</span>
+            </div>
+            <div className="flex justify-between items-center py-2 border-b">
+              <span className="text-sm text-muted-foreground">NPI</span>
+              <span className="font-medium">{hco.npiId}</span>
+            </div>
+            <div className="flex justify-between items-center py-2 border-b">
+              <span className="text-sm text-muted-foreground">CMS Provider Number</span>
+              <span className="font-medium">100234</span>
+            </div>
+            <div className="flex justify-between items-center py-2">
+              <span className="text-sm text-muted-foreground">Source</span>
+              <span className="font-medium">{hco.source}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Specialities */}
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle>Specialities</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-4 border rounded-lg">
+              <Badge variant="secondary" className="mb-2">Primary</Badge>
+              <h4 className="font-semibold mb-1">Acute Care Hospital</h4>
+              <p className="text-sm text-muted-foreground">Comprehensive medical and surgical services</p>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <Badge variant="secondary" className="mb-2">Secondary</Badge>
+              <h4 className="font-semibold mb-1">Cardiac Care Center</h4>
+              <p className="text-sm text-muted-foreground">Specialized cardiac procedures and treatments</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Licenses */}
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle>Licenses</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="p-4 border rounded-lg">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-semibold">Florida State Hospital License</h4>
+                <Badge className="bg-success text-white">Active</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">License Number:</p>
+                  <p className="font-medium">FL-H-12345</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">State:</p>
+                  <p className="font-medium">Florida</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Issue Date:</p>
+                  <p className="font-medium">2020-01-15</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Expiry Date:</p>
+                  <p className="font-medium">2026-01-15</p>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Primary Information */}
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="text-lg">Primary Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Facility Name</p>
-                    <p className="font-medium">{hco.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Skyra MDM ID</p>
-                    <p className="font-medium">{hco.mdmId}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">ORG ID</p>
-                    <p className="font-medium">{hco.orgId}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Facility Type</p>
-                    <p className="font-medium">{hco.organizationType}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">NPI ID</p>
-                    <p className="font-medium">{hco.npiId}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Status</p>
-                    <p className="font-medium text-success">{hco.status}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Record State</p>
-                    <p className="font-medium">Valid</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Addresses */}
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="text-lg">Addresses</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-start gap-4 p-4 border rounded-lg">
-                  <div className="p-2 bg-primary/10 rounded">
-                    <MapPin className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="font-medium">
-                        {hco.address.street} {hco.address.city} {hco.address.state} {hco.address.zipCode}
-                      </p>
-                      <Badge>Primary</Badge>
-                    </div>
-                    <Badge variant="outline" className="mr-2">Verified</Badge>
-                    <p className="text-sm text-muted-foreground mt-1">Primary Address</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Identifiers */}
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="text-lg">Identifiers</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">NPI</p>
-                    <p className="font-medium">{hco.npiId}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">NPI Source ID</p>
-                    <p className="font-medium">NPPES</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">CMS Certification Number</p>
-                    <p className="font-medium">345678</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Source ID</p>
-                    <p className="font-medium">CMS</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Departments */}
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Building2 className="h-4 w-4 text-primary" />
-                  Departments
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-2 flex-wrap">
-                  {hco.departments.map((dept, idx) => (
-                    <Badge key={idx} variant="outline">
-                      {dept}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Affiliated HCPs */}
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Users className="h-4 w-4 text-primary" />
-                  Affiliated Healthcare Professionals
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-3">
-                  {hco.affiliatedHCPs.length} healthcare professionals affiliated
-                </p>
-                <div className="flex gap-2 flex-wrap">
-                  {hco.affiliatedHCPs.map((hcpId, idx) => (
-                    <Badge key={idx} variant="secondary">
-                      {hcpId}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Patient Volume & Trends */}
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="text-lg">Patient Volume & Trends</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Total Admissions (Annual)</p>
-                    <p className="text-3xl font-bold">15,240</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Average Daily Census</p>
-                    <p className="text-3xl font-bold">342</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Bed Capacity</p>
-                    <p className="text-3xl font-bold">450</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Occupancy Rate</p>
-                    <p className="text-3xl font-bold">76%</p>
-                  </div>
-                </div>
-
-                <Separator />
-
+        {/* Accreditation */}
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle>Accreditation</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-4 border rounded-lg">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-semibold">The Joint Commission</h4>
+                <Badge className="bg-success text-white">Accredited</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 className="text-sm font-semibold mb-3">Top Referral Sources</h4>
-                  <div className="space-y-2">
-                    {["University Medical Center", "Regional Hospital Network", "Community Health Partners"].map((source, idx) => (
-                      <div key={idx} className="flex items-center gap-3">
-                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-muted text-sm font-medium">
-                          {idx + 1}
-                        </span>
-                        <span className="text-sm">{source}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <p className="text-sm text-muted-foreground mb-1">Accreditation ID:</p>
+                  <p className="font-medium">TJC-123456</p>
                 </div>
-
-                <Separator />
-
                 <div>
-                  <h4 className="text-sm font-semibold mb-3">Top Discharge Destinations</h4>
-                  <div className="space-y-2">
-                    {["Skilled Nursing Facility Network", "Home Health Services Inc", "Rehabilitation Centers Group"].map((dest, idx) => (
-                      <div key={idx} className="flex items-center gap-3">
-                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-muted text-sm font-medium">
-                          {idx + 1}
-                        </span>
-                        <span className="text-sm">{dest}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <p className="text-sm text-muted-foreground mb-1">Status:</p>
+                  <p className="font-medium">Active</p>
                 </div>
-              </CardContent>
-            </Card>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Issue Date:</p>
+                  <p className="font-medium">2021-03-10</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Expiry Date:</p>
+                  <p className="font-medium">2024-03-10</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-semibold">CMS Certification</h4>
+                <Badge className="bg-success text-white">Certified</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Certification Number:</p>
+                  <p className="font-medium">100234</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Status:</p>
+                  <p className="font-medium">Active</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Issue Date:</p>
+                  <p className="font-medium">2020-06-15</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Expiry Date:</p>
+                  <p className="font-medium">2025-06-15</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-            {/* Quality & Performance */}
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="text-lg">Quality & Performance</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">CMS Star Rating</p>
-                    <p className="text-4xl font-bold mb-1">4.0</p>
-                    <p className="text-xs text-muted-foreground">From CMS Care Compare</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Quality Score</p>
-                    <p className="text-4xl font-bold mb-1">92</p>
-                    <p className="text-xs text-muted-foreground">From CMS Care Compare</p>
-                  </div>
+        {/* Affiliated Physicians - Source Derived */}
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle>Affiliated Physicians - Source Derived (2 active)</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-4 border rounded-lg">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-semibold">Dr. Zeina M Kayali</h4>
+                <Badge className="bg-success text-white">Active</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">NPI:</p>
+                  <p className="font-medium">1578137394</p>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Specialty:</p>
+                  <p className="font-medium">Cardiology</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Role:</p>
+                  <p className="font-medium">Attending Physician</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Department:</p>
+                  <p className="font-medium">Cardiology</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Effective Date:</p>
+                  <p className="font-medium">2015-03-01</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-semibold">Dr. Sarah Johnson</h4>
+                <Badge className="bg-success text-white">Active</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">NPI:</p>
+                  <p className="font-medium">1234567892</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Specialty:</p>
+                  <p className="font-medium">Neurology</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Role:</p>
+                  <p className="font-medium">Attending Physician</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Department:</p>
+                  <p className="font-medium">Neurology</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Effective Date:</p>
+                  <p className="font-medium">2018-02-20</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="text-lg">Revision History</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="text-sm">
-                  <p className="text-muted-foreground">Update from CMS Database</p>
-                  <p className="text-muted-foreground">2025-10-15 IST</p>
+        {/* Affiliated Physicians - Field Intelligence */}
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle>Affiliated Physicians - Field Intelligence (1 active)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="p-4 border rounded-lg">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-semibold">Dr. John Smith</h4>
+                <Badge className="bg-success text-white">Active</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">NPI:</p>
+                  <p className="font-medium">1234567891</p>
                 </div>
-                <div className="text-sm">
-                  <p className="text-muted-foreground">Update from NPPES</p>
-                  <p className="text-muted-foreground">2025-09-30 IST</p>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Specialty:</p>
+                  <p className="font-medium">Internal Medicine</p>
                 </div>
-              </CardContent>
-            </Card>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Role:</p>
+                  <p className="font-medium">Consulting Physician</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Department:</p>
+                  <p className="font-medium">Internal Medicine</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Effective Date:</p>
+                  <p className="font-medium">2016-08-15</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Award className="h-5 w-5 text-primary" />
-                  Accreditation
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {hco.accreditation.map((acc, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
-                      <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-success" />
-                      <span className="text-sm">{acc}</span>
-                    </div>
-                  ))}
+        {/* Quality & Performance */}
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle>Quality & Performance</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div>
+              <p className="text-sm text-muted-foreground mb-4">CMS Care Compare Metrics</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-6 border rounded-lg">
+                  <p className="text-sm text-muted-foreground mb-2">Star Rating</p>
+                  <p className="text-5xl font-bold text-primary mb-1">4.5</p>
+                  <p className="text-xs text-muted-foreground">out of 5</p>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+                <div className="p-6 border rounded-lg">
+                  <p className="text-sm text-muted-foreground mb-2">Quality Score</p>
+                  <p className="text-5xl font-bold text-success mb-1">92</p>
+                  <p className="text-xs text-muted-foreground">CMS Score</p>
+                </div>
+              </div>
+            </div>
+            
+            <Separator />
+            
+            <div>
+              <h4 className="font-semibold mb-3">Additional Metrics</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-sm text-muted-foreground">Patient Safety Rating</span>
+                  <span className="font-semibold">A</span>
+                </div>
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-sm text-muted-foreground">Readmission Rate</span>
+                  <span className="font-semibold">12.3%</span>
+                </div>
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-sm text-muted-foreground">Patient Satisfaction</span>
+                  <span className="font-semibold">87%</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
