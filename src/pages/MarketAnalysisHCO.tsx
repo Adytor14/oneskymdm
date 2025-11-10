@@ -65,15 +65,16 @@ const MarketAnalysisHCO = () => {
 
   return (
     <div className="w-full space-y-6 p-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Market Analysis - Facility Accounts</h1>
-        <p className="text-muted-foreground mt-1">
-          Analyze facility market data and trends
-        </p>
-      </div>
+      <div className="max-w-[1400px] mx-auto space-y-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Market Analysis - Facility Accounts</h1>
+          <p className="text-muted-foreground mt-1">
+            Analyze facility market data and trends
+          </p>
+        </div>
 
-      {/* Filters for Analysis */}
+        {/* Filters for Analysis */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
@@ -218,28 +219,29 @@ const MarketAnalysisHCO = () => {
         </CardContent>
       </Card>
 
-      {/* HCO Metrics */}
-      <div className="grid gap-4 md:grid-cols-3">
-        {hcoMetrics.map((metric, index) => (
-          <Card key={index} className={metric.bgColor}>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xl font-bold text-blue-600">
-                  {metric.value}
-                </CardTitle>
-                {metric.label && (
-                  <Badge variant="secondary" className="text-xs">
-                    {metric.label}
-                  </Badge>
-                )}
-              </div>
-              <p className="text-sm text-muted-foreground">{metric.title}</p>
-            </CardHeader>
-          </Card>
-        ))}
+        {/* HCO Metrics */}
+        <div className="grid gap-4 md:grid-cols-3">
+          {hcoMetrics.map((metric, index) => (
+            <Card key={index} className={metric.bgColor}>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-xl font-bold text-blue-600">
+                    {metric.value}
+                  </CardTitle>
+                  {metric.label && (
+                    <Badge variant="secondary" className="text-xs">
+                      {metric.label}
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground">{metric.title}</p>
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
       </div>
 
-      {/* Facility Accounts Table */}
+      {/* Facility Accounts Table - Full Width */}
       <Card className="overflow-hidden">
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
