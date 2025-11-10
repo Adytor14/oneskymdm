@@ -365,34 +365,118 @@ const MarketAnalysisHCP = () => {
                 <table className="w-full"  style={{ minWidth: 'max-content' }}>
               <thead>
                 <tr className="border-b">
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Rank</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Physician Name</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">NPI</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">County</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">City</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">State</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Speciality</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">ONE ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Annual Patient Count (FFS)</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR HH Patient / HOS Patients Count</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Growth %</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Medical Director</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">MD - Agency</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Top Referring Agency</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_1</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_1</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Second Highest Referring Agency</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_2</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_2</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Third Referring Agency</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_3</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_3</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Forth Highest Referring Agency</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_4</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_4</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Fifth Referring Agency</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_5</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_5</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("rank")}>
+                    L4QTR Rank
+                    <SortIcon column="rank" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("name")}>
+                    Physician Name
+                    <SortIcon column="name" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("npi")}>
+                    NPI
+                    <SortIcon column="npi" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("county")}>
+                    County
+                    <SortIcon column="county" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("city")}>
+                    City
+                    <SortIcon column="city" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("state")}>
+                    State
+                    <SortIcon column="state" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("speciality")}>
+                    Speciality
+                    <SortIcon column="speciality" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("mdmId")}>
+                    ONE ID
+                    <SortIcon column="mdmId" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("annualPatientCount")}>
+                    Annual Patient Count (FFS)
+                    <SortIcon column="annualPatientCount" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("l4qtrPatientCount")}>
+                    L4QTR HH Patient / HOS Patients Count
+                    <SortIcon column="l4qtrPatientCount" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("growth")}>
+                    L4QTR Growth %
+                    <SortIcon column="growth" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("medicalDirector")}>
+                    Medical Director
+                    <SortIcon column="medicalDirector" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("mdAgency")}>
+                    MD - Agency
+                    <SortIcon column="mdAgency" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("referralAgency1")}>
+                    L4QTR Top Referring Agency
+                    <SortIcon column="referralAgency1" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("patientCount1")}>
+                    L4QTR Patient Count_1
+                    <SortIcon column="patientCount1" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("percentTotal1")}>
+                    % of Total Patients_1
+                    <SortIcon column="percentTotal1" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("referralAgency2")}>
+                    L4QTR Second Highest Referring Agency
+                    <SortIcon column="referralAgency2" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("patientCount2")}>
+                    L4QTR Patient Count_2
+                    <SortIcon column="patientCount2" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("percentTotal2")}>
+                    % of Total Patients_2
+                    <SortIcon column="percentTotal2" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("referralAgency3")}>
+                    L4QTR Third Referring Agency
+                    <SortIcon column="referralAgency3" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("patientCount3")}>
+                    L4QTR Patient Count_3
+                    <SortIcon column="patientCount3" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("percentTotal3")}>
+                    % of Total Patients_3
+                    <SortIcon column="percentTotal3" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("referralAgency4")}>
+                    L4QTR Forth Highest Referring Agency
+                    <SortIcon column="referralAgency4" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("patientCount4")}>
+                    L4QTR Patient Count_4
+                    <SortIcon column="patientCount4" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("percentTotal4")}>
+                    % of Total Patients_4
+                    <SortIcon column="percentTotal4" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("referralAgency5")}>
+                    L4QTR Fifth Referring Agency
+                    <SortIcon column="referralAgency5" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("patientCount5")}>
+                    L4QTR Patient Count_5
+                    <SortIcon column="patientCount5" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("percentTotal5")}>
+                    % of Total Patients_5
+                    <SortIcon column="percentTotal5" currentColumn={sortColumn} direction={sortDirection} />
+                  </th>
                 </tr>
               </thead>
               <tbody>
