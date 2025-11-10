@@ -368,64 +368,145 @@ const TopAgencies = () => {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Agency Name</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Type</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Physician Accounts</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Facility Accounts</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Distinct Patients</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Growth %</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {agencies
-                  .filter((agency) => {
-                    if (!searchTerm) return true;
-                    const search = searchTerm.toLowerCase();
-                    return (
-                      agency.name.toLowerCase().includes(search) ||
-                      agency.type.toLowerCase().includes(search)
-                    );
-                  })
-                  .map((agency, index) => (
-                  <tr
-                    key={index}
-                    className="border-b hover:bg-muted/50"
-                  >
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-3">
-                        {agency.logo && (
-                          <img 
-                            src={agency.logo} 
-                            alt={agency.name}
-                            className="h-8 w-8 object-contain"
-                          />
-                        )}
-                        <span className="font-medium">{agency.name}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 text-sm">{agency.type}</td>
-                    <td className="py-3 px-4 text-sm font-medium">{agency.physicianAccounts.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-sm font-medium">{agency.facilityAccounts.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-sm font-medium">{agency.distinctPatients.toLocaleString()}</td>
-                    <td className="py-3 px-4">
-                      <span className="text-sm text-green-600 font-medium">
-                        {agency.growth}%
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                        {agency.status}
-                      </Badge>
-                    </td>
+          <CardContent className="p-0 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-max">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Rank</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Agency Name</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">NPI</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">SKY ID</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Patient Location</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Growth</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Share</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Change in Share</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2025 Q1 Count</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2024 Q4 Count</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2024 Q3 Count</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2024 Q2 Count</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2025 Q1 Share</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2024 Q4 Share</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2024 Q3 Share</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2024 Q2 Share</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Affiliation Ownership</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Affiliated Owner</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Ownership %</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Top Referral Source</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_1</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_1</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Second Highest Referral Source</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_2</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_2</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Third Highest Referral Source</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_3</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_3</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Fourth Highest Referral Source</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_4</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_4</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Fifth Highest Referral Source</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_5</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_5</th>
                   </tr>
-                ))}
-              </tbody>
+                </thead>
+                <tbody>
+                  {agencies
+                    .filter((agency) => {
+                      if (!searchTerm) return true;
+                      const search = searchTerm.toLowerCase();
+                      return (
+                        agency.name.toLowerCase().includes(search) ||
+                        agency.type.toLowerCase().includes(search)
+                      );
+                    })
+                    .map((agency, index) => {
+                      // Mock data for new columns
+                      const rank = index + 1;
+                      const npi = `NPI${Math.floor(Math.random() * 9000000000) + 1000000000}`;
+                      const skyId = `SKY-${Math.floor(Math.random() * 90000) + 10000}`;
+                      const patientLocation = ["New York, NY", "Los Angeles, CA", "Chicago, IL", "Houston, TX", "Phoenix, AZ"][index % 5];
+                      const l4qtrPatientCount = Math.floor(Math.random() * 5000) + 1000;
+                      const l4qtrGrowth = (Math.random() * 25 + 5).toFixed(1);
+                      const l4qtrShare = (Math.random() * 15 + 5).toFixed(1);
+                      const changeInShare = (Math.random() * 5 - 2).toFixed(1);
+                      
+                      // Quarterly counts
+                      const q1_2025Count = Math.floor(Math.random() * 1500) + 500;
+                      const q4_2024Count = Math.floor(Math.random() * 1400) + 450;
+                      const q3_2024Count = Math.floor(Math.random() * 1300) + 400;
+                      const q2_2024Count = Math.floor(Math.random() * 1200) + 350;
+                      
+                      // Quarterly shares
+                      const q1_2025Share = (Math.random() * 12 + 4).toFixed(1);
+                      const q4_2024Share = (Math.random() * 11 + 3).toFixed(1);
+                      const q3_2024Share = (Math.random() * 10 + 3).toFixed(1);
+                      const q2_2024Share = (Math.random() * 9 + 3).toFixed(1);
+                      
+                      // Ownership data
+                      const affiliationOwnership = ["Full Ownership", "Partial Ownership", "Joint Venture", "Independent"][index % 4];
+                      const affiliatedOwner = ["Healthcare Corp", "Medical Holdings", "Care Partners", "Health Systems"][index % 4];
+                      const ownershipPercent = Math.floor(Math.random() * 60) + 30;
+                      
+                      // Referral sources
+                      const referralSources = [
+                        { name: "Primary Care Network", count: Math.floor(Math.random() * 800) + 200 },
+                        { name: "Specialty Clinics", count: Math.floor(Math.random() * 600) + 150 },
+                        { name: "Hospital System", count: Math.floor(Math.random() * 500) + 100 },
+                        { name: "Urgent Care Centers", count: Math.floor(Math.random() * 400) + 80 },
+                        { name: "Community Health", count: Math.floor(Math.random() * 300) + 60 },
+                      ];
+                      const totalReferralPatients = referralSources.reduce((sum, r) => sum + r.count, 0);
+                      
+                      return (
+                        <tr
+                          key={index}
+                          className="border-b hover:bg-muted/50"
+                        >
+                          <td className="py-3 px-4 text-sm">{rank}</td>
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              {agency.logo && (
+                                <img 
+                                  src={agency.logo} 
+                                  alt={agency.name}
+                                  className="h-8 w-8 object-contain"
+                                />
+                              )}
+                              <span className="font-medium whitespace-nowrap">{agency.name}</span>
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 text-sm">{npi}</td>
+                          <td className="py-3 px-4 text-sm">{skyId}</td>
+                          <td className="py-3 px-4 text-sm whitespace-nowrap">{patientLocation}</td>
+                          <td className="py-3 px-4 text-sm font-medium">{l4qtrPatientCount.toLocaleString()}</td>
+                          <td className="py-3 px-4 text-sm text-green-600 font-medium">{l4qtrGrowth}%</td>
+                          <td className="py-3 px-4 text-sm font-medium">{l4qtrShare}%</td>
+                          <td className="py-3 px-4 text-sm font-medium" style={{ color: parseFloat(changeInShare) >= 0 ? '#22c55e' : '#ef4444' }}>
+                            {parseFloat(changeInShare) >= 0 ? '+' : ''}{changeInShare}%
+                          </td>
+                          <td className="py-3 px-4 text-sm font-medium">{q1_2025Count.toLocaleString()}</td>
+                          <td className="py-3 px-4 text-sm font-medium">{q4_2024Count.toLocaleString()}</td>
+                          <td className="py-3 px-4 text-sm font-medium">{q3_2024Count.toLocaleString()}</td>
+                          <td className="py-3 px-4 text-sm font-medium">{q2_2024Count.toLocaleString()}</td>
+                          <td className="py-3 px-4 text-sm">{q1_2025Share}%</td>
+                          <td className="py-3 px-4 text-sm">{q4_2024Share}%</td>
+                          <td className="py-3 px-4 text-sm">{q3_2024Share}%</td>
+                          <td className="py-3 px-4 text-sm">{q2_2024Share}%</td>
+                          <td className="py-3 px-4 text-sm whitespace-nowrap">{affiliationOwnership}</td>
+                          <td className="py-3 px-4 text-sm whitespace-nowrap">{affiliatedOwner}</td>
+                          <td className="py-3 px-4 text-sm font-medium">{ownershipPercent}%</td>
+                          {referralSources.map((source, sourceIndex) => (
+                            <>
+                              <td key={`source-${sourceIndex}`} className="py-3 px-4 text-sm whitespace-nowrap">{source.name}</td>
+                              <td key={`count-${sourceIndex}`} className="py-3 px-4 text-sm font-medium">{source.count.toLocaleString()}</td>
+                              <td key={`percent-${sourceIndex}`} className="py-3 px-4 text-sm">{((source.count / totalReferralPatients) * 100).toFixed(1)}%</td>
+                            </>
+                          ))}
+                        </tr>
+                      );
+                    })}
+                </tbody>
             </table>
           </div>
         </CardContent>
