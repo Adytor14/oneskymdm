@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { mockHCOs } from "@/lib/mockData";
-import { Database, Building2, Eye, Search, FileSpreadsheet, FileText, Check, ChevronsUpDown, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Database, Building2, Eye, Search, FileSpreadsheet, FileText, Check, ChevronsUpDown, ArrowUpDown, ArrowUp, ArrowDown, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { exportToExcel } from "@/lib/exportUtils";
 import jsPDF from "jspdf";
@@ -22,6 +22,7 @@ const MarketAnalysisHCO = () => {
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
   const [selectedCounties, setSelectedCounties] = useState<string[]>([]);
   const [selectedPayers, setSelectedPayers] = useState<string[]>([]);
+  const [selectedQuarters, setSelectedQuarters] = useState<string[]>([]);
   const [serviceLine, setServiceLine] = useState<"HH" | "HOS">("HH");
   const [showLeftShadow, setShowLeftShadow] = useState(false);
   const [showRightShadow, setShowRightShadow] = useState(true);
@@ -57,6 +58,16 @@ const MarketAnalysisHCO = () => {
   const states = ["California", "Texas", "Florida", "New York", "Illinois"];
   const counties = ["Los Angeles", "Harris", "Miami-Dade", "Kings", "Cook"];
   const payers = ["Medicare", "Medicaid", "Private Insurance", "Uninsured"];
+  const quarters = ["Q4 2024", "Q3 2024", "Q2 2024", "Q1 2024", "Q4 2023", "Q3 2023"];
+
+  const clearFilters = () => {
+    setSelectedStates([]);
+    setSelectedCounties([]);
+    setSelectedPayers([]);
+    setSelectedQuarters([]);
+    setZipCode("");
+    setSearchTerm("");
+  };
 
   const hcoMetrics = [
     { title: "Total Facility Accounts", value: "468", bgColor: "bg-blue-50" },
@@ -78,9 +89,20 @@ const MarketAnalysisHCO = () => {
         {/* Filters for Analysis */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Database className="h-5 w-5" />
-            Filters for Analysis
+          <CardTitle className="text-lg flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Database className="h-5 w-5" />
+              Filters for Analysis
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-4 w-4 mr-2" />
+              Clear Filters
+            </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -173,17 +195,42 @@ const MarketAnalysisHCO = () => {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Time (Quarters)</label>
-              <Select defaultValue="q4-2024">
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Quarter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="q4-2024">Q4 2024</SelectItem>
-                  <SelectItem value="q3-2024">Q3 2024</SelectItem>
-                  <SelectItem value="q2-2024">Q2 2024</SelectItem>
-                  <SelectItem value="q1-2024">Q1 2024</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between">
+                    {selectedQuarters.length > 0 ? `${selectedQuarters.length} selected` : "Select quarters"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search quarters..." />
+                    <CommandEmpty>No quarter found.</CommandEmpty>
+                    <CommandGroup className="max-h-64 overflow-auto">
+                      {quarters.map((quarter) => (
+                        <CommandItem
+                          key={quarter}
+                          onSelect={() => {
+                            setSelectedQuarters(
+                              selectedQuarters.includes(quarter)
+                                ? selectedQuarters.filter((q) => q !== quarter)
+                                : [...selectedQuarters, quarter]
+                            );
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedQuarters.includes(quarter) ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {quarter}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Payer Type</label>
