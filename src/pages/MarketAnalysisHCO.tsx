@@ -82,19 +82,7 @@ const MarketAnalysisHCO = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Service Line</label>
-              <Select value={serviceLine} onValueChange={(value: "HH" | "HOS") => setServiceLine(value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Service Line" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="HH">Home Health (HH)</SelectItem>
-                  <SelectItem value="HOS">Hospice (HOS)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">State</label>
               <Popover>
