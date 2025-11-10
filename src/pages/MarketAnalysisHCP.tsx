@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -566,7 +566,14 @@ const MarketAnalysisHCP = () => {
                       className="border-b hover:bg-muted/50"
                     >
                       <td className="py-3 px-4 text-sm">{record.rank}</td>
-                      <td className="py-3 px-4 whitespace-nowrap">{record.name}</td>
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <Link 
+                          to={`/hcp/${record.id}`}
+                          className="text-primary hover:underline font-medium"
+                        >
+                          {record.name}
+                        </Link>
+                      </td>
                       <td className="py-3 px-4 text-sm">{record.npi}</td>
                       <td className="py-3 px-4 text-sm whitespace-nowrap">{record.county}</td>
                       <td className="py-3 px-4 text-sm">{record.city}</td>
