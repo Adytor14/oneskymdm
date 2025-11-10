@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -646,11 +646,18 @@ const MarketAnalysisHCO = () => {
                     return (
                       <tr
                         key={index}
-                        className="border-b hover:bg-muted/50 cursor-pointer"
-                        onClick={() => navigate(`/hco/${data.record.id}`)}
+                        className="border-b hover:bg-muted/50"
                       >
                         <td className="py-3 px-4 text-sm">{data.rank}</td>
-                        <td className="py-3 px-4 text-sm font-medium">{data.name}</td>
+                        <td className="py-3 px-4 text-sm font-medium">
+                          <Link 
+                            to={`/hco/${data.record.id}`}
+                            className="text-primary hover:underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {data.name}
+                          </Link>
+                        </td>
                         <td className="py-3 px-4 text-sm">{data.npi}</td>
                         <td className="py-3 px-4 text-sm">{data.county}</td>
                         <td className="py-3 px-4 text-sm">{data.city}</td>

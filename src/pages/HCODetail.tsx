@@ -50,7 +50,7 @@ const HCODetail = () => {
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/hco")}>
+            <Button variant="ghost" size="icon" onClick={() => navigate("/market-analysis/hco")}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
