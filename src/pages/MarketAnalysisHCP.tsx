@@ -358,9 +358,11 @@ const MarketAnalysisHCP = () => {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <ScrollArea className="w-full">
-            <table className="w-full min-w-max">
+        <CardContent className="p-0">
+          <div className="overflow-hidden">
+            <ScrollArea className="w-full whitespace-nowrap rounded-md">
+              <div className="p-6">
+                <table className="w-full"  style={{ minWidth: 'max-content' }}>
               <thead>
                 <tr className="border-b">
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Rank</th>
@@ -512,11 +514,14 @@ const MarketAnalysisHCP = () => {
                 })()}
               </tbody>
             </table>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
           
           {/* Pagination */}
-          {(() => {
+          <div className="p-6 pt-4">
+            {(() => {
             const activeRecords = mockHCPs.filter((record) => record.status === "Active");
             const preparedData = activeRecords.map((record, index) => ({
               ...record,
@@ -594,7 +599,8 @@ const MarketAnalysisHCP = () => {
                 </Pagination>
               </div>
             );
-          })()}
+            })()}
+          </div>
         </CardContent>
       </Card>
     </div>
