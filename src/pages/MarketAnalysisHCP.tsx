@@ -70,7 +70,7 @@ const MarketAnalysisHCP = () => {
   return (
     <div className="space-y-6 p-6">
       {/* Header */}
-      <div>
+      <div className="max-w-[1400px] mx-auto">
         <h1 className="text-3xl font-bold text-foreground">Market Analysis - Physician Accounts</h1>
         <p className="text-muted-foreground mt-1">
           Analyze physician market data and trends
@@ -78,7 +78,7 @@ const MarketAnalysisHCP = () => {
       </div>
 
       {/* HCP Metrics */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="max-w-[1400px] mx-auto grid gap-4 md:grid-cols-3">
         {hcpMetrics.map((metric, index) => (
           <Card key={index} className={metric.bgColor}>
             <CardHeader className="pb-2">
@@ -92,13 +92,14 @@ const MarketAnalysisHCP = () => {
       </div>
 
       {/* Filters for Analysis */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Database className="h-5 w-5" />
-            Filters for Analysis
-          </CardTitle>
-        </CardHeader>
+      <div className="max-w-[1400px] mx-auto">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Database className="h-5 w-5" />
+              Filters for Analysis
+            </CardTitle>
+          </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
@@ -232,7 +233,8 @@ const MarketAnalysisHCP = () => {
             </div>
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
 
       {/* Physician Accounts Table */}
       <Card>
