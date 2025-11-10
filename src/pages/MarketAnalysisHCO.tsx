@@ -22,6 +22,7 @@ const MarketAnalysisHCO = () => {
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
   const [selectedCounties, setSelectedCounties] = useState<string[]>([]);
   const [selectedPayers, setSelectedPayers] = useState<string[]>([]);
+  const [serviceLine, setServiceLine] = useState<"HH" | "HOS">("HH");
 
   const states = ["California", "Texas", "Florida", "New York", "Illinois"];
   const counties = ["Los Angeles", "Harris", "Miami-Dade", "Kings", "Cook"];
@@ -29,7 +30,7 @@ const MarketAnalysisHCO = () => {
 
   const hcoMetrics = [
     { title: "Total Facility Accounts", value: "468", bgColor: "bg-blue-50" },
-    { title: "Total Patients Count", value: "441", label: "HH", bgColor: "bg-green-50" },
+    { title: "Total Patients Count", value: "441", label: serviceLine, bgColor: "bg-green-50" },
     { title: "Growth", value: "8.3%", bgColor: "bg-gray-50" },
   ];
 
@@ -52,7 +53,19 @@ const MarketAnalysisHCO = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Service Line</label>
+              <Select value={serviceLine} onValueChange={(value: "HH" | "HOS") => setServiceLine(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Service Line" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="HH">Home Health (HH)</SelectItem>
+                  <SelectItem value="HOS">Hospice (HOS)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">State</label>
               <Popover>
