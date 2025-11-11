@@ -38,9 +38,6 @@ export const ServiceLineSwitcher = () => {
 
   return (
     <div className="flex items-center gap-2">
-      <Badge variant="outline">
-        {currentServiceLine}
-      </Badge>
       <Select value={currentServiceLine} onValueChange={handleServiceLineChange}>
         <SelectTrigger className="w-[150px]">
           <SelectValue />

@@ -93,9 +93,6 @@ export const RoleSwitcher = () => {
 
   return (
     <div className="flex items-center gap-2">
-      <Badge variant="outline" className="capitalize">
-        {currentRole.replace('_', ' ')}
-      </Badge>
       <Select value={currentRole} onValueChange={handleRoleChange}>
         <SelectTrigger className="w-[140px]">
           <SelectValue />
