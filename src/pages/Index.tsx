@@ -391,54 +391,7 @@ const Index = () => {
               </Popover>
             </div>
 
-            {/* Specialty Filter */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Specialty</label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Specialties" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Specialties</SelectItem>
-                  <SelectItem value="cardiology">Cardiology</SelectItem>
-                  <SelectItem value="neurology">Neurology</SelectItem>
-                  <SelectItem value="orthopedics">Orthopedics</SelectItem>
-                  <SelectItem value="pediatrics">Pediatrics</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Sub Specialty Filter */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Sub Specialty</label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Sub Specialties" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Sub Specialties</SelectItem>
-                  <SelectItem value="interventional">Interventional</SelectItem>
-                  <SelectItem value="general">General</SelectItem>
-                  <SelectItem value="pediatric">Pediatric</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Affiliations Filter */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Affiliations</label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Affiliations" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Affiliations</SelectItem>
-                  <SelectItem value="hospital-a">Hospital A</SelectItem>
-                  <SelectItem value="hospital-b">Hospital B</SelectItem>
-                  <SelectItem value="clinic-network">Clinic Network</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            
 
             {/* Payer Type Filter */}
             <div className="space-y-2">
@@ -470,25 +423,7 @@ const Index = () => {
               </Popover>
             </div>
 
-            {/* Patient Volume Filter */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Patient Volume</label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Volumes" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Volumes</SelectItem>
-                  <SelectItem value="0-100">0-100</SelectItem>
-                  <SelectItem value="101-300">101-300</SelectItem>
-                  <SelectItem value="301-500">301-500</SelectItem>
-                  <SelectItem value="500+">500+</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+            
 
       {/* Top Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
