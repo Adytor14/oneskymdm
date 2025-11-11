@@ -27,7 +27,6 @@ import MyDataHighlights from "./pages/MyDataHighlights";
 import AdminApprovalDashboard from "./pages/AdminApprovalDashboard";
 import RulesManagement from "./pages/RulesManagement";
 import MergeMatchApproval from "./pages/MergeMatchApproval";
-import AdminOverview from "./pages/AdminOverview";
 import DataChangeRequestDetail from "./pages/DataChangeRequestDetail";
 import HCPDetail from "./pages/HCPDetail";
 import HCODetail from "./pages/HCODetail";
@@ -114,7 +113,6 @@ const App = () => (
                           <Route path="/dcr" element={<DCRList />} />
                           <Route path="/change-requests" element={<DataChangeRequests />} />
                           <Route path="/change-requests/:status" element={<DataChangeRequests />} />
-                          <Route path="/admin/overview" element={<AdminOverview />} />
                           <Route path="/admin/approvals" element={<AdminApprovalDashboard />} />
                           <Route path="/rules" element={<RulesManagement />} />
                           <Route path="/merge-match-approval" element={<MergeMatchApproval />} />
