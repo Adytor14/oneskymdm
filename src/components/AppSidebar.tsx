@@ -45,7 +45,6 @@ const dcrSubItems = [
 
 const adminItems = [
   { title: "Rules", url: "/rules", icon: Layers },
-  { title: "DCR", url: "/data-change-requests", icon: FileText },
 ];
 
 const mergeMatchItems = [
@@ -248,27 +247,6 @@ export function AppSidebar() {
                       </CollapsibleContent>
                     </SidebarMenuItem>
                   </Collapsible>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-
-            <SidebarGroup>
-              <SidebarGroupLabel>Analytics</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <NavLink
-                        to="/admin/analytics"
-                        className={({ isActive }) =>
-                          isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
-                        }
-                      >
-                        <BarChart3 className="h-4 w-4" />
-                        <span>Analytics</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
