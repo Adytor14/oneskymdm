@@ -259,7 +259,7 @@ const Index = () => {
 
           {/* Organization Filter */}
           <div className="space-y-2 w-64">
-            <label className="text-sm font-medium">Organization</label>
+            <label className="text-sm font-medium">Select Organization</label>
             <Select value={selectedOrganization} onValueChange={setSelectedOrganization}>
               <SelectTrigger className="bg-white text-foreground">
                 <SelectValue placeholder="Select Organization" />
