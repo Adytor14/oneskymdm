@@ -109,11 +109,11 @@ const DataChangeRequests = () => {
         <thead>
           <tr className="border-b">
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">DCR ID</th>
-            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Entity Type</th>
-            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Entity ID</th>
-            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Request Type</th>
+            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">DCR Type</th>
+            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Data Open</th>
+            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Data/Request Type</th>
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Priority</th>
-            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
+            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Assigned to</th>
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
           </tr>
