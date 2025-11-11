@@ -243,8 +243,8 @@ const MarketAnalysisHCP = () => {
       <Card className="max-w-[1400px]">
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
-            <CardTitle className="text-lg">Physician Accounts</CardTitle>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
+              <CardTitle className="text-lg">Physician Accounts</CardTitle>
               <div className="relative w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input 
@@ -257,6 +257,8 @@ const MarketAnalysisHCP = () => {
                   }}
                 />
               </div>
+            </div>
+            <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
