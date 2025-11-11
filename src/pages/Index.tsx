@@ -422,8 +422,9 @@ const Index = () => {
                 </PopoverContent>
               </Popover>
             </div>
-
-            
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Top Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
