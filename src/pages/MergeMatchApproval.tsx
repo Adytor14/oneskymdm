@@ -436,7 +436,11 @@ const MergeMatchApproval = () => {
                 <div key={entityId} className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold">{entityId}</h3>
-                    <Button variant="link" className="text-primary p-0 h-auto">
+                    <Button 
+                      variant="link" 
+                      className="text-primary p-0 h-auto"
+                      onClick={() => navigate(`/hcp/${entityId}`)}
+                    >
                       View more
                     </Button>
                   </div>
