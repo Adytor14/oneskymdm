@@ -110,8 +110,8 @@ const DataChangeRequests = () => {
           <tr className="border-b">
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">DCR ID</th>
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">DCR Type</th>
-            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Data Open</th>
-            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Data/Request Type</th>
+            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Date Open</th>
+            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Days Open</th>
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Priority</th>
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Assigned to</th>
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
@@ -144,8 +144,12 @@ const DataChangeRequests = () => {
                   {record.entity_type}
                 </Badge>
               </td>
-              <td className="py-3 px-4 text-sm">{record.entity_id}</td>
-              <td className="py-3 px-4 text-sm capitalize">{record.request_type}</td>
+              <td className="py-3 px-4 text-sm">
+                {new Date(record.created_at).toLocaleDateString("en-GB")}
+              </td>
+              <td className="py-3 px-4 text-sm">
+                {Math.floor((new Date().getTime() - new Date(record.created_at).getTime()) / (1000 * 60 * 60 * 24))}
+              </td>
               <td className="py-3 px-4">
                 <Badge
                   className={
