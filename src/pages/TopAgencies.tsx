@@ -29,7 +29,7 @@ const TopAgencies = () => {
       distinctPatients: 45621,
       growth: 12.5,
       status: "Active",
-      logo: "/src/assets/reliant-logo.png"
+      logo: "/src/assets/reliant-logo.png",
     },
     {
       name: "Opuscare",
@@ -39,7 +39,7 @@ const TopAgencies = () => {
       distinctPatients: 32145,
       growth: 8.3,
       status: "Active",
-      logo: "/src/assets/opuscare-logo.png"
+      logo: "/src/assets/opuscare-logo.png",
     },
     {
       name: "Choice Medical",
@@ -49,7 +49,7 @@ const TopAgencies = () => {
       distinctPatients: 38942,
       growth: 15.7,
       status: "Active",
-      logo: "/src/assets/choice-logo.png"
+      logo: "/src/assets/choice-logo.png",
     },
     {
       name: "JetHealth",
@@ -59,7 +59,7 @@ const TopAgencies = () => {
       distinctPatients: 28634,
       growth: 10.2,
       status: "Active",
-      logo: "/src/assets/jethealth-logo.png"
+      logo: "/src/assets/jethealth-logo.png",
     },
     {
       name: "Skyra Medical",
@@ -69,7 +69,7 @@ const TopAgencies = () => {
       distinctPatients: 31247,
       growth: 9.8,
       status: "Active",
-      logo: "/src/assets/skyra-logo.png"
+      logo: "/src/assets/skyra-logo.png",
     },
     {
       name: "OneSky Health",
@@ -79,7 +79,7 @@ const TopAgencies = () => {
       distinctPatients: 52389,
       growth: 18.4,
       status: "Active",
-      logo: "/src/assets/OneSky-logo.png"
+      logo: "/src/assets/OneSky-logo.png",
     },
     {
       name: "Pfizer Healthcare Partners",
@@ -89,7 +89,7 @@ const TopAgencies = () => {
       distinctPatients: 68234,
       growth: 14.2,
       status: "Active",
-      logo: null
+      logo: null,
     },
     {
       name: "Johnson & Johnson Medical",
@@ -99,7 +99,7 @@ const TopAgencies = () => {
       distinctPatients: 59421,
       growth: 11.6,
       status: "Active",
-      logo: null
+      logo: null,
     },
     {
       name: "Novartis Care Network",
@@ -109,7 +109,7 @@ const TopAgencies = () => {
       distinctPatients: 42156,
       growth: 13.9,
       status: "Active",
-      logo: null
+      logo: null,
     },
     {
       name: "Merck Medical Solutions",
@@ -119,8 +119,8 @@ const TopAgencies = () => {
       distinctPatients: 38765,
       growth: 7.4,
       status: "Active",
-      logo: null
-    }
+      logo: null,
+    },
   ];
 
   const topMetrics = [
@@ -129,16 +129,16 @@ const TopAgencies = () => {
       value: "10",
       icon: Building2,
       bgColor: "bg-blue-50",
-      iconColor: "text-blue-600"
+      iconColor: "text-blue-600",
     },
     {
-      title: "Total Facility Account",
+      title: "Total Facility Accounts",
       value: "300",
       secondaryValue: "800",
-      secondarySubtitle: "Total Physician Account",
+      secondarySubtitle: "Total Physician Accounts",
       icon: Building2,
       bgColor: "bg-green-50",
-      iconColor: "text-green-600"
+      iconColor: "text-green-600",
     },
     {
       title: "Total Patients",
@@ -148,7 +148,7 @@ const TopAgencies = () => {
       secondarySubtitle: "Facilities",
       icon: Activity,
       bgColor: "bg-purple-50",
-      iconColor: "text-purple-600"
+      iconColor: "text-purple-600",
     },
     {
       title: "L4QTR Growth Rate",
@@ -158,8 +158,8 @@ const TopAgencies = () => {
       secondarySubtitle: "Facilities",
       icon: TrendingUp,
       bgColor: "bg-orange-50",
-      iconColor: "text-orange-600"
-    }
+      iconColor: "text-orange-600",
+    },
   ];
 
   return (
@@ -201,14 +201,14 @@ const TopAgencies = () => {
                               setSelectedStates(
                                 selectedStates.includes(state)
                                   ? selectedStates.filter((s) => s !== state)
-                                  : [...selectedStates, state]
+                                  : [...selectedStates, state],
                               );
                             }}
                           >
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                selectedStates.includes(state) ? "opacity-100" : "opacity-0"
+                                selectedStates.includes(state) ? "opacity-100" : "opacity-0",
                               )}
                             />
                             {state}
@@ -240,14 +240,14 @@ const TopAgencies = () => {
                               setSelectedCounties(
                                 selectedCounties.includes(county)
                                   ? selectedCounties.filter((c) => c !== county)
-                                  : [...selectedCounties, county]
+                                  : [...selectedCounties, county],
                               );
                             }}
                           >
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                selectedCounties.includes(county) ? "opacity-100" : "opacity-0"
+                                selectedCounties.includes(county) ? "opacity-100" : "opacity-0",
                               )}
                             />
                             {county}
@@ -260,11 +260,7 @@ const TopAgencies = () => {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">ZIP</label>
-                <Input 
-                  placeholder="Enter ZIP code" 
-                  value={zipCode}
-                  onChange={(e) => setZipCode(e.target.value)}
-                />
+                <Input placeholder="Enter ZIP code" value={zipCode} onChange={(e) => setZipCode(e.target.value)} />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Time (Quarters)</label>
@@ -301,14 +297,14 @@ const TopAgencies = () => {
                               setSelectedPayers(
                                 selectedPayers.includes(payer)
                                   ? selectedPayers.filter((p) => p !== payer)
-                                  : [...selectedPayers, payer]
+                                  : [...selectedPayers, payer],
                               );
                             }}
                           >
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                selectedPayers.includes(payer) ? "opacity-100" : "opacity-0"
+                                selectedPayers.includes(payer) ? "opacity-100" : "opacity-0",
                               )}
                             />
                             {payer}
@@ -330,16 +326,12 @@ const TopAgencies = () => {
             return (
               <Card key={index}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {metric.title}
-                  </CardTitle>
+                  <CardTitle className="text-sm font-medium text-muted-foreground">{metric.title}</CardTitle>
                   <Icon className={`h-4 w-4 ${metric.iconColor}`} />
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold">{metric.value}</div>
-                  {metric.subtitle && (
-                    <p className="text-xs text-muted-foreground mt-1">{metric.subtitle}</p>
-                  )}
+                  {metric.subtitle && <p className="text-xs text-muted-foreground mt-1">{metric.subtitle}</p>}
                   {metric.secondaryValue && (
                     <>
                       <div className="text-2xl font-bold mt-2">{metric.secondaryValue}</div>
@@ -352,7 +344,7 @@ const TopAgencies = () => {
           })}
         </div>
       </div>
-      
+
       {/* Agencies Table */}
       <div className="max-w-[1400px]">
         <Card>
@@ -361,8 +353,8 @@ const TopAgencies = () => {
               <CardTitle>Healthcare Agencies Overview</CardTitle>
               <div className="relative w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Search agencies..." 
+                <Input
+                  placeholder="Search agencies..."
                   className="pl-9"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -375,41 +367,111 @@ const TopAgencies = () => {
               <table className="w-full min-w-max">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Rank</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Agency Name</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">NPI</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">SKY ID</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Patient Location</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Growth</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Share</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Change in Share</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2025 Q1 Count</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2024 Q4 Count</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2024 Q3 Count</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2024 Q2 Count</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2025 Q1 Share</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2024 Q4 Share</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2024 Q3 Share</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">2024 Q2 Share</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Affiliation Ownership</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Affiliated Owner</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Ownership %</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Top Referral Source</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_1</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_1</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Second Highest Referral Source</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_2</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_2</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Third Highest Referral Source</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_3</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_3</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Fourth Highest Referral Source</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_4</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_4</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Fifth Highest Referral Source</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Patient Count_5</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients_5</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      L4QTR Rank
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      Agency Name
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      NPI
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      SKY ID
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      Patient Location
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      L4QTR Patient Count
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      L4QTR Growth
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      L4QTR Share
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      L4QTR Change in Share
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      2025 Q1 Count
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      2024 Q4 Count
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      2024 Q3 Count
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      2024 Q2 Count
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      2025 Q1 Share
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      2024 Q4 Share
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      2024 Q3 Share
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      2024 Q2 Share
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      Affiliation Ownership
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      Affiliated Owner
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      Ownership %
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      Top Referral Source
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      L4QTR Patient Count_1
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      % of Total Patients_1
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      Second Highest Referral Source
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      L4QTR Patient Count_2
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      % of Total Patients_2
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      Third Highest Referral Source
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      L4QTR Patient Count_3
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      % of Total Patients_3
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      Fourth Highest Referral Source
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      L4QTR Patient Count_4
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      % of Total Patients_4
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      Fifth Highest Referral Source
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      L4QTR Patient Count_5
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      % of Total Patients_5
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -417,39 +479,52 @@ const TopAgencies = () => {
                     .filter((agency) => {
                       if (!searchTerm) return true;
                       const search = searchTerm.toLowerCase();
-                      return (
-                        agency.name.toLowerCase().includes(search) ||
-                        agency.type.toLowerCase().includes(search)
-                      );
+                      return agency.name.toLowerCase().includes(search) || agency.type.toLowerCase().includes(search);
                     })
                     .map((agency, index) => {
                       // Mock data for new columns
                       const rank = index + 1;
                       const npi = `NPI${Math.floor(Math.random() * 9000000000) + 1000000000}`;
                       const skyId = `SKY-${Math.floor(Math.random() * 90000) + 10000}`;
-                      const patientLocation = ["New York, NY", "Los Angeles, CA", "Chicago, IL", "Houston, TX", "Phoenix, AZ"][index % 5];
+                      const patientLocation = [
+                        "New York, NY",
+                        "Los Angeles, CA",
+                        "Chicago, IL",
+                        "Houston, TX",
+                        "Phoenix, AZ",
+                      ][index % 5];
                       const l4qtrPatientCount = Math.floor(Math.random() * 5000) + 1000;
                       const l4qtrGrowth = (Math.random() * 25 + 5).toFixed(1);
                       const l4qtrShare = (Math.random() * 15 + 5).toFixed(1);
                       const changeInShare = (Math.random() * 5 - 2).toFixed(1);
-                      
+
                       // Quarterly counts
                       const q1_2025Count = Math.floor(Math.random() * 1500) + 500;
                       const q4_2024Count = Math.floor(Math.random() * 1400) + 450;
                       const q3_2024Count = Math.floor(Math.random() * 1300) + 400;
                       const q2_2024Count = Math.floor(Math.random() * 1200) + 350;
-                      
+
                       // Quarterly shares
                       const q1_2025Share = (Math.random() * 12 + 4).toFixed(1);
                       const q4_2024Share = (Math.random() * 11 + 3).toFixed(1);
                       const q3_2024Share = (Math.random() * 10 + 3).toFixed(1);
                       const q2_2024Share = (Math.random() * 9 + 3).toFixed(1);
-                      
+
                       // Ownership data
-                      const affiliationOwnership = ["Full Ownership", "Partial Ownership", "Joint Venture", "Independent"][index % 4];
-                      const affiliatedOwner = ["Healthcare Corp", "Medical Holdings", "Care Partners", "Health Systems"][index % 4];
+                      const affiliationOwnership = [
+                        "Full Ownership",
+                        "Partial Ownership",
+                        "Joint Venture",
+                        "Independent",
+                      ][index % 4];
+                      const affiliatedOwner = [
+                        "Healthcare Corp",
+                        "Medical Holdings",
+                        "Care Partners",
+                        "Health Systems",
+                      ][index % 4];
                       const ownershipPercent = Math.floor(Math.random() * 60) + 30;
-                      
+
                       // Referral sources
                       const referralSources = [
                         { name: "Primary Care Network", count: Math.floor(Math.random() * 800) + 200 },
@@ -459,21 +534,14 @@ const TopAgencies = () => {
                         { name: "Community Health", count: Math.floor(Math.random() * 300) + 60 },
                       ];
                       const totalReferralPatients = referralSources.reduce((sum, r) => sum + r.count, 0);
-                      
+
                       return (
-                        <tr
-                          key={index}
-                          className="border-b hover:bg-muted/50"
-                        >
+                        <tr key={index} className="border-b hover:bg-muted/50">
                           <td className="py-3 px-4 text-sm">{rank}</td>
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-3">
                               {agency.logo && (
-                                <img 
-                                  src={agency.logo} 
-                                  alt={agency.name}
-                                  className="h-8 w-8 object-contain"
-                                />
+                                <img src={agency.logo} alt={agency.name} className="h-8 w-8 object-contain" />
                               )}
                               <span className="font-medium whitespace-nowrap">{agency.name}</span>
                             </div>
@@ -484,8 +552,12 @@ const TopAgencies = () => {
                           <td className="py-3 px-4 text-sm font-medium">{l4qtrPatientCount.toLocaleString()}</td>
                           <td className="py-3 px-4 text-sm text-green-600 font-medium">{l4qtrGrowth}%</td>
                           <td className="py-3 px-4 text-sm font-medium">{l4qtrShare}%</td>
-                          <td className="py-3 px-4 text-sm font-medium" style={{ color: parseFloat(changeInShare) >= 0 ? '#22c55e' : '#ef4444' }}>
-                            {parseFloat(changeInShare) >= 0 ? '+' : ''}{changeInShare}%
+                          <td
+                            className="py-3 px-4 text-sm font-medium"
+                            style={{ color: parseFloat(changeInShare) >= 0 ? "#22c55e" : "#ef4444" }}
+                          >
+                            {parseFloat(changeInShare) >= 0 ? "+" : ""}
+                            {changeInShare}%
                           </td>
                           <td className="py-3 px-4 text-sm font-medium">{q1_2025Count.toLocaleString()}</td>
                           <td className="py-3 px-4 text-sm font-medium">{q4_2024Count.toLocaleString()}</td>
@@ -500,19 +572,25 @@ const TopAgencies = () => {
                           <td className="py-3 px-4 text-sm font-medium">{ownershipPercent}%</td>
                           {referralSources.map((source, sourceIndex) => (
                             <>
-                              <td key={`source-${sourceIndex}`} className="py-3 px-4 text-sm whitespace-nowrap">{source.name}</td>
-                              <td key={`count-${sourceIndex}`} className="py-3 px-4 text-sm font-medium">{source.count.toLocaleString()}</td>
-                              <td key={`percent-${sourceIndex}`} className="py-3 px-4 text-sm">{((source.count / totalReferralPatients) * 100).toFixed(1)}%</td>
+                              <td key={`source-${sourceIndex}`} className="py-3 px-4 text-sm whitespace-nowrap">
+                                {source.name}
+                              </td>
+                              <td key={`count-${sourceIndex}`} className="py-3 px-4 text-sm font-medium">
+                                {source.count.toLocaleString()}
+                              </td>
+                              <td key={`percent-${sourceIndex}`} className="py-3 px-4 text-sm">
+                                {((source.count / totalReferralPatients) * 100).toFixed(1)}%
+                              </td>
                             </>
                           ))}
                         </tr>
                       );
                     })}
                 </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
