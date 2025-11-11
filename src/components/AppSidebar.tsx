@@ -44,7 +44,6 @@ const dcrSubItems = [
 ];
 
 const adminItems = [
-  { title: "Overview", url: "/admin/overview", icon: LayoutDashboard },
   { title: "Rules", url: "/rules", icon: Layers },
   { title: "DCR", url: "/data-change-requests", icon: FileText },
 ];
