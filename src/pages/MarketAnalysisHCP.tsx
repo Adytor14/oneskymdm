@@ -48,6 +48,31 @@ const MarketAnalysisHCP = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  // Filter states
+  const [stateFilter, setStateFilter] = useState("all");
+  const [countiesFilter, setCountiesFilter] = useState("all");
+  const [zipFilter, setZipFilter] = useState("");
+  const [quarterFilter, setQuarterFilter] = useState("q4-2024");
+  const [payerFilter, setPayerFilter] = useState("all");
+  const [specialtyFilter, setSpecialtyFilter] = useState("all");
+  const [subSpecialtyFilter, setSubSpecialtyFilter] = useState("all");
+  const [affiliationsFilter, setAffiliationsFilter] = useState("all");
+  const [patientVolumeFilter, setPatientVolumeFilter] = useState("all");
+  const [deliberateDuplicates, setDeliberateDuplicates] = useState(false);
+
+  const handleClearFilters = () => {
+    setStateFilter("all");
+    setCountiesFilter("all");
+    setZipFilter("");
+    setQuarterFilter("q4-2024");
+    setPayerFilter("all");
+    setSpecialtyFilter("all");
+    setSubSpecialtyFilter("all");
+    setAffiliationsFilter("all");
+    setPatientVolumeFilter("all");
+    setDeliberateDuplicates(false);
+  };
+
   const handleSort = (column: string) => {
     if (sortColumn === column) {
       if (sortDirection === "asc") {
@@ -102,137 +127,155 @@ const MarketAnalysisHCP = () => {
             </CardTitle>
           </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">State</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All States" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All States</SelectItem>
-                  <SelectItem value="ny">New York</SelectItem>
-                  <SelectItem value="ca">California</SelectItem>
-                  <SelectItem value="il">Illinois</SelectItem>
-                  <SelectItem value="tx">Texas</SelectItem>
-                  <SelectItem value="az">Arizona</SelectItem>
-                </SelectContent>
-              </Select>
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">State</label>
+                <Select value={stateFilter} onValueChange={setStateFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All States" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All States</SelectItem>
+                    <SelectItem value="ny">New York</SelectItem>
+                    <SelectItem value="ca">California</SelectItem>
+                    <SelectItem value="il">Illinois</SelectItem>
+                    <SelectItem value="tx">Texas</SelectItem>
+                    <SelectItem value="az">Arizona</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Counties</label>
+                <Select value={countiesFilter} onValueChange={setCountiesFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Counties" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Counties</SelectItem>
+                    <SelectItem value="kings">Kings County</SelectItem>
+                    <SelectItem value="los-angeles">Los Angeles County</SelectItem>
+                    <SelectItem value="cook">Cook County</SelectItem>
+                    <SelectItem value="harris">Harris County</SelectItem>
+                    <SelectItem value="maricopa">Maricopa County</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">ZIP</label>
+                <Input 
+                  placeholder="Enter ZIP code" 
+                  value={zipFilter}
+                  onChange={(e) => setZipFilter(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Time (Quarters)</label>
+                <Select value={quarterFilter} onValueChange={setQuarterFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Quarter" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="q4-2024">Q4 2024</SelectItem>
+                    <SelectItem value="q3-2024">Q3 2024</SelectItem>
+                    <SelectItem value="q2-2024">Q2 2024</SelectItem>
+                    <SelectItem value="q1-2024">Q1 2024</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Payer Type</label>
+                <Select value={payerFilter} onValueChange={setPayerFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Payers" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Payers</SelectItem>
+                    <SelectItem value="medicare">Medicare</SelectItem>
+                    <SelectItem value="medicaid">Medicaid</SelectItem>
+                    <SelectItem value="private">Private Insurance</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Specialty</label>
+                <Select value={specialtyFilter} onValueChange={setSpecialtyFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Specialties" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Specialties</SelectItem>
+                    <SelectItem value="cardiology">Cardiology</SelectItem>
+                    <SelectItem value="orthopedics">Orthopedics</SelectItem>
+                    <SelectItem value="neurology">Neurology</SelectItem>
+                    <SelectItem value="pediatrics">Pediatrics</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Sub Specialty</label>
+                <Select value={subSpecialtyFilter} onValueChange={setSubSpecialtyFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Sub Specialties" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Sub Specialties</SelectItem>
+                    <SelectItem value="interventional">Interventional</SelectItem>
+                    <SelectItem value="general">General</SelectItem>
+                    <SelectItem value="pediatric">Pediatric</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Affiliations</label>
+                <Select value={affiliationsFilter} onValueChange={setAffiliationsFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Affiliations" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Affiliations</SelectItem>
+                    <SelectItem value="hospital-a">Hospital A</SelectItem>
+                    <SelectItem value="hospital-b">Hospital B</SelectItem>
+                    <SelectItem value="clinic-network">Clinic Network</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Patient Volume</label>
+                <Select value={patientVolumeFilter} onValueChange={setPatientVolumeFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Volumes" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Volumes</SelectItem>
+                    <SelectItem value="0-100">0 - 100</SelectItem>
+                    <SelectItem value="100-300">100 - 300</SelectItem>
+                    <SelectItem value="300-500">300 - 500</SelectItem>
+                    <SelectItem value="500+">500+</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center space-x-2 pt-6">
+                <Checkbox 
+                  id="deliberate-duplicates" 
+                  checked={deliberateDuplicates}
+                  onCheckedChange={(checked) => setDeliberateDuplicates(checked as boolean)}
+                />
+                <Label 
+                  htmlFor="deliberate-duplicates" 
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Deliberate Duplicates
+                </Label>
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Counties</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All Counties" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Counties</SelectItem>
-                  <SelectItem value="kings">Kings County</SelectItem>
-                  <SelectItem value="los-angeles">Los Angeles County</SelectItem>
-                  <SelectItem value="cook">Cook County</SelectItem>
-                  <SelectItem value="harris">Harris County</SelectItem>
-                  <SelectItem value="maricopa">Maricopa County</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">ZIP</label>
-              <Input placeholder="Enter ZIP code" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Time (Quarters)</label>
-              <Select defaultValue="q4-2024">
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Quarter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="q4-2024">Q4 2024</SelectItem>
-                  <SelectItem value="q3-2024">Q3 2024</SelectItem>
-                  <SelectItem value="q2-2024">Q2 2024</SelectItem>
-                  <SelectItem value="q1-2024">Q1 2024</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Payer Type</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All Payers" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Payers</SelectItem>
-                  <SelectItem value="medicare">Medicare</SelectItem>
-                  <SelectItem value="medicaid">Medicaid</SelectItem>
-                  <SelectItem value="private">Private Insurance</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Specialty</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All Specialties" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Specialties</SelectItem>
-                  <SelectItem value="cardiology">Cardiology</SelectItem>
-                  <SelectItem value="orthopedics">Orthopedics</SelectItem>
-                  <SelectItem value="neurology">Neurology</SelectItem>
-                  <SelectItem value="pediatrics">Pediatrics</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Sub Specialty</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All Sub Specialties" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Sub Specialties</SelectItem>
-                  <SelectItem value="interventional">Interventional</SelectItem>
-                  <SelectItem value="general">General</SelectItem>
-                  <SelectItem value="pediatric">Pediatric</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Affiliations</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All Affiliations" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Affiliations</SelectItem>
-                  <SelectItem value="hospital-a">Hospital A</SelectItem>
-                  <SelectItem value="hospital-b">Hospital B</SelectItem>
-                  <SelectItem value="clinic-network">Clinic Network</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Patient Volume</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All Volumes" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Volumes</SelectItem>
-                  <SelectItem value="0-100">0 - 100</SelectItem>
-                  <SelectItem value="100-300">100 - 300</SelectItem>
-                  <SelectItem value="300-500">300 - 500</SelectItem>
-                  <SelectItem value="500+">500+</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center space-x-2 pt-6">
-              <Checkbox id="deliberate-duplicates" />
-              <Label 
-                htmlFor="deliberate-duplicates" 
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            <div className="flex justify-end">
+              <Button 
+                variant="outline" 
+                onClick={handleClearFilters}
               >
-                Deliberate Duplicates
-              </Label>
+                Clear Filters
+              </Button>
             </div>
           </div>
         </CardContent>
