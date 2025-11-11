@@ -1,4 +1,4 @@
-import { Building2, User, FileText, LayoutDashboard, LogOut, FileEdit, CheckSquare, Layers, GitMerge, ClipboardList, TrendingUp, ChevronDown, MapPin, Hash, BarChart3 } from "lucide-react";
+import { Building2, User, FileText, LayoutDashboard, LogOut, FileEdit, CheckSquare, Layers, GitMerge, ClipboardList, TrendingUp, ChevronDown, MapPin, BarChart3 } from "lucide-react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -51,7 +51,6 @@ const mergeMatchItems = [
   { title: "Physician Accounts", url: "/merge-match-approval?type=hcp", icon: User },
   { title: "Facility Account", url: "/merge-match-approval?type=hco", icon: Building2 },
   { title: "Address", url: "/merge-match-approval?type=address", icon: MapPin },
-  { title: "SLN", url: "/merge-match-approval?type=sln", icon: Hash },
 ];
 
 export function AppSidebar() {
