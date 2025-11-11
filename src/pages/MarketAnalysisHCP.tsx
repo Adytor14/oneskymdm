@@ -104,20 +104,6 @@ const MarketAnalysisHCP = () => {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Countries</label>
-              <Select defaultValue="all">
-                <SelectTrigger>
-                  <SelectValue placeholder="All Countries" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Countries</SelectItem>
-                  <SelectItem value="us">United States</SelectItem>
-                  <SelectItem value="uk">United Kingdom</SelectItem>
-                  <SelectItem value="ca">Canada</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
               <label className="text-sm font-medium">State</label>
               <Select defaultValue="all">
                 <SelectTrigger>
@@ -130,6 +116,22 @@ const MarketAnalysisHCP = () => {
                   <SelectItem value="il">Illinois</SelectItem>
                   <SelectItem value="tx">Texas</SelectItem>
                   <SelectItem value="az">Arizona</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Counties</label>
+              <Select defaultValue="all">
+                <SelectTrigger>
+                  <SelectValue placeholder="All Counties" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Counties</SelectItem>
+                  <SelectItem value="kings">Kings County</SelectItem>
+                  <SelectItem value="los-angeles">Los Angeles County</SelectItem>
+                  <SelectItem value="cook">Cook County</SelectItem>
+                  <SelectItem value="harris">Harris County</SelectItem>
+                  <SelectItem value="maricopa">Maricopa County</SelectItem>
                 </SelectContent>
               </Select>
             </div>
