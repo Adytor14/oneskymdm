@@ -4,16 +4,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Eye, Search } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Eye, Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const MergeMatchApproval = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [activeStatusTab, setActiveStatusTab] = useState("pending");
   const [searchTerm, setSearchTerm] = useState("");
   const [scoreFilter, setScoreFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [timeFilter, setTimeFilter] = useState("all");
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [comment, setComment] = useState("");
 
   const mockPendingData = [
     {
@@ -52,6 +60,29 @@ const MergeMatchApproval = () => {
       processedDate: "20/10/2025",
     },
   ];
+
+  const mockEntityDetails = {
+    HCP1001: {
+      firstName: "Sarah",
+      lastName: "Johnson",
+      npiId: "1234567890",
+      orgId: "ORG-12345",
+      source: "Epic EMR",
+      mdmId: "MDM-HCP-001",
+      medicalLicense: "MA-MD-123456",
+      address: "123 Medical Plaza, Boston, MA 02115, USA",
+    },
+    HCP2104: {
+      firstName: "Sarrah",
+      lastName: "Johnson",
+      npiId: "1234567890",
+      orgId: "ORG-12345",
+      source: "Epic EMR",
+      mdmId: "MDM-HCP-001",
+      medicalLicense: "MA-MD-123456",
+      address: "123 Medical Plaza, Boston, MA 02115, USA",
+    },
+  };
 
   const mockResolvedData = [
     {
@@ -105,6 +136,37 @@ const MergeMatchApproval = () => {
       comments: "Accepted",
     },
   ];
+
+  const handleViewRequest = (record: any) => {
+    setSelectedRequest(record);
+    setIsDialogOpen(true);
+    setComment("");
+  };
+
+  const handleApprove = () => {
+    toast({
+      title: "Request Approved",
+      description: `Merge request ${selectedRequest?.requestId} has been approved.`,
+    });
+    setIsDialogOpen(false);
+  };
+
+  const handleReject = () => {
+    toast({
+      title: "Request Rejected",
+      description: `Merge request ${selectedRequest?.requestId} has been rejected.`,
+      variant: "destructive",
+    });
+    setIsDialogOpen(false);
+  };
+
+  const handleMarkDuplicate = () => {
+    toast({
+      title: "Marked as Deliberate Duplicate",
+      description: `Request ${selectedRequest?.requestId} marked as deliberate duplicate.`,
+    });
+    setIsDialogOpen(false);
+  };
 
   return (
     <div className="space-y-6 p-6">
@@ -206,10 +268,13 @@ const MergeMatchApproval = () => {
                           {record.status}
                         </Badge>
                       </td>
-                      <td className="py-3 px-4 text-sm">{record.processedDate}</td>
-                      <td className="py-3 px-4">
-                        <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
-                      </td>
+                          <td className="py-3 px-4 text-sm">{record.processedDate}</td>
+                          <td className="py-3 px-4">
+                            <Eye 
+                              className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
+                              onClick={() => handleViewRequest(record)}
+                            />
+                          </td>
                     </tr>
                   ))}
                 </tbody>
@@ -315,6 +380,143 @@ const MergeMatchApproval = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="flex flex-row items-center justify-between pb-4 border-b">
+            <DialogTitle className="text-xl font-semibold">
+              {selectedRequest?.requestId} - Merge
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedRequest && (
+            <div className="space-y-6">
+              {/* Summary Info */}
+              <div className="grid grid-cols-2 gap-8 p-4 bg-muted/30 rounded-lg">
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">Entity ID</div>
+                    <div className="font-medium text-primary">
+                      {selectedRequest.entityIds}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">Rule</div>
+                    <div className="font-medium">Suspect</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">Match Score</div>
+                    <div className="font-medium">{selectedRequest.matchScore}%</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">Status</div>
+                    <Badge className="bg-orange-500 hover:bg-orange-600 text-white">
+                      {selectedRequest.status}
+                    </Badge>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">Processed Date</div>
+                    <div className="font-medium">{selectedRequest.processedDate}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">Resolved Date</div>
+                    <div className="font-medium">-</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">Resolved By</div>
+                    <div className="font-medium">-</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Entity Details */}
+              {selectedRequest.entityIds.split(", ").map((entityId: string, index: number) => (
+                <div key={entityId} className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">{entityId}</h3>
+                    <Button variant="link" className="text-primary p-0 h-auto">
+                      View more
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                    <div>
+                      <div className="text-muted-foreground mb-1">First Name</div>
+                      <div className={index === 0 ? "text-red-600 font-medium" : ""}>
+                        {mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.firstName}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground mb-1">NPI ID</div>
+                      <div>{mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.npiId}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground mb-1">Last Name</div>
+                      <div>{mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.lastName}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground mb-1">ORG ID</div>
+                      <div>{mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.orgId}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground mb-1">Source</div>
+                      <div>{mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.source}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground mb-1">MDM ID</div>
+                      <div>{mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.mdmId}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground mb-1">Medical License</div>
+                      <div>{mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.medicalLicense}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground mb-1">Address</div>
+                      <div>{mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.address}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Comment Section */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Add a comment (Optional)</label>
+                <Textarea
+                  placeholder="Enter your comment..."
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  className="min-h-[100px]"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                <Button 
+                  variant="outline" 
+                  className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+                  onClick={handleReject}
+                >
+                  Reject
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={handleMarkDuplicate}
+                >
+                  Mark Deliberate Duplicate
+                </Button>
+                <Button 
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  onClick={handleApprove}
+                >
+                  Approve
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
