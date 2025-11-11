@@ -60,6 +60,8 @@ const MarketAnalysisHCP = () => {
   const [patientVolumeFilter, setPatientVolumeFilter] = useState("all");
   const [deliberateDuplicates, setDeliberateDuplicates] = useState(false);
 
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+
   const handleClearFilters = () => {
     setStateFilter("all");
     setCountiesFilter("all");
@@ -71,6 +73,25 @@ const MarketAnalysisHCP = () => {
     setAffiliationsFilter("all");
     setPatientVolumeFilter("all");
     setDeliberateDuplicates(false);
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = mockHCPs.filter(r => r.status === "Active").map(r => r.mdmId);
+      setSelectedRows(new Set(allIds));
+    } else {
+      setSelectedRows(new Set());
+    }
+  };
+
+  const handleSelectRow = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedRows);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedRows(newSelected);
   };
 
   const handleSort = (column: string) => {
@@ -412,6 +433,12 @@ const MarketAnalysisHCP = () => {
                 <table className="w-full"  style={{ minWidth: 'max-content' }}>
               <thead>
                 <tr className="border-b">
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <Checkbox
+                      checked={selectedRows.size > 0 && selectedRows.size === mockHCPs.filter(r => r.status === "Active").length}
+                      onCheckedChange={handleSelectAll}
+                    />
+                  </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("rank")}>
                     L4QTR Rank
                     <SortIcon column="rank" currentColumn={sortColumn} direction={sortDirection} />
@@ -612,6 +639,12 @@ const MarketAnalysisHCP = () => {
                       key={index}
                       className="border-b hover:bg-muted/50"
                     >
+                      <td className="py-3 px-4">
+                        <Checkbox
+                          checked={selectedRows.has(record.id)}
+                          onCheckedChange={(checked) => handleSelectRow(record.id, checked as boolean)}
+                        />
+                      </td>
                       <td className="py-3 px-4 text-sm">{record.rank}</td>
                       <td className="py-3 px-4 whitespace-nowrap">
                         <Link 

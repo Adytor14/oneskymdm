@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Building2, Users, TrendingUp, Activity, Database, Search, Check, ChevronsUpDown } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
@@ -15,6 +16,26 @@ const TopAgencies = () => {
   const [selectedCounties, setSelectedCounties] = useState<string[]>([]);
   const [selectedPayers, setSelectedPayers] = useState<string[]>([]);
   const [zipCode, setZipCode] = useState("");
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = agencies.filter(a => a.status === "Active").map((_, index) => index.toString());
+      setSelectedRows(new Set(allIds));
+    } else {
+      setSelectedRows(new Set());
+    }
+  };
+
+  const handleSelectRow = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedRows);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedRows(newSelected);
+  };
 
   const states = ["California", "Texas", "Florida", "New York", "Illinois"];
   const counties = ["Los Angeles", "Harris", "Miami-Dade", "Kings", "Cook"];
@@ -368,6 +389,12 @@ const TopAgencies = () => {
                 <thead>
                   <tr className="border-b">
                     <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                      <Checkbox
+                        checked={selectedRows.size > 0 && selectedRows.size === agencies.filter(a => a.status === "Active").length}
+                        onCheckedChange={handleSelectAll}
+                      />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
                       L4QTR Rank
                     </th>
                     <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
@@ -537,6 +564,12 @@ const TopAgencies = () => {
 
                       return (
                         <tr key={index} className="border-b hover:bg-muted/50">
+                          <td className="py-3 px-4">
+                            <Checkbox
+                              checked={selectedRows.has(index.toString())}
+                              onCheckedChange={(checked) => handleSelectRow(index.toString(), checked as boolean)}
+                            />
+                          </td>
                           <td className="py-3 px-4 text-sm">{rank}</td>
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-3">

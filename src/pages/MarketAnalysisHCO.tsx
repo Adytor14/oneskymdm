@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { mockHCOs } from "@/lib/mockData";
 import { Database, Building2, Eye, Search, FileSpreadsheet, FileText, Check, ChevronsUpDown, ArrowUpDown, ArrowUp, ArrowDown, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -29,6 +30,7 @@ const MarketAnalysisHCO = () => {
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [zipCode, setZipCode] = useState("");
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
@@ -67,6 +69,25 @@ const MarketAnalysisHCO = () => {
     setSelectedQuarters([]);
     setZipCode("");
     setSearchTerm("");
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = mockHCOs.filter(r => r.status === "Active").map(r => r.mdmId);
+      setSelectedRows(new Set(allIds));
+    } else {
+      setSelectedRows(new Set());
+    }
+  };
+
+  const handleSelectRow = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedRows);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedRows(newSelected);
   };
 
   const hcoMetrics = [
@@ -459,6 +480,12 @@ const MarketAnalysisHCO = () => {
               <thead>
                 <tr className="border-b">
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <Checkbox
+                      checked={selectedRows.size > 0 && selectedRows.size === mockHCOs.filter(r => r.status === "Active").length}
+                      onCheckedChange={handleSelectAll}
+                    />
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
                     <button onClick={() => handleSort("rank")} className="flex items-center hover:text-foreground">
                       L4QTR Rank
                       <SortIcon column="rank" />
@@ -648,6 +675,12 @@ const MarketAnalysisHCO = () => {
                         key={index}
                         className="border-b hover:bg-muted/50"
                       >
+                        <td className="py-3 px-4">
+                          <Checkbox
+                            checked={selectedRows.has(data.record.mdmId)}
+                            onCheckedChange={(checked) => handleSelectRow(data.record.mdmId, checked as boolean)}
+                          />
+                        </td>
                         <td className="py-3 px-4 text-sm">{data.rank}</td>
                         <td className="py-3 px-4 text-sm font-medium">
                           <Link 
