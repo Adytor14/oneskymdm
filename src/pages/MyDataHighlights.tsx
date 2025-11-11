@@ -19,6 +19,7 @@ const MyDataHighlights = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("hcp");
   const [selectedOrganization, setSelectedOrganization] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
   
   // Filter states
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
@@ -427,8 +428,19 @@ const MyDataHighlights = () => {
           {/* Physician Accounts Table */}
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Physician Accounts</CardTitle>
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <CardTitle className="text-lg">Physician Accounts</CardTitle>
+                  <div className="relative w-64">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      placeholder="Search by name, NPI, or specialty..." 
+                      className="pl-9"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                </div>
                 <p className="text-sm text-muted-foreground">
                   Showing 13 of 15 profiles
                 </p>
