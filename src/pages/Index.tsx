@@ -6,7 +6,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { mockHCPs, mockHCOs, mockAddresses, mockDCRs } from "@/lib/mockData";
-import { Database, Users, Building2, MapPin, FileText, Search, Eye, TrendingUp, ArrowUpRight, Check, ChevronsUpDown, ChevronUp, ChevronDown, ChevronsUpDown as ArrowUpDown, Download, FileSpreadsheet, X } from "lucide-react";
+import {
+  Database,
+  Users,
+  Building2,
+  MapPin,
+  FileText,
+  Search,
+  Eye,
+  TrendingUp,
+  ArrowUpRight,
+  Check,
+  ChevronsUpDown,
+  ChevronUp,
+  ChevronDown,
+  ChevronsUpDown as ArrowUpDown,
+  Download,
+  FileSpreadsheet,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { getOrganizationTheme } from "@/lib/organizationThemes";
@@ -20,36 +38,36 @@ const Index = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("hcp");
   const [selectedOrganization, setSelectedOrganization] = useState("all");
-  
+
   // Filter states
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
   const [selectedCounties, setSelectedCounties] = useState<string[]>([]);
   const [selectedQuarters, setSelectedQuarters] = useState<string[]>([]);
   const [selectedPayers, setSelectedPayers] = useState<string[]>([]);
-  
+
   // Sorting states for HCP
   const [hcpSortColumn, setHcpSortColumn] = useState<string | null>(null);
-  const [hcpSortDirection, setHcpSortDirection] = useState<'asc' | 'desc'>('asc');
-  
+  const [hcpSortDirection, setHcpSortDirection] = useState<"asc" | "desc">("asc");
+
   // Pagination states for HCP
   const [hcpCurrentPage, setHcpCurrentPage] = useState(1);
   const [hcpRowsPerPage, setHcpRowsPerPage] = useState(10);
-  
+
   // Sorting states for HCO
   const [hcoSortColumn, setHcoSortColumn] = useState<string | null>(null);
-  const [hcoSortDirection, setHcoSortDirection] = useState<'asc' | 'desc'>('asc');
-  
+  const [hcoSortDirection, setHcoSortDirection] = useState<"asc" | "desc">("asc");
+
   // Pagination states for HCO
   const [hcoCurrentPage, setHcoCurrentPage] = useState(1);
   const [hcoRowsPerPage, setHcoRowsPerPage] = useState(10);
-  
+
   // Search states
   const [hcpSearchQuery, setHcpSearchQuery] = useState("");
   const [hcoSearchQuery, setHcoSearchQuery] = useState("");
-  
+
   // Get current organization theme
   const currentTheme = getOrganizationTheme(selectedOrganization);
-  
+
   // Filter options
   const states = [
     { value: "ny", label: "New York" },
@@ -58,7 +76,7 @@ const Index = () => {
     { value: "fl", label: "Florida" },
     { value: "il", label: "Illinois" },
   ];
-  
+
   const counties = [
     { value: "kings", label: "Kings County" },
     { value: "los-angeles", label: "Los Angeles County" },
@@ -66,24 +84,24 @@ const Index = () => {
     { value: "miami-dade", label: "Miami-Dade County" },
     { value: "cook", label: "Cook County" },
   ];
-  
+
   const quarters = [
     { value: "q4-2024", label: "Q4 2024" },
     { value: "q3-2024", label: "Q3 2024" },
     { value: "q2-2024", label: "Q2 2024" },
     { value: "q1-2024", label: "Q1 2024" },
   ];
-  
+
   const payers = [
     { value: "medicare", label: "Medicare" },
     { value: "medicaid", label: "Medicaid" },
     { value: "private", label: "Private Insurance" },
     { value: "commercial", label: "Commercial" },
   ];
-  
+
   const toggleSelection = (value: string, selected: string[], setSelected: (values: string[]) => void) => {
     if (selected.includes(value)) {
-      setSelected(selected.filter(v => v !== value));
+      setSelected(selected.filter((v) => v !== value));
     } else {
       setSelected([...selected, value]);
     }
@@ -92,10 +110,10 @@ const Index = () => {
   // Sorting handler for HCP table
   const handleHcpSort = (column: string) => {
     if (hcpSortColumn === column) {
-      setHcpSortDirection(hcpSortDirection === 'asc' ? 'desc' : 'asc');
+      setHcpSortDirection(hcpSortDirection === "asc" ? "desc" : "asc");
     } else {
       setHcpSortColumn(column);
-      setHcpSortDirection('asc');
+      setHcpSortDirection("asc");
     }
     setHcpCurrentPage(1); // Reset to first page on sort
   };
@@ -103,22 +121,32 @@ const Index = () => {
   // Sorting handler for HCO table
   const handleHcoSort = (column: string) => {
     if (hcoSortColumn === column) {
-      setHcoSortDirection(hcoSortDirection === 'asc' ? 'desc' : 'asc');
+      setHcoSortDirection(hcoSortDirection === "asc" ? "desc" : "asc");
     } else {
       setHcoSortColumn(column);
-      setHcoSortDirection('asc');
+      setHcoSortDirection("asc");
     }
     setHcoCurrentPage(1); // Reset to first page on sort
   };
 
   // Sort icon component
-  const SortIcon = ({ column, currentColumn, direction }: { column: string; currentColumn: string | null; direction: 'asc' | 'desc' }) => {
+  const SortIcon = ({
+    column,
+    currentColumn,
+    direction,
+  }: {
+    column: string;
+    currentColumn: string | null;
+    direction: "asc" | "desc";
+  }) => {
     if (currentColumn !== column) {
       return <ArrowUpDown className="h-3 w-3 ml-1 inline opacity-30" />;
     }
-    return direction === 'asc' ? 
-      <ChevronUp className="h-3 w-3 ml-1 inline" /> : 
-      <ChevronDown className="h-3 w-3 ml-1 inline" />;
+    return direction === "asc" ? (
+      <ChevronUp className="h-3 w-3 ml-1 inline" />
+    ) : (
+      <ChevronDown className="h-3 w-3 ml-1 inline" />
+    );
   };
 
   // Clear all filters function
@@ -138,12 +166,12 @@ const Index = () => {
   };
 
   // Check if any filters are active
-  const hasActiveFilters = 
-    selectedStates.length > 0 || 
-    selectedCounties.length > 0 || 
-    selectedQuarters.length > 0 || 
-    selectedPayers.length > 0 || 
-    hcpSearchQuery.length > 0 || 
+  const hasActiveFilters =
+    selectedStates.length > 0 ||
+    selectedCounties.length > 0 ||
+    selectedQuarters.length > 0 ||
+    selectedPayers.length > 0 ||
+    hcpSearchQuery.length > 0 ||
     hcoSearchQuery.length > 0;
 
   const topStats = [
@@ -213,26 +241,22 @@ const Index = () => {
   return (
     <div className="space-y-6 p-6">
       {/* Branded Header Band */}
-      <div 
+      <div
         className="rounded-lg p-6 shadow-lg mb-6"
-        style={{ 
+        style={{
           background: currentTheme.colors.headerBg,
-          color: currentTheme.colors.headerText
+          color: currentTheme.colors.headerText,
         }}
       >
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <img 
-              src={currentTheme.logo} 
-              alt={`${currentTheme.name} Logo`}
-              className="h-16 w-auto object-contain"
-            />
+            <img src={currentTheme.logo} alt={`${currentTheme.name} Logo`} className="h-16 w-auto object-contain" />
             <div>
               <h1 className="text-3xl font-bold">{currentTheme.name}</h1>
               <p className="mt-1 opacity-90">{currentTheme.tagline}</p>
             </div>
           </div>
-          
+
           {/* Organization Filter */}
           <div className="space-y-2 w-64">
             <label className="text-sm font-medium">Organization</label>
@@ -262,12 +286,7 @@ const Index = () => {
               Filters for Analysis
             </CardTitle>
             {hasActiveFilters && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleClearFilters}
-                className="flex items-center gap-2"
-              >
+              <Button variant="outline" size="sm" onClick={handleClearFilters} className="flex items-center gap-2">
                 <X className="h-4 w-4" />
                 Clear Filters
               </Button>
@@ -281,14 +300,8 @@ const Index = () => {
               <label className="text-sm font-medium">State</label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className="w-full justify-between font-normal"
-                  >
-                    {selectedStates.length === 0
-                      ? "All States"
-                      : `${selectedStates.length} selected`}
+                  <Button variant="outline" role="combobox" className="w-full justify-between font-normal">
+                    {selectedStates.length === 0 ? "All States" : `${selectedStates.length} selected`}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -317,14 +330,8 @@ const Index = () => {
               <label className="text-sm font-medium">Counties</label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className="w-full justify-between font-normal"
-                  >
-                    {selectedCounties.length === 0
-                      ? "All Counties"
-                      : `${selectedCounties.length} selected`}
+                  <Button variant="outline" role="combobox" className="w-full justify-between font-normal">
+                    {selectedCounties.length === 0 ? "All Counties" : `${selectedCounties.length} selected`}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -359,14 +366,8 @@ const Index = () => {
               <label className="text-sm font-medium">Time (Quarters)</label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className="w-full justify-between font-normal"
-                  >
-                    {selectedQuarters.length === 0
-                      ? "All Quarters"
-                      : `${selectedQuarters.length} selected`}
+                  <Button variant="outline" role="combobox" className="w-full justify-between font-normal">
+                    {selectedQuarters.length === 0 ? "All Quarters" : `${selectedQuarters.length} selected`}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -444,14 +445,8 @@ const Index = () => {
               <label className="text-sm font-medium">Payer Type</label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className="w-full justify-between font-normal"
-                  >
-                    {selectedPayers.length === 0
-                      ? "All Payers"
-                      : `${selectedPayers.length} selected`}
+                  <Button variant="outline" role="combobox" className="w-full justify-between font-normal">
+                    {selectedPayers.length === 0 ? "All Payers" : `${selectedPayers.length} selected`}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -500,22 +495,13 @@ const Index = () => {
         {topStats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card 
-              key={index} 
-              style={{ backgroundColor: currentTheme.colors.cardBg }}
-            >
+            <Card key={index} style={{ backgroundColor: currentTheme.colors.cardBg }}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
-                <Icon 
-                  className="h-4 w-4" 
-                  style={{ color: currentTheme.colors.iconColor }}
-                />
+                <Icon className="h-4 w-4" style={{ color: currentTheme.colors.iconColor }} />
               </CardHeader>
               <CardContent>
-                <div 
-                  className="text-3xl font-bold"
-                  style={{ color: currentTheme.colors.primary }}
-                >
+                <div className="text-3xl font-bold" style={{ color: currentTheme.colors.primary }}>
                   {stat.value}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">{stat.subtitle}</p>
@@ -527,9 +513,7 @@ const Index = () => {
 
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList 
-          style={{ backgroundColor: currentTheme.colors.cardBg }}
-        >
+        <TabsList style={{ backgroundColor: currentTheme.colors.cardBg }}>
           <TabsTrigger value="hcp" className="data-[state=active]:bg-white">
             <Users className="h-4 w-4 mr-2" />
             Physician Accounts
@@ -544,15 +528,9 @@ const Index = () => {
           {/* HCP Metrics */}
           <div className="grid gap-4 md:grid-cols-3">
             {hcpMetrics.map((metric, index) => (
-              <Card 
-                key={index} 
-                style={{ backgroundColor: currentTheme.colors.cardBg }}
-              >
+              <Card key={index} style={{ backgroundColor: currentTheme.colors.cardBg }}>
                 <CardHeader className="pb-2">
-                  <CardTitle 
-                    className="text-xl font-bold"
-                    style={{ color: currentTheme.colors.primary }}
-                  >
+                  <CardTitle className="text-xl font-bold" style={{ color: currentTheme.colors.primary }}>
                     {metric.value}
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">{metric.title}</p>
@@ -580,23 +558,23 @@ const Index = () => {
                         const distinctPatients = Math.floor(Math.random() * 500) + 100;
                         const growth = Math.floor(Math.random() * 20) + 1;
                         const addressableCount = Math.floor(Math.random() * 300) + 50;
-                        
+
                         return {
-                          'Name': `Dr. ${record.firstName} ${record.lastName}`,
-                          'NPI': npiId,
-                          'City': city,
-                          'State': state,
-                          'One ID': record.mdmId,
-                          'Speciality': record.speciality[0],
-                          'Sub Speciality': subSpeciality,
-                          'Assigned Identifiers': record.identifiers.join(', '),
-                          'Distinct Patients': distinctPatients,
-                          'Growth %': `${growth}%`,
-                          'Addressable Count': addressableCount,
+                          Name: `Dr. ${record.firstName} ${record.lastName}`,
+                          NPI: npiId,
+                          City: city,
+                          State: state,
+                          "One ID": record.mdmId,
+                          Speciality: record.speciality[0],
+                          "Sub Speciality": subSpeciality,
+                          "Assigned Identifiers": record.identifiers.join(", "),
+                          "Distinct Patients": distinctPatients,
+                          "Growth %": `${growth}%`,
+                          "Addressable Count": addressableCount,
                         };
                       });
-                      
-                      exportToExcel(preparedData, `Physician_Accounts_${new Date().toISOString().split('T')[0]}`);
+
+                      exportToExcel(preparedData, `Physician_Accounts_${new Date().toISOString().split("T")[0]}`);
                       toast({
                         title: "Export successful",
                         description: "Physician accounts data has been exported to Excel",
@@ -608,7 +586,7 @@ const Index = () => {
                   </Button>
                 </div>
               </div>
-              
+
               {/* Search Input */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -628,82 +606,94 @@ const Index = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th 
+                      <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                        onClick={() => handleHcpSort('name')}
+                        onClick={() => handleHcpSort("name")}
                       >
                         Name
                         <SortIcon column="name" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
                       </th>
-                      <th 
+                      <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                        onClick={() => handleHcpSort('npi')}
+                        onClick={() => handleHcpSort("npi")}
                       >
                         NPI
                         <SortIcon column="npi" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
                       </th>
-                      <th 
+                      <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                        onClick={() => handleHcpSort('city')}
+                        onClick={() => handleHcpSort("city")}
                       >
                         City
                         <SortIcon column="city" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
                       </th>
-                      <th 
+                      <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                        onClick={() => handleHcpSort('state')}
+                        onClick={() => handleHcpSort("state")}
                       >
                         State
                         <SortIcon column="state" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
                       </th>
-                      <th 
+                      <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                        onClick={() => handleHcpSort('mdmId')}
+                        onClick={() => handleHcpSort("mdmId")}
                       >
                         One ID
                         <SortIcon column="mdmId" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
                       </th>
-                      <th 
+                      <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                        onClick={() => handleHcpSort('speciality')}
+                        onClick={() => handleHcpSort("speciality")}
                       >
                         Speciality
                         <SortIcon column="speciality" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
                       </th>
-                      <th 
+                      <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                        onClick={() => handleHcpSort('subSpeciality')}
+                        onClick={() => handleHcpSort("subSpeciality")}
                       >
                         Sub Speciality
                         <SortIcon column="subSpeciality" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
                       </th>
-                      <th 
+                      <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                        onClick={() => handleHcpSort('assignedAccounts')}
+                        onClick={() => handleHcpSort("assignedAccounts")}
                       >
                         Assigned Accounts
-                        <SortIcon column="assignedAccounts" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
+                        <SortIcon
+                          column="assignedAccounts"
+                          currentColumn={hcpSortColumn}
+                          direction={hcpSortDirection}
+                        />
                       </th>
                       <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                        onClick={() => handleHcpSort('distinctPatients')}
+                        onClick={() => handleHcpSort("distinctPatients")}
                       >
                         Distinct Patients count
-                        <SortIcon column="distinctPatients" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
+                        <SortIcon
+                          column="distinctPatients"
+                          currentColumn={hcpSortColumn}
+                          direction={hcpSortDirection}
+                        />
                       </th>
-                      <th 
+                      <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                        onClick={() => handleHcpSort('growth')}
+                        onClick={() => handleHcpSort("growth")}
                       >
                         Growth %
                         <SortIcon column="growth" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
                       </th>
-                      <th 
+                      <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                        onClick={() => handleHcpSort('addressableCount')}
+                        onClick={() => handleHcpSort("addressableCount")}
                       >
                         Addressable count
-                        <SortIcon column="addressableCount" currentColumn={hcpSortColumn} direction={hcpSortDirection} />
+                        <SortIcon
+                          column="addressableCount"
+                          currentColumn={hcpSortColumn}
+                          direction={hcpSortDirection}
+                        />
                       </th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Push</th>
@@ -712,7 +702,7 @@ const Index = () => {
                   <tbody>
                     {(() => {
                       const activeRecords = mockHCPs.filter((record) => record.status === "Active");
-                      
+
                       // Prepare data with computed columns
                       const preparedData = activeRecords.map((record, index) => ({
                         ...record,
@@ -720,12 +710,12 @@ const Index = () => {
                         city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
                         state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
                         subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
-                        assignedAccounts: `EMR-${String(index + 1).padStart(6, '0')}`,
+                        assignedAccounts: `EMR-${String(index + 1).padStart(6, "0")}`,
                         distinctPatients: Math.floor(Math.random() * 500) + 100,
                         growth: Math.floor(Math.random() * 20) + 1,
                         addressableCount: Math.floor(Math.random() * 300) + 50,
                       }));
-                      
+
                       // Filter data based on search query
                       let filteredData = preparedData;
                       if (hcpSearchQuery) {
@@ -737,62 +727,57 @@ const Index = () => {
                           const state = record.state.toLowerCase();
                           const specialty = record.speciality[0].toLowerCase();
                           const subSpecialty = record.subSpeciality.toLowerCase();
-                          
-                          return name.includes(query) || 
-                                 npi.includes(query) || 
-                                 city.includes(query) || 
-                                 state.includes(query) || 
-                                 specialty.includes(query) || 
-                                 subSpecialty.includes(query);
+
+                          return (
+                            name.includes(query) ||
+                            npi.includes(query) ||
+                            city.includes(query) ||
+                            state.includes(query) ||
+                            specialty.includes(query) ||
+                            subSpecialty.includes(query)
+                          );
                         });
                       }
-                      
+
                       // Sort data
                       let sortedData = [...filteredData];
                       if (hcpSortColumn) {
                         sortedData.sort((a: any, b: any) => {
                           let aVal = a[hcpSortColumn];
                           let bVal = b[hcpSortColumn];
-                          
+
                           // Handle name sorting
-                          if (hcpSortColumn === 'name') {
+                          if (hcpSortColumn === "name") {
                             aVal = `${a.firstName} ${a.lastName}`;
                             bVal = `${b.firstName} ${b.lastName}`;
                           }
-                          
+
                           // Handle speciality sorting
-                          if (hcpSortColumn === 'speciality') {
+                          if (hcpSortColumn === "speciality") {
                             aVal = a.speciality[0];
                             bVal = b.speciality[0];
                           }
-                          
+
                           // Handle npi sorting
-                          if (hcpSortColumn === 'npi') {
+                          if (hcpSortColumn === "npi") {
                             aVal = a.npiId;
                             bVal = b.npiId;
                           }
-                          
-                          if (typeof aVal === 'string' && typeof bVal === 'string') {
-                            return hcpSortDirection === 'asc' 
-                              ? aVal.localeCompare(bVal)
-                              : bVal.localeCompare(aVal);
+
+                          if (typeof aVal === "string" && typeof bVal === "string") {
+                            return hcpSortDirection === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
                           }
-                          
-                          return hcpSortDirection === 'asc' 
-                            ? (aVal > bVal ? 1 : -1)
-                            : (bVal > aVal ? 1 : -1);
+
+                          return hcpSortDirection === "asc" ? (aVal > bVal ? 1 : -1) : bVal > aVal ? 1 : -1;
                         });
                       }
-                      
+
                       // Paginate data
                       const startIndex = (hcpCurrentPage - 1) * hcpRowsPerPage;
                       const paginatedData = sortedData.slice(startIndex, startIndex + hcpRowsPerPage);
-                      
+
                       return paginatedData.map((record, index) => (
-                        <tr
-                          key={index}
-                          className="border-b hover:bg-muted/50"
-                        >
+                        <tr key={index} className="border-b hover:bg-muted/50">
                           <td className="py-3 px-4">
                             Dr. {record.firstName} {record.lastName}
                           </td>
@@ -807,14 +792,14 @@ const Index = () => {
                           <td className="py-3 px-4 text-sm text-green-600 font-medium">{record.growth}%</td>
                           <td className="py-3 px-4 text-sm font-medium">{record.addressableCount}</td>
                           <td className="py-3 px-4">
-                            <Eye 
-                              className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
+                            <Eye
+                              className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground"
                               onClick={() => navigate(`/hcp/${record.id}`)}
                             />
                           </td>
                           <td className="py-3 px-4">
-                            <Button 
-                              size="sm" 
+                            <Button
+                              size="sm"
                               variant="outline"
                               className="h-8 px-3"
                               onClick={(e) => {
@@ -834,13 +819,13 @@ const Index = () => {
                   </tbody>
                 </table>
               </div>
-              
+
               {/* Pagination Controls */}
               <div className="flex items-center justify-between mt-4 pt-4 border-t">
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">Rows per page:</span>
-                  <Select 
-                    value={hcpRowsPerPage.toString()} 
+                  <Select
+                    value={hcpRowsPerPage.toString()}
                     onValueChange={(value) => {
                       setHcpRowsPerPage(Number(value));
                       setHcpCurrentPage(1);
@@ -857,111 +842,127 @@ const Index = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setHcpCurrentPage(prev => Math.max(1, prev - 1))}
+                    onClick={() => setHcpCurrentPage((prev) => Math.max(1, prev - 1))}
                     disabled={hcpCurrentPage === 1}
                   >
                     Previous
                   </Button>
                   <span className="text-sm text-muted-foreground">
-                    Page {hcpCurrentPage} of {Math.ceil((() => {
-                      const activeRecords = mockHCPs.filter((record) => record.status === "Active");
-                      const preparedData = activeRecords.map((record, index) => ({
-                        ...record,
-                        npiId: `12345${6789 + index}0`,
-                        city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
-                        state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
-                        subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
-                      }));
-                      
-                      if (!hcpSearchQuery) return preparedData.length;
-                      
-                      const query = hcpSearchQuery.toLowerCase();
-                      return preparedData.filter((record) => {
-                        const name = `Dr. ${record.firstName} ${record.lastName}`.toLowerCase();
-                        const npi = record.npiId.toLowerCase();
-                        const city = record.city.toLowerCase();
-                        const state = record.state.toLowerCase();
-                        const specialty = record.speciality[0].toLowerCase();
-                        const subSpecialty = record.subSpeciality.toLowerCase();
-                        
-                        return name.includes(query) || 
-                               npi.includes(query) || 
-                               city.includes(query) || 
-                               state.includes(query) || 
-                               specialty.includes(query) || 
-                               subSpecialty.includes(query);
-                      }).length;
-                    })() / hcpRowsPerPage)}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setHcpCurrentPage(prev => {
-                      const activeRecords = mockHCPs.filter((record) => record.status === "Active");
-                      const preparedData = activeRecords.map((record, index) => ({
-                        ...record,
-                        npiId: `12345${6789 + index}0`,
-                        city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
-                        state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
-                        subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
-                      }));
-                      
-                      let filteredCount = preparedData.length;
-                      if (hcpSearchQuery) {
+                    Page {hcpCurrentPage} of{" "}
+                    {Math.ceil(
+                      (() => {
+                        const activeRecords = mockHCPs.filter((record) => record.status === "Active");
+                        const preparedData = activeRecords.map((record, index) => ({
+                          ...record,
+                          npiId: `12345${6789 + index}0`,
+                          city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
+                          state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
+                          subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
+                        }));
+
+                        if (!hcpSearchQuery) return preparedData.length;
+
                         const query = hcpSearchQuery.toLowerCase();
-                        filteredCount = preparedData.filter((record) => {
+                        return preparedData.filter((record) => {
                           const name = `Dr. ${record.firstName} ${record.lastName}`.toLowerCase();
                           const npi = record.npiId.toLowerCase();
                           const city = record.city.toLowerCase();
                           const state = record.state.toLowerCase();
                           const specialty = record.speciality[0].toLowerCase();
                           const subSpecialty = record.subSpeciality.toLowerCase();
-                          
-                          return name.includes(query) || 
-                                 npi.includes(query) || 
-                                 city.includes(query) || 
-                                 state.includes(query) || 
-                                 specialty.includes(query) || 
-                                 subSpecialty.includes(query);
+
+                          return (
+                            name.includes(query) ||
+                            npi.includes(query) ||
+                            city.includes(query) ||
+                            state.includes(query) ||
+                            specialty.includes(query) ||
+                            subSpecialty.includes(query)
+                          );
                         }).length;
-                      }
-                      
-                      return Math.min(Math.ceil(filteredCount / hcpRowsPerPage), prev + 1);
-                    })}
-                    disabled={hcpCurrentPage >= Math.ceil((() => {
-                      const activeRecords = mockHCPs.filter((record) => record.status === "Active");
-                      const preparedData = activeRecords.map((record, index) => ({
-                        ...record,
-                        npiId: `12345${6789 + index}0`,
-                        city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
-                        state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
-                        subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
-                      }));
-                      
-                      if (!hcpSearchQuery) return preparedData.length;
-                      
-                      const query = hcpSearchQuery.toLowerCase();
-                      return preparedData.filter((record) => {
-                        const name = `Dr. ${record.firstName} ${record.lastName}`.toLowerCase();
-                        const npi = record.npiId.toLowerCase();
-                        const city = record.city.toLowerCase();
-                        const state = record.state.toLowerCase();
-                        const specialty = record.speciality[0].toLowerCase();
-                        const subSpecialty = record.subSpeciality.toLowerCase();
-                        
-                        return name.includes(query) || 
-                               npi.includes(query) || 
-                               city.includes(query) || 
-                               state.includes(query) || 
-                               specialty.includes(query) || 
-                               subSpecialty.includes(query);
-                      }).length;
-                    })() / hcpRowsPerPage)}
+                      })() / hcpRowsPerPage,
+                    )}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setHcpCurrentPage((prev) => {
+                        const activeRecords = mockHCPs.filter((record) => record.status === "Active");
+                        const preparedData = activeRecords.map((record, index) => ({
+                          ...record,
+                          npiId: `12345${6789 + index}0`,
+                          city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
+                          state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
+                          subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
+                        }));
+
+                        let filteredCount = preparedData.length;
+                        if (hcpSearchQuery) {
+                          const query = hcpSearchQuery.toLowerCase();
+                          filteredCount = preparedData.filter((record) => {
+                            const name = `Dr. ${record.firstName} ${record.lastName}`.toLowerCase();
+                            const npi = record.npiId.toLowerCase();
+                            const city = record.city.toLowerCase();
+                            const state = record.state.toLowerCase();
+                            const specialty = record.speciality[0].toLowerCase();
+                            const subSpecialty = record.subSpeciality.toLowerCase();
+
+                            return (
+                              name.includes(query) ||
+                              npi.includes(query) ||
+                              city.includes(query) ||
+                              state.includes(query) ||
+                              specialty.includes(query) ||
+                              subSpecialty.includes(query)
+                            );
+                          }).length;
+                        }
+
+                        return Math.min(Math.ceil(filteredCount / hcpRowsPerPage), prev + 1);
+                      })
+                    }
+                    disabled={
+                      hcpCurrentPage >=
+                      Math.ceil(
+                        (() => {
+                          const activeRecords = mockHCPs.filter((record) => record.status === "Active");
+                          const preparedData = activeRecords.map((record, index) => ({
+                            ...record,
+                            npiId: `12345${6789 + index}0`,
+                            city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
+                            state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
+                            subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
+                          }));
+
+                          if (!hcpSearchQuery) return preparedData.length;
+
+                          const query = hcpSearchQuery.toLowerCase();
+                          return preparedData.filter((record) => {
+                            const name = `Dr. ${record.firstName} ${record.lastName}`.toLowerCase();
+                            const npi = record.npiId.toLowerCase();
+                            const city = record.city.toLowerCase();
+                            const state = record.state.toLowerCase();
+                            const specialty = record.speciality[0].toLowerCase();
+                            const subSpecialty = record.subSpeciality.toLowerCase();
+
+                            return (
+                              name.includes(query) ||
+                              npi.includes(query) ||
+                              city.includes(query) ||
+                              state.includes(query) ||
+                              specialty.includes(query) ||
+                              subSpecialty.includes(query)
+                            );
+                          }).length;
+                        })() / hcpRowsPerPage,
+                      )
+                    }
                   >
                     Next
                   </Button>
@@ -976,7 +977,7 @@ const Index = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between mb-4">
-                <CardTitle className="text-lg">Facility Accounts Master Data</CardTitle>
+                <CardTitle className="text-lg">Facility Accounts</CardTitle>
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
@@ -987,19 +988,19 @@ const Index = () => {
                         const distinctPatients = Math.floor(Math.random() * 2000) + 500;
                         const growth = Math.floor(Math.random() * 25) + 5;
                         const addressableCount = Math.floor(Math.random() * 1000) + 200;
-                        
+
                         return {
-                          'Name': record.name,
-                          'Org ID': record.orgId,
-                          'Skyra MDM ID': record.mdmId,
-                          'Identifiers': `NPI-${record.mdmId.slice(-6)}`,
-                          'Distinct Patients': distinctPatients,
-                          'Growth %': `${growth}%`,
-                          'Addressable Count': addressableCount,
+                          Name: record.name,
+                          "Org ID": record.orgId,
+                          "Skyra MDM ID": record.mdmId,
+                          Identifiers: `NPI-${record.mdmId.slice(-6)}`,
+                          "Distinct Patients": distinctPatients,
+                          "Growth %": `${growth}%`,
+                          "Addressable Count": addressableCount,
                         };
                       });
-                      
-                      exportToExcel(preparedData, `Facility_Accounts_${new Date().toISOString().split('T')[0]}`);
+
+                      exportToExcel(preparedData, `Facility_Accounts_${new Date().toISOString().split("T")[0]}`);
                       toast({
                         title: "Export successful",
                         description: "Facility accounts data has been exported to Excel",
@@ -1011,7 +1012,7 @@ const Index = () => {
                   </Button>
                 </div>
               </div>
-              
+
               {/* Search Input */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -1031,9 +1032,9 @@ const Index = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th 
+                      <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                        onClick={() => handleHcoSort('name')}
+                        onClick={() => handleHcoSort("name")}
                       >
                         Name
                         <SortIcon column="name" currentColumn={hcoSortColumn} direction={hcoSortDirection} />
@@ -1041,26 +1042,34 @@ const Index = () => {
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Identifiers</th>
-                      <th 
+                      <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                        onClick={() => handleHcoSort('distinctPatients')}
+                        onClick={() => handleHcoSort("distinctPatients")}
                       >
                         Distinct Patients count
-                        <SortIcon column="distinctPatients" currentColumn={hcoSortColumn} direction={hcoSortDirection} />
+                        <SortIcon
+                          column="distinctPatients"
+                          currentColumn={hcoSortColumn}
+                          direction={hcoSortDirection}
+                        />
                       </th>
-                      <th 
+                      <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                        onClick={() => handleHcoSort('growth')}
+                        onClick={() => handleHcoSort("growth")}
                       >
                         Growth %
                         <SortIcon column="growth" currentColumn={hcoSortColumn} direction={hcoSortDirection} />
                       </th>
-                      <th 
+                      <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-                        onClick={() => handleHcoSort('addressableCount')}
+                        onClick={() => handleHcoSort("addressableCount")}
                       >
                         Addressable count
-                        <SortIcon column="addressableCount" currentColumn={hcoSortColumn} direction={hcoSortDirection} />
+                        <SortIcon
+                          column="addressableCount"
+                          currentColumn={hcoSortColumn}
+                          direction={hcoSortDirection}
+                        />
                       </th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
                     </tr>
@@ -1068,7 +1077,7 @@ const Index = () => {
                   <tbody>
                     {(() => {
                       const activeRecords = mockHCOs.filter((record) => record.status === "Active");
-                      
+
                       // Prepare data with computed columns
                       const preparedData = activeRecords.map((record, index) => ({
                         ...record,
@@ -1076,7 +1085,7 @@ const Index = () => {
                         growth: Math.floor(Math.random() * 25) + 5,
                         addressableCount: Math.floor(Math.random() * 1000) + 200,
                       }));
-                      
+
                       // Filter data based on search query
                       let filteredData = preparedData;
                       if (hcoSearchQuery) {
@@ -1085,36 +1094,30 @@ const Index = () => {
                           const name = record.name.toLowerCase();
                           const orgId = record.orgId.toLowerCase();
                           const mdmId = record.mdmId.toLowerCase();
-                          
-                          return name.includes(query) || 
-                                 orgId.includes(query) || 
-                                 mdmId.includes(query);
+
+                          return name.includes(query) || orgId.includes(query) || mdmId.includes(query);
                         });
                       }
-                      
+
                       // Sort data
                       let sortedData = [...filteredData];
                       if (hcoSortColumn) {
                         sortedData.sort((a: any, b: any) => {
                           let aVal = a[hcoSortColumn];
                           let bVal = b[hcoSortColumn];
-                          
-                          if (typeof aVal === 'string' && typeof bVal === 'string') {
-                            return hcoSortDirection === 'asc' 
-                              ? aVal.localeCompare(bVal)
-                              : bVal.localeCompare(aVal);
+
+                          if (typeof aVal === "string" && typeof bVal === "string") {
+                            return hcoSortDirection === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
                           }
-                          
-                          return hcoSortDirection === 'asc' 
-                            ? (aVal > bVal ? 1 : -1)
-                            : (bVal > aVal ? 1 : -1);
+
+                          return hcoSortDirection === "asc" ? (aVal > bVal ? 1 : -1) : bVal > aVal ? 1 : -1;
                         });
                       }
-                      
+
                       // Paginate data
                       const startIndex = (hcoCurrentPage - 1) * hcoRowsPerPage;
                       const paginatedData = sortedData.slice(startIndex, startIndex + hcoRowsPerPage);
-                      
+
                       return paginatedData.map((record, index) => (
                         <tr
                           key={index}
@@ -1137,13 +1140,13 @@ const Index = () => {
                   </tbody>
                 </table>
               </div>
-              
+
               {/* Pagination Controls */}
               <div className="flex items-center justify-between mt-4 pt-4 border-t">
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">Rows per page:</span>
-                  <Select 
-                    value={hcoRowsPerPage.toString()} 
+                  <Select
+                    value={hcoRowsPerPage.toString()}
                     onValueChange={(value) => {
                       setHcoRowsPerPage(Number(value));
                       setHcoCurrentPage(1);
@@ -1160,90 +1163,94 @@ const Index = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setHcoCurrentPage(prev => Math.max(1, prev - 1))}
+                    onClick={() => setHcoCurrentPage((prev) => Math.max(1, prev - 1))}
                     disabled={hcoCurrentPage === 1}
                   >
                     Previous
                   </Button>
                   <span className="text-sm text-muted-foreground">
-                    Page {hcoCurrentPage} of {Math.ceil((() => {
-                      const activeRecords = mockHCOs.filter((record) => record.status === "Active");
-                      const preparedData = activeRecords.map((record, index) => ({
-                        ...record,
-                        distinctPatients: Math.floor(Math.random() * 2000) + 500,
-                        growth: Math.floor(Math.random() * 25) + 5,
-                        addressableCount: Math.floor(Math.random() * 1000) + 200,
-                      }));
-                      
-                      if (!hcoSearchQuery) return preparedData.length;
-                      
-                      const query = hcoSearchQuery.toLowerCase();
-                      return preparedData.filter((record) => {
-                        const name = record.name.toLowerCase();
-                        const orgId = record.orgId.toLowerCase();
-                        const mdmId = record.mdmId.toLowerCase();
-                        
-                        return name.includes(query) || 
-                               orgId.includes(query) || 
-                               mdmId.includes(query);
-                      }).length;
-                    })() / hcoRowsPerPage)}
+                    Page {hcoCurrentPage} of{" "}
+                    {Math.ceil(
+                      (() => {
+                        const activeRecords = mockHCOs.filter((record) => record.status === "Active");
+                        const preparedData = activeRecords.map((record, index) => ({
+                          ...record,
+                          distinctPatients: Math.floor(Math.random() * 2000) + 500,
+                          growth: Math.floor(Math.random() * 25) + 5,
+                          addressableCount: Math.floor(Math.random() * 1000) + 200,
+                        }));
+
+                        if (!hcoSearchQuery) return preparedData.length;
+
+                        const query = hcoSearchQuery.toLowerCase();
+                        return preparedData.filter((record) => {
+                          const name = record.name.toLowerCase();
+                          const orgId = record.orgId.toLowerCase();
+                          const mdmId = record.mdmId.toLowerCase();
+
+                          return name.includes(query) || orgId.includes(query) || mdmId.includes(query);
+                        }).length;
+                      })() / hcoRowsPerPage,
+                    )}
                   </span>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setHcoCurrentPage(prev => {
-                      const activeRecords = mockHCOs.filter((record) => record.status === "Active");
-                      const preparedData = activeRecords.map((record, index) => ({
-                        ...record,
-                        distinctPatients: Math.floor(Math.random() * 2000) + 500,
-                        growth: Math.floor(Math.random() * 25) + 5,
-                        addressableCount: Math.floor(Math.random() * 1000) + 200,
-                      }));
-                      
-                      let filteredCount = preparedData.length;
-                      if (hcoSearchQuery) {
-                        const query = hcoSearchQuery.toLowerCase();
-                        filteredCount = preparedData.filter((record) => {
-                          const name = record.name.toLowerCase();
-                          const orgId = record.orgId.toLowerCase();
-                          const mdmId = record.mdmId.toLowerCase();
-                          
-                          return name.includes(query) || 
-                                 orgId.includes(query) || 
-                                 mdmId.includes(query);
-                        }).length;
-                      }
-                      
-                      return Math.min(Math.ceil(filteredCount / hcoRowsPerPage), prev + 1);
-                    })}
-                    disabled={hcoCurrentPage >= Math.ceil((() => {
-                      const activeRecords = mockHCOs.filter((record) => record.status === "Active");
-                      const preparedData = activeRecords.map((record, index) => ({
-                        ...record,
-                        distinctPatients: Math.floor(Math.random() * 2000) + 500,
-                        growth: Math.floor(Math.random() * 25) + 5,
-                        addressableCount: Math.floor(Math.random() * 1000) + 200,
-                      }));
-                      
-                      if (!hcoSearchQuery) return preparedData.length;
-                      
-                      const query = hcoSearchQuery.toLowerCase();
-                      return preparedData.filter((record) => {
-                        const name = record.name.toLowerCase();
-                        const orgId = record.orgId.toLowerCase();
-                        const mdmId = record.mdmId.toLowerCase();
-                        
-                        return name.includes(query) || 
-                               orgId.includes(query) || 
-                               mdmId.includes(query);
-                      }).length;
-                    })() / hcoRowsPerPage)}
+                    onClick={() =>
+                      setHcoCurrentPage((prev) => {
+                        const activeRecords = mockHCOs.filter((record) => record.status === "Active");
+                        const preparedData = activeRecords.map((record, index) => ({
+                          ...record,
+                          distinctPatients: Math.floor(Math.random() * 2000) + 500,
+                          growth: Math.floor(Math.random() * 25) + 5,
+                          addressableCount: Math.floor(Math.random() * 1000) + 200,
+                        }));
+
+                        let filteredCount = preparedData.length;
+                        if (hcoSearchQuery) {
+                          const query = hcoSearchQuery.toLowerCase();
+                          filteredCount = preparedData.filter((record) => {
+                            const name = record.name.toLowerCase();
+                            const orgId = record.orgId.toLowerCase();
+                            const mdmId = record.mdmId.toLowerCase();
+
+                            return name.includes(query) || orgId.includes(query) || mdmId.includes(query);
+                          }).length;
+                        }
+
+                        return Math.min(Math.ceil(filteredCount / hcoRowsPerPage), prev + 1);
+                      })
+                    }
+                    disabled={
+                      hcoCurrentPage >=
+                      Math.ceil(
+                        (() => {
+                          const activeRecords = mockHCOs.filter((record) => record.status === "Active");
+                          const preparedData = activeRecords.map((record, index) => ({
+                            ...record,
+                            distinctPatients: Math.floor(Math.random() * 2000) + 500,
+                            growth: Math.floor(Math.random() * 25) + 5,
+                            addressableCount: Math.floor(Math.random() * 1000) + 200,
+                          }));
+
+                          if (!hcoSearchQuery) return preparedData.length;
+
+                          const query = hcoSearchQuery.toLowerCase();
+                          return preparedData.filter((record) => {
+                            const name = record.name.toLowerCase();
+                            const orgId = record.orgId.toLowerCase();
+                            const mdmId = record.mdmId.toLowerCase();
+
+                            return name.includes(query) || orgId.includes(query) || mdmId.includes(query);
+                          }).length;
+                        })() / hcoRowsPerPage,
+                      )
+                    }
                   >
                     Next
                   </Button>
