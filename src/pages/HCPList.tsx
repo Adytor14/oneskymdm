@@ -23,14 +23,13 @@ const HCPList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
   const [selectedSubSpecialty, setSelectedSubSpecialty] = useState("all");
-  const [selectedCountry, setSelectedCountry] = useState("all");
+  const [selectedCounties, setSelectedCounties] = useState("all");
   const [selectedState, setSelectedState] = useState("all");
   const [selectedZip, setSelectedZip] = useState("");
   const [selectedQuarter, setSelectedQuarter] = useState("all");
   const [selectedPayerType, setSelectedPayerType] = useState("all");
   const [affiliationsSearch, setAffiliationsSearch] = useState("");
   const [selectedPatientVolume, setSelectedPatientVolume] = useState("all");
-  const [selectedStarRating, setSelectedStarRating] = useState("all");
   const [deliberateDuplicates, setDeliberateDuplicates] = useState(false);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
@@ -72,6 +71,19 @@ const HCPList = () => {
     } else {
       setSelectedRows(selectedRows.filter(rowId => rowId !== id));
     }
+  };
+
+  const clearAllFilters = () => {
+    setSelectedSpecialty("all");
+    setSelectedSubSpecialty("all");
+    setSelectedCounties("all");
+    setSelectedState("all");
+    setSelectedZip("");
+    setSelectedQuarter("all");
+    setSelectedPayerType("all");
+    setAffiliationsSearch("");
+    setSelectedPatientVolume("all");
+    setDeliberateDuplicates(false);
   };
 
   const handleExport = (format: 'excel' | 'json' | 'pdf') => {
@@ -132,39 +144,22 @@ const HCPList = () => {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Search className="h-5 w-5" />
-            Filters
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Search className="h-5 w-5" />
+              Filters
+            </CardTitle>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={clearAllFilters}
+            >
+              Clear Filters
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Search</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Search by name, ID, or identifier..." 
-                  className="pl-9" 
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Country</label>
-              <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Countries" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Countries</SelectItem>
-                  <SelectItem value="USA">United States</SelectItem>
-                  <SelectItem value="Canada">Canada</SelectItem>
-                  <SelectItem value="Mexico">Mexico</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">State</label>
               <Select value={selectedState} onValueChange={setSelectedState}>
@@ -178,6 +173,22 @@ const HCPList = () => {
                   <SelectItem value="TX">Texas</SelectItem>
                   <SelectItem value="FL">Florida</SelectItem>
                   <SelectItem value="IL">Illinois</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Counties</label>
+              <Select value={selectedCounties} onValueChange={setSelectedCounties}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Counties" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">All Counties</SelectItem>
+                  <SelectItem value="kings">Kings County</SelectItem>
+                  <SelectItem value="los-angeles">Los Angeles County</SelectItem>
+                  <SelectItem value="harris">Harris County</SelectItem>
+                  <SelectItem value="miami-dade">Miami-Dade County</SelectItem>
+                  <SelectItem value="cook">Cook County</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -276,22 +287,6 @@ const HCPList = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Star Rating</label>
-              <Select value={selectedStarRating} onValueChange={setSelectedStarRating}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Ratings" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Ratings</SelectItem>
-                  <SelectItem value="1">1 Star</SelectItem>
-                  <SelectItem value="2">2 Star</SelectItem>
-                  <SelectItem value="3">3 Star</SelectItem>
-                  <SelectItem value="4">4 Star</SelectItem>
-                  <SelectItem value="5">5 Star</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
               <label className="text-sm font-medium">Options</label>
               <div className="flex items-center space-x-2 h-10">
                 <Checkbox 
@@ -314,8 +309,19 @@ const HCPList = () => {
       {/* Physician Accounts Table */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Physician Accounts</CardTitle>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <CardTitle className="text-lg">Physician Accounts</CardTitle>
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="Search by name, NPI, or specialty..." 
+                  className="pl-9"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
             <div className="flex items-center gap-4">
               <p className="text-sm text-muted-foreground">Showing {filteredData.length} of {mockHCPs.length} records</p>
               <DropdownMenu>
