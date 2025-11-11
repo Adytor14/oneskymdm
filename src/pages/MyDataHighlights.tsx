@@ -69,6 +69,13 @@ const MyDataHighlights = () => {
     }
   };
 
+  const clearAllFilters = () => {
+    setSelectedStates([]);
+    setSelectedCounties([]);
+    setSelectedQuarters([]);
+    setSelectedPayers([]);
+  };
+
   const topStats = [
     {
       title: "Physician Accounts",
@@ -179,10 +186,20 @@ const MyDataHighlights = () => {
       {/* Filters for Analysis */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Database className="h-5 w-5" />
-            Filters for Analysis
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Database className="h-5 w-5" />
+              Filters for Analysis
+            </CardTitle>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={clearAllFilters}
+              disabled={selectedStates.length === 0 && selectedCounties.length === 0 && selectedQuarters.length === 0 && selectedPayers.length === 0}
+            >
+              Clear Filters
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
