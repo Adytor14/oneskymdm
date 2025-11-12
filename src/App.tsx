@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { ServiceLineSwitcher } from "@/components/ServiceLineSwitcher";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -96,6 +97,7 @@ const App = () => (
                           <span className="text-xl font-bold">OneSky</span>
                           <div className="flex-1" />
                           <ServiceLineSwitcher />
+                          <RoleSwitcher />
                         </div>
                       </header>
                       <main className="flex-1">
