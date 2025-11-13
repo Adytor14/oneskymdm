@@ -483,6 +483,74 @@ const HCPList = () => {
                       L4QTR Growth %
                       <SortIcon column="growth" currentColumn={sortColumn} direction={sortDirection} />
                     </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("medicalDirector")}>
+                      Medical Director
+                      <SortIcon column="medicalDirector" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("mdAgency")}>
+                      MD - Agency
+                      <SortIcon column="mdAgency" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("referralAgency1")}>
+                      L4QTR Top Referring Agency
+                      <SortIcon column="referralAgency1" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("patientCount1")}>
+                      L4QTR Patient Count_1
+                      <SortIcon column="patientCount1" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("percentTotal1")}>
+                      % of Total Patients_1
+                      <SortIcon column="percentTotal1" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("referralAgency2")}>
+                      L4QTR Second Highest Referring Agency
+                      <SortIcon column="referralAgency2" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("patientCount2")}>
+                      L4QTR Patient Count_2
+                      <SortIcon column="patientCount2" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("percentTotal2")}>
+                      % of Total Patients_2
+                      <SortIcon column="percentTotal2" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("referralAgency3")}>
+                      L4QTR Third Referring Agency
+                      <SortIcon column="referralAgency3" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("patientCount3")}>
+                      L4QTR Patient Count_3
+                      <SortIcon column="patientCount3" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("percentTotal3")}>
+                      % of Total Patients_3
+                      <SortIcon column="percentTotal3" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("referralAgency4")}>
+                      L4QTR Forth Highest Referring Agency
+                      <SortIcon column="referralAgency4" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("patientCount4")}>
+                      L4QTR Patient Count_4
+                      <SortIcon column="patientCount4" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("percentTotal4")}>
+                      % of Total Patients_4
+                      <SortIcon column="percentTotal4" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("referralAgency5")}>
+                      L4QTR Fifth Referring Agency
+                      <SortIcon column="referralAgency5" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("patientCount5")}>
+                      L4QTR Patient Count_5
+                      <SortIcon column="patientCount5" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("percentTotal5")}>
+                      % of Total Patients_5
+                      <SortIcon column="percentTotal5" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -502,6 +570,23 @@ const HCPList = () => {
                       annualPatientCount: Math.floor(Math.random() * 2000) + 500,
                       l4qtrPatientCount: Math.floor(Math.random() * 500) + 100,
                       growth: Math.floor(Math.random() * 20) + 1,
+                      medicalDirector: ["Dr. Smith", "Dr. Johnson", "Dr. Williams", "Dr. Brown", "Dr. Davis"][index % 5],
+                      mdAgency: ["Skyra Medical", "OneSky Home Health", "JetHealth Agency", "OpusCare Services", "Choice Healthcare"][index % 5],
+                      topReferralAgency: ["Skyra Medical", "OneSky Home Health", "JetHealth Agency", "OpusCare Services", "Choice Healthcare"][index % 5],
+                      patientCount1: Math.floor(Math.random() * 200) + 50,
+                      percentTotal1: (Math.random() * 30 + 10).toFixed(1),
+                      referralAgency2: ["OneSky Home Health", "JetHealth Agency", "OpusCare Services", "Choice Healthcare", "Skyra Medical"][index % 5],
+                      patientCount2: Math.floor(Math.random() * 150) + 40,
+                      percentTotal2: (Math.random() * 20 + 8).toFixed(1),
+                      referralAgency3: ["JetHealth Agency", "OpusCare Services", "Choice Healthcare", "Skyra Medical", "OneSky Home Health"][index % 5],
+                      patientCount3: Math.floor(Math.random() * 100) + 30,
+                      percentTotal3: (Math.random() * 15 + 5).toFixed(1),
+                      referralAgency4: ["OpusCare Services", "Choice Healthcare", "Skyra Medical", "OneSky Home Health", "JetHealth Agency"][index % 5],
+                      patientCount4: Math.floor(Math.random() * 80) + 20,
+                      percentTotal4: (Math.random() * 10 + 3).toFixed(1),
+                      referralAgency5: ["Choice Healthcare", "Skyra Medical", "OneSky Home Health", "JetHealth Agency", "OpusCare Services"][index % 5],
+                      patientCount5: Math.floor(Math.random() * 60) + 15,
+                      percentTotal5: (Math.random() * 8 + 2).toFixed(1),
                     }));
 
                     // Apply search filter
@@ -589,6 +674,23 @@ const HCPList = () => {
                             {record.growth}%
                           </Badge>
                         </td>
+                        <td className="py-3 px-4 text-sm whitespace-nowrap">{record.medicalDirector}</td>
+                        <td className="py-3 px-4 text-sm whitespace-nowrap">{record.mdAgency}</td>
+                        <td className="py-3 px-4 text-sm whitespace-nowrap">{record.topReferralAgency}</td>
+                        <td className="py-3 px-4 text-sm font-medium">{record.patientCount1}</td>
+                        <td className="py-3 px-4 text-sm">{record.percentTotal1}%</td>
+                        <td className="py-3 px-4 text-sm whitespace-nowrap">{record.referralAgency2}</td>
+                        <td className="py-3 px-4 text-sm font-medium">{record.patientCount2}</td>
+                        <td className="py-3 px-4 text-sm">{record.percentTotal2}%</td>
+                        <td className="py-3 px-4 text-sm whitespace-nowrap">{record.referralAgency3}</td>
+                        <td className="py-3 px-4 text-sm font-medium">{record.patientCount3}</td>
+                        <td className="py-3 px-4 text-sm">{record.percentTotal3}%</td>
+                        <td className="py-3 px-4 text-sm whitespace-nowrap">{record.referralAgency4}</td>
+                        <td className="py-3 px-4 text-sm font-medium">{record.patientCount4}</td>
+                        <td className="py-3 px-4 text-sm">{record.percentTotal4}%</td>
+                        <td className="py-3 px-4 text-sm whitespace-nowrap">{record.referralAgency5}</td>
+                        <td className="py-3 px-4 text-sm font-medium">{record.patientCount5}</td>
+                        <td className="py-3 px-4 text-sm">{record.percentTotal5}%</td>
                       </tr>
                     ));
                   })()}
