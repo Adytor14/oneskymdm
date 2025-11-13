@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { mockHCPs } from "@/lib/mockData";
-import { Search, Eye, Users, TrendingUp, AlertCircle, Clock, Download, FileJson, FileSpreadsheet, FileText, ArrowUpRight } from "lucide-react";
+import { Search, Eye, Users, TrendingUp, AlertCircle, Clock, Download, FileJson, FileSpreadsheet, FileText, ArrowUpRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { exportToExcel, exportToJSON, exportHCPToPDF, prepareHCPForExport } from "@/lib/exportUtils";
 import {
   DropdownMenu,
@@ -15,12 +16,42 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { useToast } from "@/hooks/use-toast";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
+type SortDirection = "asc" | "desc" | null;
+
+const SortIcon = ({ column, currentColumn, direction }: { 
+  column: string; 
+  currentColumn: string | null; 
+  direction: SortDirection;
+}) => {
+  if (column !== currentColumn) {
+    return <ArrowUpDown className="inline-block ml-1 h-3 w-3" />;
+  }
+  return direction === "asc" ? 
+    <ArrowUp className="inline-block ml-1 h-3 w-3" /> : 
+    <ArrowDown className="inline-block ml-1 h-3 w-3" />;
+};
 
 const HCPList = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
   const [selectedSubSpecialty, setSelectedSubSpecialty] = useState("all");
   const [selectedCounties, setSelectedCounties] = useState("all");
@@ -31,7 +62,7 @@ const HCPList = () => {
   const [affiliationsSearch, setAffiliationsSearch] = useState("");
   const [selectedPatientVolume, setSelectedPatientVolume] = useState("all");
   const [deliberateDuplicates, setDeliberateDuplicates] = useState(false);
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
 
   const filteredData = mockHCPs.filter((item) => {
     const matchesSearch =
@@ -59,17 +90,34 @@ const HCPList = () => {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedRows(filteredData.map(item => item.id));
+      const allIds = mockHCPs.filter(r => r.status === "Active").map(r => r.mdmId);
+      setSelectedRows(new Set(allIds));
     } else {
-      setSelectedRows([]);
+      setSelectedRows(new Set());
     }
   };
 
   const handleSelectRow = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedRows);
     if (checked) {
-      setSelectedRows([...selectedRows, id]);
+      newSelected.add(id);
     } else {
-      setSelectedRows(selectedRows.filter(rowId => rowId !== id));
+      newSelected.delete(id);
+    }
+    setSelectedRows(newSelected);
+  };
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      if (sortDirection === "asc") {
+        setSortDirection("desc");
+      } else if (sortDirection === "desc") {
+        setSortColumn(null);
+        setSortDirection(null);
+      }
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
     }
   };
 
@@ -87,7 +135,7 @@ const HCPList = () => {
   };
 
   const handleExport = (format: 'excel' | 'json' | 'pdf') => {
-    if (selectedRows.length === 0) {
+    if (selectedRows.size === 0) {
       toast({
         title: "No rows selected",
         description: "Please select at least one row to export",
@@ -96,7 +144,7 @@ const HCPList = () => {
       return;
     }
 
-    const selectedData = mockHCPs.filter(hcp => selectedRows.includes(hcp.id));
+    const selectedData = mockHCPs.filter(hcp => selectedRows.has(hcp.id));
     
     if (format === 'excel') {
       const exportData = selectedData.map(prepareHCPForExport);
@@ -109,7 +157,7 @@ const HCPList = () => {
 
     toast({
       title: "Export successful",
-      description: `Exported ${selectedRows.length} record(s) to ${format.toUpperCase()}`,
+      description: `Exported ${selectedRows.size} record(s) to ${format.toUpperCase()}`,
     });
   };
 
@@ -318,17 +366,47 @@ const HCPList = () => {
                   placeholder="Search by name, NPI, or specialty..." 
                   className="pl-9"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
                 />
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <p className="text-sm text-muted-foreground">Showing {filteredData.length} of {mockHCPs.length} records</p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const activeRecords = mockHCPs.filter((record) => record.status === "Active");
+                  const preparedData = activeRecords.map((record, index) => ({
+                    'L4QTR Rank': index + 1,
+                    'Physician Name': `Dr. ${record.firstName} ${record.lastName}`,
+                    NPI: `12345${6789 + index}0`,
+                    County: ["Kings County", "Los Angeles County", "Cook County", "Harris County", "Maricopa County"][index % 5],
+                    City: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
+                    State: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
+                    Speciality: record.speciality[0],
+                    'ONE ID': record.mdmId,
+                    'Annual Patient Count (FFS)': Math.floor(Math.random() * 2000) + 500,
+                    'L4QTR HH Patient / HOS Patients Count': Math.floor(Math.random() * 500) + 100,
+                    'L4QTR Growth %': Math.floor(Math.random() * 20) + 1,
+                  }));
+                  exportToExcel(preparedData, 'Market_Analysis_Physicians');
+                  toast({
+                    title: "Export successful",
+                    description: "Data exported to Excel",
+                  });
+                }}
+              >
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Export to Excel
+              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button size="sm" disabled={selectedRows.length === 0}>
+                  <Button size="sm" disabled={selectedRows.size === 0}>
                     <Download className="h-4 w-4 mr-2" />
-                    Export Selected ({selectedRows.length})
+                    Export Selected ({selectedRows.size})
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -350,91 +428,253 @@ const HCPList = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground w-12">
-                    <Checkbox 
-                      checked={selectedRows.length === filteredData.length && filteredData.length > 0}
-                      onCheckedChange={handleSelectAll}
-                    />
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">NPI</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">City</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">State</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">One ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Speciality</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Sub Speciality</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Assigned Identifiers</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Distinct Patients</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Growth</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Addressable Count</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Push</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredData.map((record, index) => {
-                  // Mock data for new columns
-                  const npiId = `12345${6789 + index}0`;
-                  const city = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5];
-                  const state = ["NY", "CA", "IL", "TX", "AZ"][index % 5];
-                  const subSpeciality = record.speciality[0] === "Cardiology" ? "Interventional" : "General";
-                  const distinctPatients = Math.floor(Math.random() * 500) + 100;
-                  const growth = `${Math.floor(Math.random() * 20) + 1}%`;
-                  const addressableCount = Math.floor(Math.random() * 300) + 50;
-                  
-                  return (
-                    <tr 
-                      key={index} 
-                      className="border-b hover:bg-muted/50"
-                    >
-                      <td className="py-3 px-4">
-                        <Checkbox 
-                          checked={selectedRows.includes(record.id)}
-                          onCheckedChange={(checked) => handleSelectRow(record.id, checked as boolean)}
-                        />
-                      </td>
-                      <td className="py-3 px-4">Dr. {record.firstName} {record.lastName}</td>
-                      <td className="py-3 px-4 text-sm">{npiId}</td>
-                      <td className="py-3 px-4 text-sm">{city}</td>
-                      <td className="py-3 px-4 text-sm">{state}</td>
-                      <td className="py-3 px-4 text-sm">{record.mdmId}</td>
-                      <td className="py-3 px-4 text-sm">{record.speciality[0]}</td>
-                      <td className="py-3 px-4 text-sm">{subSpeciality}</td>
-                      <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
-                      <td className="py-3 px-4 text-sm font-medium">{distinctPatients}</td>
-                      <td className="py-3 px-4 text-sm text-green-600 font-medium">{growth}</td>
-                      <td className="py-3 px-4 text-sm font-medium">{addressableCount}</td>
-                      <td className="py-3 px-4">
-                        <Eye 
-                          className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
-                          onClick={() => navigate(`/hcp/${record.id}`)}
-                        />
-                      </td>
-                      <td className="py-3 px-4">
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          className="h-8 px-3"
-                          onClick={() => {
-                            toast({
-                              title: "Push initiated",
-                              description: `Pushing data for Dr. ${record.firstName} ${record.lastName}`,
-                            });
-                          }}
-                        >
-                          <ArrowUpRight className="h-4 w-4" />
-                        </Button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <ScrollArea className="w-full">
+            <div className="min-w-max">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground w-12 sticky left-0 bg-background z-10">
+                      <Checkbox 
+                        checked={selectedRows.size > 0 && selectedRows.size === mockHCPs.filter(r => r.status === "Active").length}
+                        onCheckedChange={handleSelectAll}
+                      />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("rank")}>
+                      L4QTR Rank
+                      <SortIcon column="rank" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("name")}>
+                      Physician Name
+                      <SortIcon column="name" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("npi")}>
+                      NPI
+                      <SortIcon column="npi" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("county")}>
+                      County
+                      <SortIcon column="county" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("city")}>
+                      City
+                      <SortIcon column="city" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("state")}>
+                      State
+                      <SortIcon column="state" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("speciality")}>
+                      Speciality
+                      <SortIcon column="speciality" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("mdmId")}>
+                      ONE ID
+                      <SortIcon column="mdmId" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("annualPatientCount")}>
+                      Annual Patient Count (FFS)
+                      <SortIcon column="annualPatientCount" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("l4qtrPatientCount")}>
+                      L4QTR HH Patient / HOS Patients Count
+                      <SortIcon column="l4qtrPatientCount" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50" onClick={() => handleSort("growth")}>
+                      L4QTR Growth %
+                      <SortIcon column="growth" currentColumn={sortColumn} direction={sortDirection} />
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(() => {
+                    const activeRecords = mockHCPs.filter((record) => record.status === "Active");
+                    
+                    const preparedData = activeRecords.map((record, index) => ({
+                      id: record.id,
+                      rank: index + 1,
+                      name: `Dr. ${record.firstName} ${record.lastName}`,
+                      npi: `12345${6789 + index}0`,
+                      county: ["Kings County", "Los Angeles County", "Cook County", "Harris County", "Maricopa County"][index % 5],
+                      city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
+                      state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
+                      speciality: record.speciality,
+                      mdmId: record.mdmId,
+                      annualPatientCount: Math.floor(Math.random() * 2000) + 500,
+                      l4qtrPatientCount: Math.floor(Math.random() * 500) + 100,
+                      growth: Math.floor(Math.random() * 20) + 1,
+                    }));
+
+                    // Apply search filter
+                    const filteredData = preparedData.filter((record) => {
+                      if (!searchTerm) return true;
+                      const search = searchTerm.toLowerCase();
+                      return (
+                        record.name.toLowerCase().includes(search) ||
+                        record.npi.toLowerCase().includes(search) ||
+                        record.speciality[0].toLowerCase().includes(search)
+                      );
+                    });
+
+                    // Apply sorting
+                    const sortedData = [...filteredData].sort((a, b) => {
+                      if (!sortColumn || !sortDirection) return 0;
+
+                      let aValue: any = a[sortColumn as keyof typeof a];
+                      let bValue: any = b[sortColumn as keyof typeof b];
+
+                      // Handle speciality array
+                      if (sortColumn === 'speciality') {
+                        aValue = a.speciality[0];
+                        bValue = b.speciality[0];
+                      }
+
+                      // Handle numeric sorting
+                      if (typeof aValue === 'number' && typeof bValue === 'number') {
+                        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+                      }
+
+                      // Handle string sorting
+                      const aStr = String(aValue).toLowerCase();
+                      const bStr = String(bValue).toLowerCase();
+                      
+                      if (sortDirection === 'asc') {
+                        return aStr.localeCompare(bStr);
+                      } else {
+                        return bStr.localeCompare(aStr);
+                      }
+                    });
+
+                    // Apply pagination
+                    const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+                    const startIndex = (currentPage - 1) * itemsPerPage;
+                    const endIndex = startIndex + itemsPerPage;
+                    const paginatedData = sortedData.slice(startIndex, endIndex);
+
+                    return paginatedData.map((record, index) => (
+                      <tr
+                        key={index}
+                        className="border-b hover:bg-muted/50"
+                      >
+                        <td className="py-3 px-4 sticky left-0 bg-background">
+                          <Checkbox
+                            checked={selectedRows.has(record.id)}
+                            onCheckedChange={(checked) => handleSelectRow(record.id, checked as boolean)}
+                          />
+                        </td>
+                        <td className="py-3 px-4 text-sm">{record.rank}</td>
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          <Link 
+                            to={`/hcp/${record.id}`}
+                            className="text-primary hover:underline font-medium"
+                          >
+                            {record.name}
+                          </Link>
+                        </td>
+                        <td className="py-3 px-4 text-sm">{record.npi}</td>
+                        <td className="py-3 px-4 text-sm whitespace-nowrap">{record.county}</td>
+                        <td className="py-3 px-4 text-sm">{record.city}</td>
+                        <td className="py-3 px-4 text-sm">{record.state}</td>
+                        <td className="py-3 px-4 text-sm">
+                          {record.speciality.map((spec, i) => (
+                            <Badge key={i} variant="secondary" className="mr-1 mb-1">
+                              {spec}
+                            </Badge>
+                          ))}
+                        </td>
+                        <td className="py-3 px-4 text-sm">{record.mdmId}</td>
+                        <td className="py-3 px-4 text-sm">{record.annualPatientCount.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-sm">{record.l4qtrPatientCount}</td>
+                        <td className="py-3 px-4 text-sm">
+                          <Badge variant={record.growth > 10 ? "default" : "secondary"}>
+                            {record.growth}%
+                          </Badge>
+                        </td>
+                      </tr>
+                    ));
+                  })()}
+                </tbody>
+              </table>
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+
+          {/* Pagination */}
+          {(() => {
+            const activeRecords = mockHCPs.filter((record) => record.status === "Active");
+            const filteredData = activeRecords.filter((record) => {
+              if (!searchTerm) return true;
+              const search = searchTerm.toLowerCase();
+              const name = `Dr. ${record.firstName} ${record.lastName}`.toLowerCase();
+              const npi = `12345${activeRecords.indexOf(record) + 6789}0`;
+              return (
+                name.includes(search) ||
+                npi.includes(search) ||
+                record.speciality[0].toLowerCase().includes(search)
+              );
+            });
+            
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+            if (totalPages <= 1) return null;
+
+            const getPageNumbers = () => {
+              const pages: (number | string)[] = [];
+              
+              if (totalPages <= 7) {
+                for (let i = 1; i <= totalPages; i++) {
+                  pages.push(i);
+                }
+              } else {
+                if (currentPage <= 3) {
+                  pages.push(1, 2, 3, 4, '...', totalPages);
+                } else if (currentPage >= totalPages - 2) {
+                  pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+                } else {
+                  pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+                }
+              }
+              
+              return pages;
+            };
+
+            return (
+              <div className="mt-4">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    
+                    {getPageNumbers().map((page, index) => (
+                      <PaginationItem key={index}>
+                        {page === '...' ? (
+                          <PaginationEllipsis />
+                        ) : (
+                          <PaginationLink
+                            onClick={() => setCurrentPage(page as number)}
+                            isActive={currentPage === page}
+                            className="cursor-pointer"
+                          >
+                            {page}
+                          </PaginationLink>
+                        )}
+                      </PaginationItem>
+                    ))}
+                    
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            );
+          })()}
         </CardContent>
       </Card>
     </div>
