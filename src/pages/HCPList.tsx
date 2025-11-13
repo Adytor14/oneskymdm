@@ -216,7 +216,8 @@ const HCPList = () => {
       </div>
 
       {/* Physician Accounts Table */}
-      <Card>
+      <div className="max-w-[1400px]">
+        <Card>
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -639,7 +640,8 @@ const HCPList = () => {
             );
           })()}
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 };
