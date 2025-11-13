@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { mockHCOs } from "@/lib/mockData";
-import { Search, Eye, Building2, TrendingUp, AlertCircle, Clock, Download, FileJson, FileSpreadsheet, FileText } from "lucide-react";
+import { Search, Eye, Building2, TrendingUp, AlertCircle, Clock, Download, FileJson, FileSpreadsheet, FileText, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { exportToExcel, exportToJSON, exportHCOToPDF, prepareHCOForExport } from "@/lib/exportUtils";
 import {
   DropdownMenu,
@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 const HCOList = () => {
   const navigate = useNavigate();
@@ -28,7 +29,10 @@ const HCOList = () => {
   const [selectedQuarter, setSelectedQuarter] = useState("all");
   const [selectedPayerType, setSelectedPayerType] = useState("all");
   const [affiliationsSearch, setAffiliationsSearch] = useState("");
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [sortBy, setSortBy] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [serviceLine, setServiceLine] = useState<"HH" | "HOS">("HH");
 
   const filteredData = mockHCOs.filter((item) => {
     const matchesSearch =
@@ -51,18 +55,37 @@ const HCOList = () => {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedRows(filteredData.map(item => item.id));
+      const allIds = filteredData.map(item => item.mdmId);
+      setSelectedRows(new Set(allIds));
     } else {
-      setSelectedRows([]);
+      setSelectedRows(new Set());
     }
   };
 
   const handleSelectRow = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedRows);
     if (checked) {
-      setSelectedRows([...selectedRows, id]);
+      newSelected.add(id);
     } else {
-      setSelectedRows(selectedRows.filter(rowId => rowId !== id));
+      newSelected.delete(id);
     }
+    setSelectedRows(newSelected);
+  };
+
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(column);
+      setSortOrder("asc");
+    }
+  };
+
+  const SortIcon = ({ column }: { column: string }) => {
+    if (sortBy !== column) return <ArrowUpDown className="h-4 w-4 ml-1 opacity-40" />;
+    return sortOrder === "asc" ? 
+      <ArrowUp className="h-4 w-4 ml-1" /> : 
+      <ArrowDown className="h-4 w-4 ml-1" />;
   };
 
   const clearAllFilters = () => {
@@ -76,7 +99,7 @@ const HCOList = () => {
   };
 
   const handleExport = (format: 'excel' | 'json' | 'pdf') => {
-    if (selectedRows.length === 0) {
+    if (selectedRows.size === 0) {
       toast({
         title: "No rows selected",
         description: "Please select at least one row to export",
@@ -85,7 +108,7 @@ const HCOList = () => {
       return;
     }
 
-    const selectedData = mockHCOs.filter(hco => selectedRows.includes(hco.id));
+    const selectedData = mockHCOs.filter(hco => selectedRows.has(hco.mdmId));
     
     if (format === 'excel') {
       const exportData = selectedData.map(prepareHCOForExport);
@@ -98,7 +121,7 @@ const HCOList = () => {
 
     toast({
       title: "Export successful",
-      description: `Exported ${selectedRows.length} record(s) to ${format.toUpperCase()}`,
+      description: `Exported ${selectedRows.size} record(s) to ${format.toUpperCase()}`,
     });
   };
 
@@ -252,106 +275,273 @@ const HCOList = () => {
         </CardContent>
       </Card>
 
-      {/* Master Data Records Table */}
+      {/* Facility Accounts Table */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <CardTitle className="text-lg">Facility Accounts</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">Facility Accounts</CardTitle>
+            <div className="flex items-center gap-2">
               <div className="relative w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Search by name, NPI, or type..." 
+                <Input
+                  placeholder="Search by name or ID..."
                   className="pl-9"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <p className="text-sm text-muted-foreground">Showing {filteredData.length} of {mockHCOs.length} records</p>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button size="sm" disabled={selectedRows.length === 0}>
+                  <Button variant="outline" size="sm" disabled={selectedRows.size === 0}>
                     <Download className="h-4 w-4 mr-2" />
-                    Export Selected ({selectedRows.length})
+                    Export ({selectedRows.size})
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleExport('json')}>
-                    <FileJson className="mr-2 h-4 w-4" />
-                    Download JSON
-                  </DropdownMenuItem>
+                <DropdownMenuContent>
                   <DropdownMenuItem onClick={() => handleExport('excel')}>
-                    <FileSpreadsheet className="mr-2 h-4 w-4" />
-                    Export to Excel
+                    <FileSpreadsheet className="h-4 w-4 mr-2" />
+                    Excel
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport('json')}>
+                    <FileJson className="h-4 w-4 mr-2" />
+                    JSON
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleExport('pdf')}>
-                    <FileText className="mr-2 h-4 w-4" />
-                    Export to PDF
+                    <FileText className="h-4 w-4 mr-2" />
+                    PDF
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
+        <CardContent className="p-0">
+          <ScrollArea className="whitespace-nowrap">
+            <table className="w-full min-w-[2000px]">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground w-12">
-                    <Checkbox 
-                      checked={selectedRows.length === filteredData.length && filteredData.length > 0}
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <Checkbox
+                      checked={selectedRows.size > 0 && selectedRows.size === filteredData.length}
                       onCheckedChange={handleSelectAll}
                     />
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Identifiers</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Status</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("rank")} className="flex items-center hover:text-foreground">
+                      L4QTR Rank
+                      <SortIcon column="rank" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("name")} className="flex items-center hover:text-foreground">
+                      Facility Name
+                      <SortIcon column="name" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">NPI</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("county")} className="flex items-center hover:text-foreground">
+                      County
+                      <SortIcon column="county" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("city")} className="flex items-center hover:text-foreground">
+                      City
+                      <SortIcon column="city" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("state")} className="flex items-center hover:text-foreground">
+                      State
+                      <SortIcon column="state" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">Parent Facility</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">ONE ID</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("annualPatientCount")} className="flex items-center hover:text-foreground">
+                      Annual Patient Count (FFS)
+                      <SortIcon column="annualPatientCount" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("l4qtrPatientCount")} className="flex items-center hover:text-foreground">
+                      L4QTR {serviceLine === "HH" ? "HH Patient" : "HOS Patient"} Count
+                      <SortIcon column="l4qtrPatientCount" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("growth")} className="flex items-center hover:text-foreground">
+                      L4QTR Growth %
+                      <SortIcon column="growth" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("facilityType")} className="flex items-center hover:text-foreground">
+                      Facility Type
+                      <SortIcon column="facilityType" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">MD - Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Top Referring Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("agency1Count")} className="flex items-center hover:text-foreground">
+                      L4QTR Patient Count
+                      <SortIcon column="agency1Count" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Second Highest Referring Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("agency2Count")} className="flex items-center hover:text-foreground">
+                      L4QTR Patient Count
+                      <SortIcon column="agency2Count" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Third Referring Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("agency3Count")} className="flex items-center hover:text-foreground">
+                      L4QTR Patient Count
+                      <SortIcon column="agency3Count" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Fourth Highest Referring Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("agency4Count")} className="flex items-center hover:text-foreground">
+                      L4QTR Patient Count
+                      <SortIcon column="agency4Count" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">L4QTR Fifth Referring Agency</th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("agency5Count")} className="flex items-center hover:text-foreground">
+                      L4QTR Patient Count
+                      <SortIcon column="agency5Count" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">% of Total Patients</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredData.map((record, index) => (
-                  <tr 
-                    key={index} 
-                    className="border-b hover:bg-muted/50"
-                  >
-                    <td className="py-3 px-4">
-                      <Checkbox 
-                        checked={selectedRows.includes(record.id)}
-                        onCheckedChange={(checked) => handleSelectRow(record.id, checked as boolean)}
-                      />
-                    </td>
-                    <td className="py-3 px-4">{record.name}</td>
-                    <td className="py-3 px-4 text-sm">{record.orgId}</td>
-                    <td className="py-3 px-4 text-sm">{record.mdmId}</td>
-                    <td className="py-3 px-4 text-sm">{record.identifiers.join(", ")}</td>
-                    <td className="py-3 px-4">
-                      <Badge className={
-                        record.status === "Active" 
-                          ? "bg-blue-600 text-white hover:bg-blue-700" 
-                          : "bg-gray-400 text-white hover:bg-gray-500"
-                      }>
-                        {record.status}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4 text-sm">{new Date(record.lastUpdated).toLocaleDateString('en-GB')}</td>
-                    <td className="py-3 px-4">
-                      <Eye 
-                        className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
-                        onClick={() => navigate(`/hco/${record.id}`)}
-                      />
-                    </td>
-                  </tr>
-                ))}
+                {filteredData
+                  .map((record, index) => {
+                    const rank = index + 1;
+                    const npi = `NPI${Math.floor(Math.random() * 9000000000) + 1000000000}`;
+                    const counties = ["Los Angeles", "Harris", "Miami-Dade", "Kings", "Cook"];
+                    const cities = ["Los Angeles", "Houston", "Miami", "Brooklyn", "Chicago"];
+                    const states = ["CA", "TX", "FL", "NY", "IL"];
+                    const county = counties[Math.floor(Math.random() * counties.length)];
+                    const city = cities[Math.floor(Math.random() * cities.length)];
+                    const state = states[Math.floor(Math.random() * states.length)];
+                    const parentFacility = `Parent ${record.name.split(" ")[0]}`;
+                    const oneId = `ONE-${Math.floor(Math.random() * 90000) + 10000}`;
+                    const annualPatientCount = Math.floor(Math.random() * 5000) + 1000;
+                    const l4qtrPatientCount = Math.floor(Math.random() * 1500) + 300;
+                    const growth = parseFloat((Math.random() * 25 + 5).toFixed(1));
+                    const facilityTypes = ["Acute Care", "SNF", "IRF", "LTACH"];
+                    const facilityType = facilityTypes[Math.floor(Math.random() * facilityTypes.length)];
+                    const mdAgency = `MD Agency ${Math.floor(Math.random() * 100) + 1}`;
+                    
+                    const agencies = [
+                      { name: "Healthcare Partners", count: Math.floor(Math.random() * 200) + 50 },
+                      { name: "Medical Associates", count: Math.floor(Math.random() * 180) + 40 },
+                      { name: "Premier Health Group", count: Math.floor(Math.random() * 150) + 30 },
+                      { name: "Unity Medical", count: Math.floor(Math.random() * 120) + 25 },
+                      { name: "Community Health Network", count: Math.floor(Math.random() * 100) + 20 },
+                    ];
+                    const totalAgencyPatients = agencies.reduce((sum, a) => sum + a.count, 0);
+
+                    return {
+                      record,
+                      rank,
+                      npi,
+                      county,
+                      city,
+                      state,
+                      parentFacility,
+                      oneId,
+                      annualPatientCount,
+                      l4qtrPatientCount,
+                      growth,
+                      facilityType,
+                      mdAgency,
+                      agencies,
+                      totalAgencyPatients,
+                      name: record.name,
+                      agency1Count: agencies[0].count,
+                      agency2Count: agencies[1].count,
+                      agency3Count: agencies[2].count,
+                      agency4Count: agencies[3].count,
+                      agency5Count: agencies[4].count,
+                    };
+                  })
+                  .sort((a, b) => {
+                    if (!sortBy) return 0;
+                    
+                    let aVal = a[sortBy as keyof typeof a];
+                    let bVal = b[sortBy as keyof typeof b];
+                    
+                    if (typeof aVal === 'string' && typeof bVal === 'string') {
+                      return sortOrder === 'asc' 
+                        ? aVal.localeCompare(bVal)
+                        : bVal.localeCompare(aVal);
+                    }
+                    
+                    if (typeof aVal === 'number' && typeof bVal === 'number') {
+                      return sortOrder === 'asc' ? aVal - bVal : bVal - aVal;
+                    }
+                    
+                    return 0;
+                  })
+                  .map((data, index) => (
+                    <tr
+                      key={index}
+                      className="border-b hover:bg-muted/50"
+                    >
+                      <td className="py-3 px-4">
+                        <Checkbox
+                          checked={selectedRows.has(data.record.mdmId)}
+                          onCheckedChange={(checked) => handleSelectRow(data.record.mdmId, checked as boolean)}
+                        />
+                      </td>
+                      <td className="py-3 px-4 text-sm">{data.rank}</td>
+                      <td className="py-3 px-4 text-sm font-medium">
+                        <Link 
+                          to={`/hco/${data.record.id}`}
+                          className="text-primary hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {data.name}
+                        </Link>
+                      </td>
+                      <td className="py-3 px-4 text-sm">{data.npi}</td>
+                      <td className="py-3 px-4 text-sm">{data.county}</td>
+                      <td className="py-3 px-4 text-sm">{data.city}</td>
+                      <td className="py-3 px-4 text-sm">{data.state}</td>
+                      <td className="py-3 px-4 text-sm">{data.parentFacility}</td>
+                      <td className="py-3 px-4 text-sm">{data.oneId}</td>
+                      <td className="py-3 px-4 text-sm font-medium">{data.annualPatientCount.toLocaleString()}</td>
+                      <td className="py-3 px-4 text-sm font-medium">{data.l4qtrPatientCount.toLocaleString()}</td>
+                      <td className="py-3 px-4 text-sm text-green-600 font-medium">{data.growth}%</td>
+                      <td className="py-3 px-4 text-sm">{data.facilityType}</td>
+                      <td className="py-3 px-4 text-sm">{data.mdAgency}</td>
+                      {data.agencies.map((agency, agencyIndex) => (
+                        <>
+                          <td key={`agency-${agencyIndex}`} className="py-3 px-4 text-sm">{agency.name}</td>
+                          <td key={`count-${agencyIndex}`} className="py-3 px-4 text-sm font-medium">{agency.count}</td>
+                          <td key={`pct-${agencyIndex}`} className="py-3 px-4 text-sm">{((agency.count / data.totalAgencyPatients) * 100).toFixed(1)}%</td>
+                        </>
+                      ))}
+                    </tr>
+                  ))}
               </tbody>
             </table>
-          </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         </CardContent>
       </Card>
     </div>
