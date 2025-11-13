@@ -163,196 +163,57 @@ const HCPList = () => {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Physician Accounts</h1>
-        <p className="text-muted-foreground mt-1">
-          Healthcare professionals - Manage and view physician profiles, credentials, and affiliations
-        </p>
-      </div>
+      <div className="max-w-[1400px]">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Physician Accounts</h1>
+          <p className="text-muted-foreground mt-1">
+            Healthcare professionals - Manage and view physician profiles, credentials, and affiliations
+          </p>
+        </div>
 
-      {/* Metrics */}
-      <div className="grid gap-4 md:grid-cols-3">
-        {metrics.map((metric, index) => {
-          const Icon = metric.icon;
-          return (
-            <Card key={index} className={metric.bgColor}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{metric.title}</CardTitle>
-                <Icon className={`h-4 w-4 ${metric.iconColor}`} />
-              </CardHeader>
-              <CardContent>
-                <div className={`text-3xl font-bold ${metric.iconColor}`}>{metric.value}</div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+        {/* Metrics */}
+        <div className="grid gap-4 md:grid-cols-3 mt-6">
+          {metrics.map((metric, index) => {
+            const Icon = metric.icon;
+            return (
+              <Card key={index} className={metric.bgColor}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">{metric.title}</CardTitle>
+                  <Icon className={`h-4 w-4 ${metric.iconColor}`} />
+                </CardHeader>
+                <CardContent>
+                  <div className={`text-3xl font-bold ${metric.iconColor}`}>{metric.value}</div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
 
-      {/* Filters */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Search className="h-5 w-5" />
-              Filters
-            </CardTitle>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={clearAllFilters}
-            >
-              Clear Filters
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">State</label>
-              <Select value={selectedState} onValueChange={setSelectedState}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All States" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All States</SelectItem>
-                  <SelectItem value="NY">New York</SelectItem>
-                  <SelectItem value="CA">California</SelectItem>
-                  <SelectItem value="TX">Texas</SelectItem>
-                  <SelectItem value="FL">Florida</SelectItem>
-                  <SelectItem value="IL">Illinois</SelectItem>
-                </SelectContent>
-              </Select>
+        {/* Filters */}
+        <Card className="mt-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Search className="h-5 w-5" />
+                Filters
+              </CardTitle>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={clearAllFilters}
+              >
+                Clear Filters
+              </Button>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Counties</label>
-              <Select value={selectedCounties} onValueChange={setSelectedCounties}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Counties" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Counties</SelectItem>
-                  <SelectItem value="kings">Kings County</SelectItem>
-                  <SelectItem value="los-angeles">Los Angeles County</SelectItem>
-                  <SelectItem value="harris">Harris County</SelectItem>
-                  <SelectItem value="miami-dade">Miami-Dade County</SelectItem>
-                  <SelectItem value="cook">Cook County</SelectItem>
-                </SelectContent>
-              </Select>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+...
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">ZIP</label>
-              <Input 
-                placeholder="Enter ZIP code..." 
-                value={selectedZip}
-                onChange={(e) => setSelectedZip(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Time (Quarters)</label>
-              <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Quarters" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Quarters</SelectItem>
-                  <SelectItem value="Q1-2024">Q1 2024</SelectItem>
-                  <SelectItem value="Q2-2024">Q2 2024</SelectItem>
-                  <SelectItem value="Q3-2024">Q3 2024</SelectItem>
-                  <SelectItem value="Q4-2024">Q4 2024</SelectItem>
-                  <SelectItem value="Q1-2025">Q1 2025</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Payer Type</label>
-              <Select value={selectedPayerType} onValueChange={setSelectedPayerType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Payer Types" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Payer Types</SelectItem>
-                  <SelectItem value="Medicare">Medicare</SelectItem>
-                  <SelectItem value="Medicaid">Medicaid</SelectItem>
-                  <SelectItem value="Commercial">Commercial</SelectItem>
-                  <SelectItem value="Self-Pay">Self-Pay</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Specialty</label>
-              <Select value={selectedSpecialty} onValueChange={setSelectedSpecialty}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Specialties" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Specialties</SelectItem>
-                  <SelectItem value="Cardiology">Cardiology</SelectItem>
-                  <SelectItem value="Neurology">Neurology</SelectItem>
-                  <SelectItem value="Oncology">Oncology</SelectItem>
-                  <SelectItem value="Orthopedics">Orthopedics</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Sub Specialty</label>
-              <Select value={selectedSubSpecialty} onValueChange={setSelectedSubSpecialty}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Sub Specialties" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Sub Specialties</SelectItem>
-                  <SelectItem value="Interventional">Interventional</SelectItem>
-                  <SelectItem value="General">General</SelectItem>
-                  <SelectItem value="Pediatric">Pediatric</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Affiliations</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Search affiliations..." 
-                  className="pl-9" 
-                  value={affiliationsSearch}
-                  onChange={(e) => setAffiliationsSearch(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Patient Volume</label>
-              <Select value={selectedPatientVolume} onValueChange={setSelectedPatientVolume}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Volumes" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Volumes</SelectItem>
-                  <SelectItem value="0-100">0-100</SelectItem>
-                  <SelectItem value="101-500">101-500</SelectItem>
-                  <SelectItem value=">500">&gt;500</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Options</label>
-              <div className="flex items-center space-x-2 h-10">
-                <Checkbox 
-                  id="deliberate-duplicates"
-                  checked={deliberateDuplicates}
-                  onCheckedChange={(checked) => setDeliberateDuplicates(checked as boolean)}
-                />
-                <label
-                  htmlFor="deliberate-duplicates"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                >
-                  Deliberate Duplicates
-                </label>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Physician Accounts Table */}
       <Card>
@@ -428,9 +289,9 @@ const HCPList = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="w-full">
+          <ScrollArea className="w-full whitespace-nowrap">
             <div className="min-w-max">
-              <table className="w-full">
+              <table className="w-full min-w-[2000px]">
                 <thead>
                   <tr className="border-b">
                     <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground w-12 sticky left-0 bg-background z-10">
