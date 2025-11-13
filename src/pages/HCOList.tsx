@@ -127,16 +127,19 @@ const HCOList = () => {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Facility Accounts</h1>
-        <p className="text-muted-foreground mt-1">
-          Healthcare organizations - Manage and view facility profiles, facilities, and departments
-        </p>
+      <div className="max-w-[1400px]">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Facility Accounts</h1>
+          <p className="text-muted-foreground mt-1">
+            Healthcare organizations - Manage and view facility profiles, facilities, and departments
+          </p>
+        </div>
       </div>
 
       {/* Metrics */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="max-w-[1400px]">
+        <div className="grid gap-4 md:grid-cols-3 mt-6">
         {metrics.map((metric, index) => {
           const Icon = metric.icon;
           return (
@@ -151,10 +154,12 @@ const HCOList = () => {
             </Card>
           );
         })}
+        </div>
       </div>
 
       {/* Filters */}
-      <Card>
+      <div className="max-w-[1400px]">
+        <Card className="mt-6">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2">
@@ -273,10 +278,12 @@ const HCOList = () => {
             </div>
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
 
       {/* Facility Accounts Table */}
-      <Card>
+      <div className="max-w-[1400px]">
+        <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Facility Accounts</CardTitle>
@@ -543,7 +550,8 @@ const HCOList = () => {
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 };
