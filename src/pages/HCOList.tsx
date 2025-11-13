@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { mockHCOs } from "@/lib/mockData";
-import { Search, Eye, Building2, TrendingUp, AlertCircle, Clock, Download, FileJson, FileSpreadsheet, FileText, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Search, Eye, Building2, TrendingUp, AlertCircle, Clock, Download, FileJson, FileSpreadsheet, FileText, ArrowUpDown, ArrowUp, ArrowDown, Database, ChevronsUpDown, Check, X } from "lucide-react";
 import { exportToExcel, exportToJSON, exportHCOToPDF, prepareHCOForExport } from "@/lib/exportUtils";
 import {
   DropdownMenu,
@@ -17,30 +17,46 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 const HCOList = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFacilityType, setSelectedFacilityType] = useState("all");
-  const [selectedCounties, setSelectedCounties] = useState("all");
-  const [selectedState, setSelectedState] = useState("all");
-  const [selectedZip, setSelectedZip] = useState("");
-  const [selectedQuarter, setSelectedQuarter] = useState("all");
-  const [selectedPayerType, setSelectedPayerType] = useState("all");
-  const [affiliationsSearch, setAffiliationsSearch] = useState("");
+  const [selectedStates, setSelectedStates] = useState<string[]>([]);
+  const [selectedCounties, setSelectedCounties] = useState<string[]>([]);
+  const [selectedPayers, setSelectedPayers] = useState<string[]>([]);
+  const [selectedQuarters, setSelectedQuarters] = useState<string[]>([]);
+  const [zipCode, setZipCode] = useState("");
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [serviceLine, setServiceLine] = useState<"HH" | "HOS">("HH");
+
+  const states = ["California", "Texas", "Florida", "New York", "Illinois"];
+  const counties = ["Los Angeles", "Harris", "Miami-Dade", "Kings", "Cook"];
+  const payers = ["Medicare", "Medicaid", "Private Insurance", "Uninsured"];
+  const quarters = ["Q4 2024", "Q3 2024", "Q2 2024", "Q1 2024", "Q4 2023", "Q3 2023"];
 
   const filteredData = mockHCOs.filter((item) => {
     const matchesSearch =
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.mdmId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.orgId.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Use address properties for filtering
+    const matchesStates = selectedStates.length === 0 || 
+      (item.address && selectedStates.includes(item.address.state));
+    const matchesCounties = selectedCounties.length === 0; // County not available in mock data
+    const matchesPayers = selectedPayers.length === 0; // Payer type not available in mock data
+    const matchesQuarters = selectedQuarters.length === 0; // Quarter not available in mock data
+    const matchesZip = !zipCode || 
+      (item.address && item.address.zipCode?.includes(zipCode));
 
-    return matchesSearch;
+    return matchesSearch && matchesStates && matchesCounties && matchesPayers && 
+           matchesQuarters && matchesZip;
   });
 
   const activeCount = mockHCOs.filter(hco => hco.status === "Active").length;
@@ -89,13 +105,12 @@ const HCOList = () => {
   };
 
   const clearAllFilters = () => {
-    setSelectedFacilityType("all");
-    setSelectedCounties("all");
-    setSelectedState("all");
-    setSelectedZip("");
-    setSelectedQuarter("all");
-    setSelectedPayerType("all");
-    setAffiliationsSearch("");
+    setSelectedStates([]);
+    setSelectedCounties([]);
+    setSelectedPayers([]);
+    setSelectedQuarters([]);
+    setZipCode("");
+    setSearchTerm("");
   };
 
   const handleExport = (format: 'excel' | 'json' | 'pdf') => {
@@ -157,124 +172,191 @@ const HCOList = () => {
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Filters for Analysis */}
       <div className="max-w-[1400px]">
         <Card className="mt-6">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Search className="h-5 w-5" />
-              Filters
-            </CardTitle>
-            <Button 
-              variant="outline" 
+          <CardTitle className="text-lg flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Database className="h-5 w-5" />
+              Filters for Analysis
+            </div>
+            <Button
+              variant="ghost"
               size="sm"
               onClick={clearAllFilters}
+              className="text-muted-foreground hover:text-foreground"
             >
+              <X className="h-4 w-4 mr-2" />
               Clear Filters
             </Button>
-          </div>
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
             <div className="space-y-2">
               <label className="text-sm font-medium">State</label>
-              <Select value={selectedState} onValueChange={setSelectedState}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All States" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All States</SelectItem>
-                  <SelectItem value="NY">New York</SelectItem>
-                  <SelectItem value="CA">California</SelectItem>
-                  <SelectItem value="TX">Texas</SelectItem>
-                  <SelectItem value="FL">Florida</SelectItem>
-                  <SelectItem value="IL">Illinois</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between">
+                    {selectedStates.length > 0 ? `${selectedStates.length} selected` : "Select states"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search states..." />
+                    <CommandEmpty>No state found.</CommandEmpty>
+                    <CommandGroup className="max-h-64 overflow-auto">
+                      {states.map((state) => (
+                        <CommandItem
+                          key={state}
+                          onSelect={() => {
+                            setSelectedStates(
+                              selectedStates.includes(state)
+                                ? selectedStates.filter((s) => s !== state)
+                                : [...selectedStates, state]
+                            );
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedStates.includes(state) ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {state}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Counties</label>
-              <Select value={selectedCounties} onValueChange={setSelectedCounties}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Counties" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Counties</SelectItem>
-                  <SelectItem value="kings">Kings County</SelectItem>
-                  <SelectItem value="los-angeles">Los Angeles County</SelectItem>
-                  <SelectItem value="harris">Harris County</SelectItem>
-                  <SelectItem value="miami-dade">Miami-Dade County</SelectItem>
-                  <SelectItem value="cook">Cook County</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between">
+                    {selectedCounties.length > 0 ? `${selectedCounties.length} selected` : "Select counties"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search counties..." />
+                    <CommandEmpty>No county found.</CommandEmpty>
+                    <CommandGroup className="max-h-64 overflow-auto">
+                      {counties.map((county) => (
+                        <CommandItem
+                          key={county}
+                          onSelect={() => {
+                            setSelectedCounties(
+                              selectedCounties.includes(county)
+                                ? selectedCounties.filter((c) => c !== county)
+                                : [...selectedCounties, county]
+                            );
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedCounties.includes(county) ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {county}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">ZIP</label>
               <Input 
-                placeholder="Enter ZIP code..." 
-                value={selectedZip}
-                onChange={(e) => setSelectedZip(e.target.value)}
+                placeholder="Enter ZIP code" 
+                value={zipCode}
+                onChange={(e) => setZipCode(e.target.value)}
               />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Time (Quarters)</label>
-              <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Quarters" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Quarters</SelectItem>
-                  <SelectItem value="Q1-2024">Q1 2024</SelectItem>
-                  <SelectItem value="Q2-2024">Q2 2024</SelectItem>
-                  <SelectItem value="Q3-2024">Q3 2024</SelectItem>
-                  <SelectItem value="Q4-2024">Q4 2024</SelectItem>
-                  <SelectItem value="Q1-2025">Q1 2025</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between">
+                    {selectedQuarters.length > 0 ? `${selectedQuarters.length} selected` : "Select quarters"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search quarters..." />
+                    <CommandEmpty>No quarter found.</CommandEmpty>
+                    <CommandGroup className="max-h-64 overflow-auto">
+                      {quarters.map((quarter) => (
+                        <CommandItem
+                          key={quarter}
+                          onSelect={() => {
+                            setSelectedQuarters(
+                              selectedQuarters.includes(quarter)
+                                ? selectedQuarters.filter((q) => q !== quarter)
+                                : [...selectedQuarters, quarter]
+                            );
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedQuarters.includes(quarter) ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {quarter}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Payer Type</label>
-              <Select value={selectedPayerType} onValueChange={setSelectedPayerType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Payer Types" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Payer Types</SelectItem>
-                  <SelectItem value="Medicare">Medicare</SelectItem>
-                  <SelectItem value="Medicaid">Medicaid</SelectItem>
-                  <SelectItem value="Commercial">Commercial</SelectItem>
-                  <SelectItem value="Self-Pay">Self-Pay</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Facility Type</label>
-              <Select value={selectedFacilityType} onValueChange={setSelectedFacilityType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Facility Types" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Facility Types</SelectItem>
-                  <SelectItem value="Hospital">Hospital</SelectItem>
-                  <SelectItem value="SNF">SNF</SelectItem>
-                  <SelectItem value="ALF">ALF</SelectItem>
-                  <SelectItem value="Clinic">Clinic</SelectItem>
-                  <SelectItem value="Medical Center">Medical Center</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Affiliations</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Search affiliations..." 
-                  className="pl-9" 
-                  value={affiliationsSearch}
-                  onChange={(e) => setAffiliationsSearch(e.target.value)}
-                />
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between">
+                    {selectedPayers.length > 0 ? `${selectedPayers.length} selected` : "Select payers"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search payers..." />
+                    <CommandEmpty>No payer found.</CommandEmpty>
+                    <CommandGroup className="max-h-64 overflow-auto">
+                      {payers.map((payer) => (
+                        <CommandItem
+                          key={payer}
+                          onSelect={() => {
+                            setSelectedPayers(
+                              selectedPayers.includes(payer)
+                                ? selectedPayers.filter((p) => p !== payer)
+                                : [...selectedPayers, payer]
+                            );
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedPayers.includes(payer) ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {payer}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </CardContent>
