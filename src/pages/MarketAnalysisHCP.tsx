@@ -352,6 +352,7 @@ const MarketAnalysisHCP = () => {
                     "Annual Patient Count (FFS)": Math.floor(Math.random() * 2000) + 500,
                     "L4QTR HH Patient / HOS Patients Count": Math.floor(Math.random() * 500) + 100,
                     "L4QTR Growth %": Math.floor(Math.random() * 20) + 1,
+                    "Addressable Count": Math.floor(Math.random() * 500) + 100,
                     "Medical Director": [" Smith", "Johnson", " Williams", " Brown", " Davis"][index % 5],
                     "MD - Agency": [
                       "Skyra Medical",
@@ -435,6 +436,7 @@ const MarketAnalysisHCP = () => {
                     annualPatientCount: Math.floor(Math.random() * 2000) + 500,
                     l4qtrPatientCount: Math.floor(Math.random() * 500) + 100,
                     growth: Math.floor(Math.random() * 20) + 1,
+                    addressableCount: Math.floor(Math.random() * 500) + 100,
                     medicalDirector: ["Dr. Smith", "Dr. Johnson", "Dr. Williams", "Dr. Brown", "Dr. Davis"][index % 5],
                     mdAgency: [
                       "Skyra Medical",
@@ -464,6 +466,7 @@ const MarketAnalysisHCP = () => {
                         "Annual Patient Count",
                         "L4QTR Patient Count",
                         "Growth %",
+                        "Addressable Count",
                       ],
                     ],
                     body: preparedData.map((d) => [
@@ -478,6 +481,7 @@ const MarketAnalysisHCP = () => {
                       d.annualPatientCount,
                       d.l4qtrPatientCount,
                       `${d.growth}%`,
+                      d.addressableCount,
                     ]),
                     theme: "striped",
                     headStyles: { fillColor: [33, 150, 243] },
@@ -588,6 +592,13 @@ const MarketAnalysisHCP = () => {
                       >
                         L4QTR Growth %
                         <SortIcon column="growth" currentColumn={sortColumn} direction={sortDirection} />
+                      </th>
+                      <th
+                        className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50"
+                        onClick={() => handleSort("addressableCount")}
+                      >
+                        Addressable Count
+                        <SortIcon column="addressableCount" currentColumn={sortColumn} direction={sortDirection} />
                       </th>
                       <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap cursor-pointer hover:bg-accent/50"
@@ -720,6 +731,7 @@ const MarketAnalysisHCP = () => {
                         rank: index + 1 + (currentPage - 1) * itemsPerPage,
                         name: ` ${record.firstName} ${record.lastName}`,
                         npi: `12345${6789 + index}0`,
+                        addressableCount: Math.floor(Math.random() * 500) + 100,
                         county: [
                           "Kings County",
                           "Los Angeles County",
@@ -856,6 +868,7 @@ const MarketAnalysisHCP = () => {
                           <td className="py-3 px-4 text-sm font-medium">{record.annualPatientCount}</td>
                           <td className="py-3 px-4 text-sm font-medium">{record.l4qtrPatientCount}</td>
                           <td className="py-3 px-4 text-sm text-green-600 font-medium">{record.growth}%</td>
+                          <td className="py-3 px-4 text-sm font-medium">{record.addressableCount}</td>
                           <td className="py-3 px-4 text-sm whitespace-nowrap">{record.medicalDirector}</td>
                           <td className="py-3 px-4 text-sm whitespace-nowrap">{record.mdAgency}</td>
                           <td className="py-3 px-4 text-sm whitespace-nowrap">{record.topReferralAgency}</td>
