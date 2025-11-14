@@ -124,20 +124,6 @@ const MarketAnalysisHCP = () => {
         </p>
       </div>
 
-      {/* HCP Metrics */}
-      <div className="max-w-[1400px] grid gap-4 md:grid-cols-3">
-        {hcpMetrics.map((metric, index) => (
-          <Card key={index} className={metric.bgColor}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl font-bold text-blue-600">
-                {metric.value}
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">{metric.title}</p>
-            </CardHeader>
-          </Card>
-        ))}
-      </div>
-
       {/* Filters for Analysis */}
       <div className="max-w-[1400px]">
         <Card>
@@ -276,7 +262,7 @@ const MarketAnalysisHCP = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex items-center space-x-2 pt-6">
+              <div className="flex items-center space-x-2">
                 <Checkbox 
                   id="deliberate-duplicates" 
                   checked={deliberateDuplicates}
@@ -301,6 +287,20 @@ const MarketAnalysisHCP = () => {
           </div>
         </CardContent>
         </Card>
+      </div>
+
+      {/* HCP Metrics */}
+      <div className="max-w-[1400px] grid gap-4 md:grid-cols-3">
+        {hcpMetrics.map((metric, index) => (
+          <Card key={index} className={metric.bgColor}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl font-bold text-blue-600">
+                {metric.value}
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">{metric.title}</p>
+            </CardHeader>
+          </Card>
+        ))}
       </div>
 
       {/* Physician Accounts Table */}
