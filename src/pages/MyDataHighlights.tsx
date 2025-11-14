@@ -494,6 +494,19 @@ const MyDataHighlights = () => {
         </TabsContent>
 
         <TabsContent value="hco" className="space-y-4">
+          {/* HCP Metrics */}
+          <div className="grid gap-4 md:grid-cols-3">
+            {hcpMetrics.map((metric, index) => (
+              <Card key={index} style={{ backgroundColor: currentTheme.colors.cardBg }}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xl font-bold" style={{ color: currentTheme.colors.primary }}>
+                    {metric.value}
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">{metric.title}</p>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
           {/* Highlights */}
 
           {/* HCO Data Table */}
