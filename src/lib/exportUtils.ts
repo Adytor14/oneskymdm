@@ -259,7 +259,7 @@ export const exportHCPToPDF = (hcp: HCPProfile) => {
   // Professional Name
   doc.setFontSize(16);
   doc.setTextColor(0, 0, 0);
-  doc.text(`Dr. ${hcp.firstName} ${hcp.lastName}`, 14, 30);
+  doc.text(`${hcp.firstName} ${hcp.lastName}`, 14, 30);
   
   // Basic Information
   doc.setFontSize(12);
