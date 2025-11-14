@@ -129,6 +129,12 @@ const MyDataHighlights = () => {
     { title: "Growth", value: "6.1%", bgColor: "bg-gray-50" },
   ];
 
+  const hcoMetrics = [
+    { title: "Total Facility Accounts", value: "1,523", bgColor: "bg-purple-50" },
+    { title: "Active Facilities", value: "1,401", bgColor: "bg-green-50" },
+    { title: "Growth", value: "8.3%", bgColor: "bg-gray-50" },
+  ];
+
   const masterDataRecords = [
     {
       name: "Dr. Sarah Johnson",
