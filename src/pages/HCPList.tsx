@@ -175,24 +175,6 @@ const HCPList = () => {
           </p>
         </div>
 
-        {/* Metrics */}
-        <div className="grid gap-4 md:grid-cols-3 mt-6">
-          {metrics.map((metric, index) => {
-            const Icon = metric.icon;
-            return (
-              <Card key={index} className={metric.bgColor}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">{metric.title}</CardTitle>
-                  <Icon className={`h-4 w-4 ${metric.iconColor}`} />
-                </CardHeader>
-                <CardContent>
-                  <div className={`text-3xl font-bold ${metric.iconColor}`}>{metric.value}</div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
         {/* Filters for Analysis */}
         <Card className="mt-6">
           <CardHeader>
@@ -288,16 +270,17 @@ const HCPList = () => {
                 </Select>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Sub Specialty</label>
+                <label className="text-sm font-medium">Sub-Specialty</label>
                 <Select value={subSpecialtyFilter} onValueChange={setSubSpecialtyFilter}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Sub Specialties" />
+                    <SelectValue placeholder="All Sub-Specialties" />
                   </SelectTrigger>
                   <SelectContent className="bg-popover z-50">
-                    <SelectItem value="all">All Sub Specialties</SelectItem>
+                    <SelectItem value="all">All Sub-Specialties</SelectItem>
                     <SelectItem value="interventional">Interventional</SelectItem>
+                    <SelectItem value="sports-medicine">Sports Medicine</SelectItem>
+                    <SelectItem value="clinical">Clinical</SelectItem>
                     <SelectItem value="general">General</SelectItem>
-                    <SelectItem value="pediatric">Pediatric</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -309,9 +292,10 @@ const HCPList = () => {
                   </SelectTrigger>
                   <SelectContent className="bg-popover z-50">
                     <SelectItem value="all">All Affiliations</SelectItem>
-                    <SelectItem value="hospital-a">Hospital A</SelectItem>
-                    <SelectItem value="hospital-b">Hospital B</SelectItem>
-                    <SelectItem value="clinic-network">Clinic Network</SelectItem>
+                    <SelectItem value="hospital">Hospital</SelectItem>
+                    <SelectItem value="clinic">Clinic</SelectItem>
+                    <SelectItem value="academic">Academic Center</SelectItem>
+                    <SelectItem value="private">Private Practice</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -330,7 +314,7 @@ const HCPList = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex items-center space-x-2 pt-6">
+              <div className="flex items-center space-x-2">
                 <Checkbox 
                   id="deliberate-duplicates" 
                   checked={deliberateDuplicates}
@@ -355,6 +339,24 @@ const HCPList = () => {
           </div>
         </CardContent>
         </Card>
+
+        {/* Metrics */}
+        <div className="grid gap-4 md:grid-cols-3 mt-6">
+          {metrics.map((metric, index) => {
+            const Icon = metric.icon;
+            return (
+              <Card key={index} className={metric.bgColor}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">{metric.title}</CardTitle>
+                  <Icon className={`h-4 w-4 ${metric.iconColor}`} />
+                </CardHeader>
+                <CardContent>
+                  <div className={`text-3xl font-bold ${metric.iconColor}`}>{metric.value}</div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </div>
 
       {/* Physician Accounts Table */}
