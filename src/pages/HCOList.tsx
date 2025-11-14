@@ -467,6 +467,12 @@ const HCOList = () => {
                     </button>
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("addressableCount")} className="flex items-center hover:text-foreground">
+                      Addressable Count
+                      <SortIcon column="addressableCount" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
                     <button onClick={() => handleSort("facilityType")} className="flex items-center hover:text-foreground">
                       Facility Type
                       <SortIcon column="facilityType" />
@@ -531,6 +537,7 @@ const HCOList = () => {
                     const annualPatientCount = Math.floor(Math.random() * 5000) + 1000;
                     const l4qtrPatientCount = Math.floor(Math.random() * 1500) + 300;
                     const growth = parseFloat((Math.random() * 25 + 5).toFixed(1));
+                    const addressableCount = Math.floor(Math.random() * 500) + 100;
                     const facilityTypes = ["Acute Care", "SNF", "IRF", "LTACH"];
                     const facilityType = facilityTypes[Math.floor(Math.random() * facilityTypes.length)];
                     const mdAgency = `MD Agency ${Math.floor(Math.random() * 100) + 1}`;
@@ -556,6 +563,7 @@ const HCOList = () => {
                       annualPatientCount,
                       l4qtrPatientCount,
                       growth,
+                      addressableCount,
                       facilityType,
                       mdAgency,
                       agencies,
@@ -616,6 +624,7 @@ const HCOList = () => {
                       <td className="py-3 px-4 text-sm font-medium">{data.annualPatientCount.toLocaleString()}</td>
                       <td className="py-3 px-4 text-sm font-medium">{data.l4qtrPatientCount.toLocaleString()}</td>
                       <td className="py-3 px-4 text-sm text-green-600 font-medium">{data.growth}%</td>
+                      <td className="py-3 px-4 text-sm font-medium">{data.addressableCount}</td>
                       <td className="py-3 px-4 text-sm">{data.facilityType}</td>
                       <td className="py-3 px-4 text-sm">{data.mdAgency}</td>
                       {data.agencies.map((agency, agencyIndex) => (
