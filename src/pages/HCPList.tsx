@@ -25,6 +25,7 @@ import {
   ArrowUp,
   ArrowDown,
   Database,
+  SlidersHorizontal,
 } from "lucide-react";
 import { exportToExcel, exportToJSON, exportHCPToPDF, prepareHCPForExport } from "@/lib/exportUtils";
 import {
@@ -42,6 +43,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -88,6 +97,7 @@ const HCPList = () => {
   const [patientVolumeFilter, setPatientVolumeFilter] = useState("all");
   const [deliberateDuplicates, setDeliberateDuplicates] = useState(false);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [showAdditionalFilters, setShowAdditionalFilters] = useState(false);
 
   const filteredData = mockHCPs.filter((item) => {
     const matchesSearch =
@@ -218,9 +228,116 @@ const HCPList = () => {
         {/* Filters for Analysis */}
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Database className="h-5 w-5" />
-              Filters for Analysis
+            <CardTitle className="text-lg flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Database className="h-5 w-5" />
+                Filters for Analysis
+              </div>
+              <Sheet open={showAdditionalFilters} onOpenChange={setShowAdditionalFilters}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <SlidersHorizontal className="h-4 w-4 mr-2" />
+                    Additional Filters
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[400px] sm:w-[540px]">
+                  <SheetHeader>
+                    <SheetTitle>Additional Filters</SheetTitle>
+                    <SheetDescription>
+                      Configure advanced filtering options for your analysis
+                    </SheetDescription>
+                  </SheetHeader>
+                  <div className="space-y-4 mt-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Payer Type</label>
+                      <Select value={payerFilter} onValueChange={setPayerFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Payers" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="all">All Payers</SelectItem>
+                          <SelectItem value="medicare">Medicare</SelectItem>
+                          <SelectItem value="medicaid">Medicaid</SelectItem>
+                          <SelectItem value="private">Private Insurance</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Specialty</label>
+                      <Select value={specialtyFilter} onValueChange={setSpecialtyFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Specialties" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="all">All Specialties</SelectItem>
+                          <SelectItem value="cardiology">Cardiology</SelectItem>
+                          <SelectItem value="orthopedics">Orthopedics</SelectItem>
+                          <SelectItem value="neurology">Neurology</SelectItem>
+                          <SelectItem value="pediatrics">Pediatrics</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Sub-Specialty</label>
+                      <Select value={subSpecialtyFilter} onValueChange={setSubSpecialtyFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Sub-Specialties" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="all">All Sub-Specialties</SelectItem>
+                          <SelectItem value="interventional">Interventional</SelectItem>
+                          <SelectItem value="sports-medicine">Sports Medicine</SelectItem>
+                          <SelectItem value="clinical">Clinical</SelectItem>
+                          <SelectItem value="general">General</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Affiliations</label>
+                      <Select value={affiliationsFilter} onValueChange={setAffiliationsFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Affiliations" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="all">All Affiliations</SelectItem>
+                          <SelectItem value="hospital">Hospital</SelectItem>
+                          <SelectItem value="clinic">Clinic</SelectItem>
+                          <SelectItem value="academic">Academic Center</SelectItem>
+                          <SelectItem value="private">Private Practice</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Patient Volume</label>
+                      <Select value={patientVolumeFilter} onValueChange={setPatientVolumeFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Volumes" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="all">All Volumes</SelectItem>
+                          <SelectItem value="0-100">0 - 100</SelectItem>
+                          <SelectItem value="100-300">100 - 300</SelectItem>
+                          <SelectItem value="300-500">300 - 500</SelectItem>
+                          <SelectItem value="500+">500+</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="deliberate-duplicates"
+                        checked={deliberateDuplicates}
+                        onCheckedChange={(checked) => setDeliberateDuplicates(checked as boolean)}
+                      />
+                      <Label
+                        htmlFor="deliberate-duplicates"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Deliberate Duplicates
+                      </Label>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -279,93 +396,6 @@ const HCPList = () => {
                       <SelectItem value="q1-2024">Q1 2024</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Payer Type</label>
-                  <Select value={payerFilter} onValueChange={setPayerFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Payers" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover z-50">
-                      <SelectItem value="all">All Payers</SelectItem>
-                      <SelectItem value="medicare">Medicare</SelectItem>
-                      <SelectItem value="medicaid">Medicaid</SelectItem>
-                      <SelectItem value="private">Private Insurance</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Specialty</label>
-                  <Select value={specialtyFilter} onValueChange={setSpecialtyFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Specialties" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover z-50">
-                      <SelectItem value="all">All Specialties</SelectItem>
-                      <SelectItem value="cardiology">Cardiology</SelectItem>
-                      <SelectItem value="orthopedics">Orthopedics</SelectItem>
-                      <SelectItem value="neurology">Neurology</SelectItem>
-                      <SelectItem value="pediatrics">Pediatrics</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Sub-Specialty</label>
-                  <Select value={subSpecialtyFilter} onValueChange={setSubSpecialtyFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Sub-Specialties" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover z-50">
-                      <SelectItem value="all">All Sub-Specialties</SelectItem>
-                      <SelectItem value="interventional">Interventional</SelectItem>
-                      <SelectItem value="sports-medicine">Sports Medicine</SelectItem>
-                      <SelectItem value="clinical">Clinical</SelectItem>
-                      <SelectItem value="general">General</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Affiliations</label>
-                  <Select value={affiliationsFilter} onValueChange={setAffiliationsFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Affiliations" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover z-50">
-                      <SelectItem value="all">All Affiliations</SelectItem>
-                      <SelectItem value="hospital">Hospital</SelectItem>
-                      <SelectItem value="clinic">Clinic</SelectItem>
-                      <SelectItem value="academic">Academic Center</SelectItem>
-                      <SelectItem value="private">Private Practice</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Patient Volume</label>
-                  <Select value={patientVolumeFilter} onValueChange={setPatientVolumeFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Volumes" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover z-50">
-                      <SelectItem value="all">All Volumes</SelectItem>
-                      <SelectItem value="0-100">0 - 100</SelectItem>
-                      <SelectItem value="100-300">100 - 300</SelectItem>
-                      <SelectItem value="300-500">300 - 500</SelectItem>
-                      <SelectItem value="500+">500+</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="deliberate-duplicates"
-                    checked={deliberateDuplicates}
-                    onCheckedChange={(checked) => setDeliberateDuplicates(checked as boolean)}
-                  />
-                  <Label
-                    htmlFor="deliberate-duplicates"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Deliberate Duplicates
-                  </Label>
                 </div>
               </div>
               <div className="flex justify-end">
