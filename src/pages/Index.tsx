@@ -391,8 +391,6 @@ const Index = () => {
               </Popover>
             </div>
 
-            
-
             {/* Payer Type Filter */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Payer Type</label>
@@ -715,7 +713,7 @@ const Index = () => {
                       return paginatedData.map((record, index) => (
                         <tr key={index} className="border-b hover:bg-muted/50">
                           <td className="py-3 px-4">
-                            Dr. {record.firstName} {record.lastName}
+                            {record.firstName} {record.lastName}
                           </td>
                           <td className="py-3 px-4 text-sm">{record.npiId}</td>
                           <td className="py-3 px-4 text-sm">{record.city}</td>
