@@ -361,6 +361,7 @@ const MarketAnalysisHCO = () => {
                       'Annual Patient Count (FFS)': Math.floor(Math.random() * 5000) + 1000,
                       [`L4QTR ${serviceLine} Patient Count`]: Math.floor(Math.random() * 1500) + 300,
                       'L4QTR Growth %': (Math.random() * 25 + 5).toFixed(1),
+                      'Addressable Count': Math.floor(Math.random() * 500) + 100,
                       'Facility Type': ["Acute Care", "SNF", "IRF"][Math.floor(Math.random() * 3)],
                       'MD - Agency': `MD Agency ${Math.floor(Math.random() * 100) + 1}`,
                       'L4QTR Top Referring Agency': agencies[0].name,
@@ -416,6 +417,7 @@ const MarketAnalysisHCO = () => {
                       annualPatientCount: Math.floor(Math.random() * 5000) + 1000,
                       l4qtrPatientCount: Math.floor(Math.random() * 1500) + 300,
                       growth: (Math.random() * 25 + 5).toFixed(1),
+                      addressableCount: Math.floor(Math.random() * 500) + 100,
                       facilityType: ["Acute Care", "SNF", "IRF"][Math.floor(Math.random() * 3)],
                       topAgency: agencies[0].name,
                       topAgencyCount: agencies[0].count,
@@ -428,7 +430,7 @@ const MarketAnalysisHCO = () => {
                   
                   autoTable(doc, {
                     startY: 25,
-                    head: [['Rank', 'Facility Name', 'NPI', 'County', 'City', 'State', 'Parent', 'ONE ID', 'Annual Count', 'L4QTR Count', 'Growth %', 'Type', 'Top Agency', 'Agency Count']],
+                    head: [['Rank', 'Facility Name', 'NPI', 'County', 'City', 'State', 'Parent', 'ONE ID', 'Annual Count', 'L4QTR Count', 'Growth %', 'Addressable Count', 'Type', 'Top Agency', 'Agency Count']],
                     body: preparedData.map(d => [
                       d.rank,
                       d.name,
@@ -441,6 +443,7 @@ const MarketAnalysisHCO = () => {
                       d.annualPatientCount,
                       d.l4qtrPatientCount,
                       `${d.growth}%`,
+                      d.addressableCount,
                       d.facilityType,
                       d.topAgency,
                       d.topAgencyCount
@@ -534,6 +537,12 @@ const MarketAnalysisHCO = () => {
                     <button onClick={() => handleSort("growth")} className="flex items-center hover:text-foreground">
                       L4QTR Growth %
                       <SortIcon column="growth" />
+                    </button>
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
+                    <button onClick={() => handleSort("addressableCount")} className="flex items-center hover:text-foreground">
+                      Addressable Count
+                      <SortIcon column="addressableCount" />
                     </button>
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
@@ -638,6 +647,7 @@ const MarketAnalysisHCO = () => {
                       annualPatientCount,
                       l4qtrPatientCount,
                       growth,
+                      addressableCount: Math.floor(Math.random() * 500) + 100,
                       facilityType,
                       mdAgency,
                       agencies,
@@ -700,6 +710,7 @@ const MarketAnalysisHCO = () => {
                         <td className="py-3 px-4 text-sm font-medium">{data.annualPatientCount.toLocaleString()}</td>
                         <td className="py-3 px-4 text-sm font-medium">{data.l4qtrPatientCount.toLocaleString()}</td>
                         <td className="py-3 px-4 text-sm text-green-600 font-medium">{data.growth}%</td>
+                        <td className="py-3 px-4 text-sm font-medium">{data.addressableCount}</td>
                         <td className="py-3 px-4 text-sm">{data.facilityType}</td>
                         <td className="py-3 px-4 text-sm">{data.mdAgency}</td>
                         {data.agencies.map((agency, agencyIndex) => (
