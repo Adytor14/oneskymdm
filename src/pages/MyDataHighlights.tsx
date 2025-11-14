@@ -513,7 +513,7 @@ const MyDataHighlights = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Facility Accounts Master Data</CardTitle>
+                <CardTitle className="text-lg">Facility Accounts</CardTitle>
                 <p className="text-sm text-muted-foreground">Showing 441 of 468 profiles</p>
               </div>
             </CardHeader>
