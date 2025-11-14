@@ -39,7 +39,7 @@ export const mockHCPs: HCPProfile[] = [
     education: [
       {
         institution: "Harvard Medical School",
-        degree: "MD",
+        degree: "Medical Degree",
         year: "2010",
         fieldOfStudy: "Medicine",
       },
@@ -51,7 +51,7 @@ export const mockHCPs: HCPProfile[] = [
       },
     ],
     license: "MA-MD-123456",
-    degreeType: "MD",
+    degreeType: "Physician",
   },
   {
     id: "hcp-002",
@@ -91,13 +91,13 @@ export const mockHCPs: HCPProfile[] = [
     education: [
       {
         institution: "Stanford Medical School",
-        degree: "MD",
+        degree: "Medical Degree",
         year: "2008",
         fieldOfStudy: "Medicine",
       },
     ],
     license: "NY-MD-789012",
-    degreeType: "MD",
+    degreeType: "Physician",
   },
   {
     id: "hcp-003",
@@ -137,13 +137,13 @@ export const mockHCPs: HCPProfile[] = [
     education: [
       {
         institution: "UCLA Medical School",
-        degree: "MD",
+        degree: "Medical Degree",
         year: "2012",
         fieldOfStudy: "Medicine",
       },
     ],
     license: "CA-MD-456789",
-    degreeType: "MD",
+    degreeType: "Physician",
   },
   {
     id: "hcp-004",
@@ -183,13 +183,13 @@ export const mockHCPs: HCPProfile[] = [
     education: [
       {
         institution: "Northwestern University",
-        degree: "MD",
+        degree: "Medical Degree",
         year: "2009",
         fieldOfStudy: "Medicine",
       },
     ],
     license: "IL-MD-234567",
-    degreeType: "MD",
+    degreeType: "Physician",
   },
   {
     id: "hcp-005",
@@ -229,13 +229,13 @@ export const mockHCPs: HCPProfile[] = [
     education: [
       {
         institution: "Boston University Medical School",
-        degree: "MD",
+        degree: "Medical Degree",
         year: "2011",
         fieldOfStudy: "Medicine",
       },
     ],
     license: "MA-MD-567890",
-    degreeType: "MD",
+    degreeType: "Physician",
   },
   {
     id: "hcp-006",
@@ -275,13 +275,13 @@ export const mockHCPs: HCPProfile[] = [
     education: [
       {
         institution: "University of Washington",
-        degree: "MD",
+        degree: "Medical Degree",
         year: "2013",
         fieldOfStudy: "Medicine",
       },
     ],
     license: "WA-MD-678901",
-    degreeType: "MD",
+    degreeType: "Physician",
   },
   {
     id: "hcp-007",
@@ -321,13 +321,13 @@ export const mockHCPs: HCPProfile[] = [
     education: [
       {
         institution: "University of Miami",
-        degree: "MD",
+        degree: "Medical Degree",
         year: "2010",
         fieldOfStudy: "Medicine",
       },
     ],
     license: "FL-MD-789012",
-    degreeType: "MD",
+    degreeType: "Physician",
   },
   {
     id: "hcp-008",
@@ -367,13 +367,13 @@ export const mockHCPs: HCPProfile[] = [
     education: [
       {
         institution: "University of Colorado",
-        degree: "MD",
+        degree: "Medical Degree",
         year: "2014",
         fieldOfStudy: "Medicine",
       },
     ],
     license: "CO-MD-890123",
-    degreeType: "MD",
+    degreeType: "Physician",
   },
   {
     id: "hcp-009",
@@ -413,13 +413,13 @@ export const mockHCPs: HCPProfile[] = [
     education: [
       {
         institution: "University of Washington",
-        degree: "MD",
+        degree: "Medical Degree",
         year: "2012",
         fieldOfStudy: "Medicine",
       },
     ],
     license: "WA-MD-901234",
-    degreeType: "MD",
+    degreeType: "Physician",
   },
   {
     id: "hcp-010",
@@ -459,13 +459,13 @@ export const mockHCPs: HCPProfile[] = [
     education: [
       {
         institution: "Baylor College of Medicine",
-        degree: "MD",
+        degree: "Medical Degree",
         year: "2011",
         fieldOfStudy: "Medicine",
       },
     ],
     license: "TX-MD-012345",
-    degreeType: "MD",
+    degreeType: "Physician",
   },
   {
     id: "hcp-011",
@@ -505,13 +505,13 @@ export const mockHCPs: HCPProfile[] = [
     education: [
       {
         institution: "University of Arizona",
-        degree: "MD",
+        degree: "Medical Degree",
         year: "2013",
         fieldOfStudy: "Medicine",
       },
     ],
     license: "AZ-MD-123456",
-    degreeType: "MD",
+    degreeType: "Physician",
   },
   {
     id: "hcp-012",
@@ -551,13 +551,13 @@ export const mockHCPs: HCPProfile[] = [
     education: [
       {
         institution: "Emory University",
-        degree: "MD",
+        degree: "Medical Degree",
         year: "2009",
         fieldOfStudy: "Medicine",
       },
     ],
     license: "GA-MD-234567",
-    degreeType: "MD",
+    degreeType: "Physician",
   },
   {
     id: "hcp-013",
@@ -597,13 +597,13 @@ export const mockHCPs: HCPProfile[] = [
     education: [
       {
         institution: "University of Pennsylvania",
-        degree: "MD",
+        degree: "Medical Degree",
         year: "2012",
         fieldOfStudy: "Medicine",
       },
     ],
     license: "PA-MD-345678",
-    degreeType: "MD",
+    degreeType: "Physician",
   },
   {
     id: "hcp-014",
@@ -643,13 +643,13 @@ export const mockHCPs: HCPProfile[] = [
     education: [
       {
         institution: "UC San Diego",
-        degree: "MD",
+        degree: "Medical Degree",
         year: "2010",
         fieldOfStudy: "Medicine",
       },
     ],
     license: "CA-MD-456789",
-    degreeType: "MD",
+    degreeType: "Physician",
   },
   {
     id: "hcp-015",
@@ -689,13 +689,13 @@ export const mockHCPs: HCPProfile[] = [
     education: [
       {
         institution: "Oregon Health & Science University",
-        degree: "MD",
+        degree: "Medical Degree",
         year: "2014",
         fieldOfStudy: "Medicine",
       },
     ],
     license: "OR-MD-567890",
-    degreeType: "MD",
+    degreeType: "Physician",
   },
 ];
 
