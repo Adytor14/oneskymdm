@@ -121,7 +121,7 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       end={item.url === "/"}
-                      className={({ isActive }) => (isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "")}
+                      className={({ isActive }) => (isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "")}
                     >
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
@@ -142,7 +142,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
-                      className={({ isActive }) => (isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "")}
+                      className={({ isActive }) => (isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "")}
                     >
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
@@ -173,7 +173,7 @@ export function AppSidebar() {
                           <SidebarMenuSubButton asChild>
                             <NavLink
                               to={item.url}
-                              className={({ isActive }) => (isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "")}
+                              className={({ isActive }) => (isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "")}
                             >
                               <span>{item.title}</span>
                             </NavLink>
@@ -210,7 +210,7 @@ export function AppSidebar() {
                                 <NavLink
                                   to={item.url}
                                   className={({ isActive }) =>
-                                    isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
+                                    isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : ""
                                   }
                                 >
                                   <item.icon className="h-4 w-4" />
@@ -237,7 +237,7 @@ export function AppSidebar() {
                         <NavLink
                           to={item.url}
                           className={({ isActive }) =>
-                            isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
+                            isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : ""
                           }
                         >
                           <item.icon className="h-4 w-4" />
