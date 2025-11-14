@@ -495,33 +495,6 @@ const MyDataHighlights = () => {
 
         <TabsContent value="hco" className="space-y-4">
           {/* Highlights */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Highlights
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground">Top Facility Type</p>
-                  <p className="text-lg font-semibold">General Hospital</p>
-                  <p className="text-xs text-muted-foreground">58% of total facilities</p>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground">Highest Census Growth</p>
-                  <p className="text-lg font-semibold">California</p>
-                  <p className="text-xs text-muted-foreground">+15.3% quarter over quarter</p>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground">Average Patient Volume</p>
-                  <p className="text-lg font-semibold">1,243 patients</p>
-                  <p className="text-xs text-muted-foreground">Per facility account</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* HCO Data Table */}
           <Card>
