@@ -152,26 +152,6 @@ const HCOList = () => {
         </div>
       </div>
 
-      {/* Metrics */}
-      <div className="max-w-[1400px]">
-        <div className="grid gap-4 md:grid-cols-3 mt-6">
-        {metrics.map((metric, index) => {
-          const Icon = metric.icon;
-          return (
-            <Card key={index} className={metric.bgColor}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{metric.title}</CardTitle>
-                <Icon className={`h-4 w-4 ${metric.iconColor}`} />
-              </CardHeader>
-              <CardContent>
-                <div className={`text-3xl font-bold ${metric.iconColor}`}>{metric.value}</div>
-              </CardContent>
-            </Card>
-          );
-        })}
-        </div>
-      </div>
-
       {/* Filters for Analysis */}
       <div className="max-w-[1400px]">
         <Card className="mt-6">
@@ -361,6 +341,26 @@ const HCOList = () => {
           </div>
         </CardContent>
         </Card>
+      </div>
+
+      {/* Metrics */}
+      <div className="max-w-[1400px]">
+        <div className="grid gap-4 md:grid-cols-3 mt-6">
+        {metrics.map((metric, index) => {
+          const Icon = metric.icon;
+          return (
+            <Card key={index} className={metric.bgColor}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">{metric.title}</CardTitle>
+                <Icon className={`h-4 w-4 ${metric.iconColor}`} />
+              </CardHeader>
+              <CardContent>
+                <div className={`text-3xl font-bold ${metric.iconColor}`}>{metric.value}</div>
+              </CardContent>
+            </Card>
+          );
+        })}
+        </div>
       </div>
 
       {/* Facility Accounts Table */}
