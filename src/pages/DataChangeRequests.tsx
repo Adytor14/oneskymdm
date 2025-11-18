@@ -78,10 +78,26 @@ const DataChangeRequests = () => {
 
   const formatPriority = (priority: string) => {
     const p = priority.toLowerCase();
-    if (p === 'high') return 'High';
+    if (p === 'high' || p === 'urgent') return 'High';
     if (p === 'medium') return 'Medium';
     if (p === 'low') return 'Low';
-    return priority;
+    return 'Medium'; // Default to Medium for any unexpected values
+  };
+
+  const getRequestedByName = (requestedBy: string) => {
+    // For now, extract a readable name from the user ID
+    // This should ideally fetch from a profiles table
+    if (!requestedBy) return 'N/A';
+    
+    // If it's a UUID, format it nicely or return a placeholder
+    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (uuidPattern.test(requestedBy)) {
+      // Return first 8 characters as User ID for now
+      return `User-${requestedBy.slice(0, 8)}`;
+    }
+    
+    // Otherwise, return the value as-is (might already be a name)
+    return requestedBy;
   };
 
   const handleViewTimeline = (e: React.MouseEvent, request: ChangeRequest) => {
@@ -163,9 +179,9 @@ const DataChangeRequests = () => {
         bValue = Math.floor((new Date().getTime() - new Date(b.created_at).getTime()) / (1000 * 60 * 60 * 24));
         break;
       case "priority":
-        const priorityOrder: { [key: string]: number } = { high: 3, medium: 2, low: 1 };
-        aValue = priorityOrder[a.priority.toLowerCase()] || 0;
-        bValue = priorityOrder[b.priority.toLowerCase()] || 0;
+        const priorityOrder: { [key: string]: number } = { high: 3, urgent: 3, medium: 2, low: 1 };
+        aValue = priorityOrder[a.priority.toLowerCase()] || 2;
+        bValue = priorityOrder[b.priority.toLowerCase()] || 2;
         break;
       case "requested_by":
         aValue = a.requested_by || "";
@@ -328,7 +344,7 @@ const DataChangeRequests = () => {
               <td className="py-3 px-4">
                 <Badge
                   className={
-                    record.priority.toLowerCase() === "high"
+                    record.priority.toLowerCase() === "high" || record.priority.toLowerCase() === "urgent"
                       ? "bg-red-100 text-red-700"
                       : record.priority.toLowerCase() === "medium"
                       ? "bg-yellow-100 text-yellow-700"
@@ -339,7 +355,7 @@ const DataChangeRequests = () => {
                 </Badge>
               </td>
               <td className="py-3 px-4 text-sm">
-                {record.requested_by || 'N/A'}
+                {getRequestedByName(record.requested_by)}
               </td>
               <td className="py-3 px-4 text-sm">
                 {new Date(record.updated_at).toLocaleDateString("en-GB")}
