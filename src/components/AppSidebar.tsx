@@ -50,7 +50,6 @@ const adminItems = [
 const mergeMatchItems = [
   { title: "Physician Accounts", url: "/merge-match-approval?type=hcp", icon: User },
   { title: "Facility Account", url: "/merge-match-approval?type=hco", icon: Building2 },
-  { title: "Address", url: "/merge-match-approval?type=address", icon: MapPin },
 ];
 
 export function AppSidebar() {
