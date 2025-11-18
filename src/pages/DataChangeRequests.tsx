@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Clock, CalendarIcon, X } from "lucide-react";
+import { Eye, Clock, CalendarIcon, X, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { useNavigate, useParams, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -45,6 +45,10 @@ const DataChangeRequests = () => {
   const [selectedRequestedBy, setSelectedRequestedBy] = useState<string>("all");
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  
+  // Sort states
+  const [sortColumn, setSortColumn] = useState<string>("");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const getDCRTypeName = (entityType: string, requestType: string) => {
     const type = requestType.toLowerCase();
@@ -94,6 +98,26 @@ const DataChangeRequests = () => {
     setDateTo(undefined);
   };
 
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
+
+  const SortIcon = ({ column }: { column: string }) => {
+    if (sortColumn !== column) {
+      return <ArrowUpDown className="h-4 w-4 ml-1 inline" />;
+    }
+    return sortDirection === "asc" ? (
+      <ArrowUp className="h-4 w-4 ml-1 inline" />
+    ) : (
+      <ArrowDown className="h-4 w-4 ml-1 inline" />
+    );
+  };
+
   // Get unique values for filters
   const uniqueDCRTypes = Array.from(new Set(requests.map(r => getDCRTypeName(r.entity_type, r.request_type))));
   const uniqueRequestedBy = Array.from(new Set(requests.map(r => r.requested_by).filter(Boolean)));
@@ -110,6 +134,52 @@ const DataChangeRequests = () => {
     const matchesDateTo = !dateTo || requestDate <= dateTo;
     
     return matchesDCRType && matchesPriority && matchesRequestedBy && matchesDateFrom && matchesDateTo;
+  });
+
+  // Apply sorting to filtered requests
+  const sortedRequests = [...filteredRequests].sort((a, b) => {
+    if (!sortColumn) return 0;
+
+    let aValue: any;
+    let bValue: any;
+
+    switch (sortColumn) {
+      case "dcr_id":
+        aValue = a.dcr_id || `DCR-${a.id.slice(0, 8)}`;
+        bValue = b.dcr_id || `DCR-${b.id.slice(0, 8)}`;
+        break;
+      case "dcr_type":
+        aValue = getDCRTypeName(a.entity_type, a.request_type);
+        bValue = getDCRTypeName(b.entity_type, b.request_type);
+        break;
+      case "date_open":
+        aValue = new Date(a.created_at).getTime();
+        bValue = new Date(b.created_at).getTime();
+        break;
+      case "days_open":
+        aValue = Math.floor((new Date().getTime() - new Date(a.created_at).getTime()) / (1000 * 60 * 60 * 24));
+        bValue = Math.floor((new Date().getTime() - new Date(b.created_at).getTime()) / (1000 * 60 * 60 * 24));
+        break;
+      case "priority":
+        const priorityOrder: { [key: string]: number } = { high: 3, medium: 2, low: 1 };
+        aValue = priorityOrder[a.priority.toLowerCase()] || 0;
+        bValue = priorityOrder[b.priority.toLowerCase()] || 0;
+        break;
+      case "requested_by":
+        aValue = a.requested_by || "";
+        bValue = b.requested_by || "";
+        break;
+      case "last_updated":
+        aValue = new Date(a.updated_at).getTime();
+        bValue = new Date(b.updated_at).getTime();
+        break;
+      default:
+        return 0;
+    }
+
+    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+    return 0;
   });
 
   useEffect(() => {
@@ -190,19 +260,54 @@ const DataChangeRequests = () => {
       <table className="w-full">
         <thead>
           <tr className="border-b">
-            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">DCR ID</th>
-            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">DCR Type</th>
-            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Date Open</th>
-            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Days Open</th>
-            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Priority</th>
-            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Requested by</th>
-            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
+            <th 
+              className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+              onClick={() => handleSort("dcr_id")}
+            >
+              DCR ID <SortIcon column="dcr_id" />
+            </th>
+            <th 
+              className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+              onClick={() => handleSort("dcr_type")}
+            >
+              DCR Type <SortIcon column="dcr_type" />
+            </th>
+            <th 
+              className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+              onClick={() => handleSort("date_open")}
+            >
+              Date Open <SortIcon column="date_open" />
+            </th>
+            <th 
+              className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+              onClick={() => handleSort("days_open")}
+            >
+              Days Open <SortIcon column="days_open" />
+            </th>
+            <th 
+              className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+              onClick={() => handleSort("priority")}
+            >
+              Priority <SortIcon column="priority" />
+            </th>
+            <th 
+              className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+              onClick={() => handleSort("requested_by")}
+            >
+              Requested by <SortIcon column="requested_by" />
+            </th>
+            <th 
+              className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+              onClick={() => handleSort("last_updated")}
+            >
+              Last Updated <SortIcon column="last_updated" />
+            </th>
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View Timeline</th>
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
           </tr>
         </thead>
         <tbody>
-          {requests.map((record) => (
+          {sortedRequests.map((record) => (
             <tr
               key={record.id}
               className="border-b hover:bg-muted/50 cursor-pointer"
@@ -404,7 +509,7 @@ const DataChangeRequests = () => {
           <CardTitle className="text-lg">{getTitle()}</CardTitle>
         </CardHeader>
         <CardContent>
-          {renderTable(filteredRequests, status)}
+          {renderTable(sortedRequests, status)}
         </CardContent>
       </Card>
 
