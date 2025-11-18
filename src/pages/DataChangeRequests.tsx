@@ -98,6 +98,8 @@ const DataChangeRequests = () => {
     setDateTo(undefined);
   };
 
+  const hasActiveFilters = selectedDCRType !== "all" || selectedPriority !== "all" || selectedRequestedBy !== "all" || dateFrom !== undefined || dateTo !== undefined;
+
   const handleSort = (column: string) => {
     if (sortColumn === column) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -372,10 +374,22 @@ const DataChangeRequests = () => {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Filters</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">Filters</CardTitle>
+            {hasActiveFilters && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={clearFilters}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Clear Filters
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
             {/* DCR Type Filter */}
             <div className="space-y-2">
               <label className="text-sm font-medium">DCR Type</label>
@@ -424,22 +438,6 @@ const DataChangeRequests = () => {
               </Select>
             </div>
 
-            {/* Clear Filters Button */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">&nbsp;</label>
-              <Button 
-                variant="outline" 
-                onClick={clearFilters}
-                className="w-full"
-              >
-                <X className="h-4 w-4 mr-2" />
-                Clear Filters
-              </Button>
-            </div>
-          </div>
-
-          {/* Date Range Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             {/* Date From */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Date From</label>
@@ -453,7 +451,7 @@ const DataChangeRequests = () => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dateFrom ? format(dateFrom, "PPP") : <span>Pick a date</span>}
+                    {dateFrom ? format(dateFrom, "dd/MM/yyyy") : <span>Pick date</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -481,7 +479,7 @@ const DataChangeRequests = () => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dateTo ? format(dateTo, "PPP") : <span>Pick a date</span>}
+                    {dateTo ? format(dateTo, "dd/MM/yyyy") : <span>Pick date</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
