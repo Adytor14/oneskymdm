@@ -28,35 +28,35 @@ const MergeMatchApproval = () => {
   const mockPendingDataHCP = [
     {
       requestId: "8f569b06",
-      entityIds: "HCP1001, HCP2104",
+      entityIds: "PHY1001, PHY2104",
       matchScore: 70,
       status: "Pending",
       processedDate: "16/10/2025",
     },
     {
       requestId: "8f569b07",
-      entityIds: "HCP1002, HCP3205",
+      entityIds: "PHY1002, PHY3205",
       matchScore: 85,
       status: "Pending",
       processedDate: "17/10/2025",
     },
     {
       requestId: "8f569b08",
-      entityIds: "HCP1003, HCP4106",
+      entityIds: "PHY1003, PHY4106",
       matchScore: 90,
       status: "Pending",
       processedDate: "18/10/2025",
     },
     {
       requestId: "8f569b09",
-      entityIds: "HCP1004, HCP5207",
+      entityIds: "PHY1004, PHY5207",
       matchScore: 81,
       status: "Pending",
       processedDate: "19/10/2025",
     },
     {
       requestId: "8f569b10",
-      entityIds: "HCP1005, HCP6308",
+      entityIds: "PHY1005, PHY6308",
       matchScore: 68,
       status: "Pending",
       processedDate: "20/10/2025",
@@ -66,35 +66,35 @@ const MergeMatchApproval = () => {
   const mockPendingDataHCO = [
     {
       requestId: "9a671c01",
-      entityIds: "HCO2001, HCO3102",
+      entityIds: "FAC2001, FAC3102",
       matchScore: 75,
       status: "Pending",
       processedDate: "15/10/2025",
     },
     {
       requestId: "9a671c02",
-      entityIds: "HCO2002, HCO4203",
+      entityIds: "FAC2002, FAC4203",
       matchScore: 88,
       status: "Pending",
       processedDate: "16/10/2025",
     },
     {
       requestId: "9a671c03",
-      entityIds: "HCO2003, HCO5304",
+      entityIds: "FAC2003, FAC5304",
       matchScore: 92,
       status: "Pending",
       processedDate: "17/10/2025",
     },
     {
       requestId: "9a671c04",
-      entityIds: "HCO2004, HCO6405",
+      entityIds: "FAC2004, FAC6405",
       matchScore: 79,
       status: "Pending",
       processedDate: "18/10/2025",
     },
     {
       requestId: "9a671c05",
-      entityIds: "HCO2005, HCO7506",
+      entityIds: "FAC2005, FAC7506",
       matchScore: 83,
       status: "Pending",
       processedDate: "19/10/2025",
@@ -104,44 +104,44 @@ const MergeMatchApproval = () => {
   const mockPendingData = entityType === "hco" ? mockPendingDataHCO : mockPendingDataHCP;
 
   const mockEntityDetailsHCP: Record<string, any> = {
-    HCP1001: {
+    PHY1001: {
       firstName: "Sarah",
       lastName: "Johnson",
       npiId: "1234567890",
       orgId: "ORG-12345",
       source: "Epic EMR",
-      mdmId: "MDM-HCP-001",
+      mdmId: "MDM-PHY-001",
       medicalLicense: "MA-MD-123456",
       address: "123 Medical Plaza, Boston, MA 02115, USA",
     },
-    HCP2104: {
+    PHY2104: {
       firstName: "Sarrah",
       lastName: "Johnson",
       npiId: "1234567890",
       orgId: "ORG-12345",
       source: "Epic EMR",
-      mdmId: "MDM-HCP-001",
+      mdmId: "MDM-PHY-001",
       medicalLicense: "MA-MD-123456",
       address: "123 Medical Plaza, Boston, MA 02115, USA",
     },
   };
 
   const mockEntityDetailsHCO: Record<string, any> = {
-    HCO2001: {
+    FAC2001: {
       name: "Boston General Hospital",
       npiId: "9876543210",
       orgId: "ORG-56789",
       source: "Cerner",
-      mdmId: "MDM-HCO-501",
+      mdmId: "MDM-FAC-501",
       taxId: "12-3456789",
       address: "456 Healthcare Ave, Boston, MA 02116, USA",
     },
-    HCO3102: {
+    FAC3102: {
       name: "Boston General Medical Center",
       npiId: "9876543210",
       orgId: "ORG-56789",
       source: "Cerner",
-      mdmId: "MDM-HCO-501",
+      mdmId: "MDM-FAC-501",
       taxId: "12-3456789",
       address: "456 Healthcare Ave, Boston, MA 02116, USA",
     },
@@ -152,7 +152,7 @@ const MergeMatchApproval = () => {
   const mockResolvedDataHCP = [
     {
       requestId: "8f569B06",
-      entityIds: "HCP1001, HCP2104",
+      entityIds: "PHY1001, PHY2104",
       matchScore: 70,
       status: "Merged",
       processedDate: "16/10/2025",
@@ -162,7 +162,7 @@ const MergeMatchApproval = () => {
     },
     {
       requestId: "8f569B07",
-      entityIds: "HCP1002, HCP3205",
+      entityIds: "PHY1002, PHY3205",
       matchScore: 85,
       status: "Rejected",
       processedDate: "17/10/2025",
@@ -172,7 +172,7 @@ const MergeMatchApproval = () => {
     },
     {
       requestId: "8f569B08",
-      entityIds: "HCP1003, HCP4106",
+      entityIds: "PHY1003, PHY4106",
       matchScore: 90,
       status: "Merged",
       processedDate: "18/10/2025",
@@ -182,7 +182,7 @@ const MergeMatchApproval = () => {
     },
     {
       requestId: "8f569B09",
-      entityIds: "HCP1004, HCP5207",
+      entityIds: "PHY1004, PHY5207",
       matchScore: 81,
       status: "Merged",
       processedDate: "19/10/2025",
@@ -192,7 +192,7 @@ const MergeMatchApproval = () => {
     },
     {
       requestId: "8f569B10",
-      entityIds: "HCP1005, HCP6308",
+      entityIds: "PHY1005, PHY6308",
       matchScore: 68,
       status: "Merged",
       processedDate: "20/10/2025",
@@ -205,7 +205,7 @@ const MergeMatchApproval = () => {
   const mockResolvedDataHCO = [
     {
       requestId: "9a671C01",
-      entityIds: "HCO2001, HCO3102",
+      entityIds: "FAC2001, FAC3102",
       matchScore: 75,
       status: "Merged",
       processedDate: "15/10/2025",
@@ -215,7 +215,7 @@ const MergeMatchApproval = () => {
     },
     {
       requestId: "9a671C02",
-      entityIds: "HCO2002, HCO4203",
+      entityIds: "FAC2002, FAC4203",
       matchScore: 88,
       status: "Merged",
       processedDate: "16/10/2025",
@@ -225,7 +225,7 @@ const MergeMatchApproval = () => {
     },
     {
       requestId: "9a671C03",
-      entityIds: "HCO2003, HCO5304",
+      entityIds: "FAC2003, FAC5304",
       matchScore: 92,
       status: "Rejected",
       processedDate: "17/10/2025",
@@ -235,7 +235,7 @@ const MergeMatchApproval = () => {
     },
     {
       requestId: "9a671C04",
-      entityIds: "HCO2004, HCO6405",
+      entityIds: "FAC2004, FAC6405",
       matchScore: 79,
       status: "Merged",
       processedDate: "18/10/2025",
@@ -245,7 +245,7 @@ const MergeMatchApproval = () => {
     },
     {
       requestId: "9a671C05",
-      entityIds: "HCO2005, HCO7506",
+      entityIds: "FAC2005, FAC7506",
       matchScore: 83,
       status: "Deliberate Duplicate",
       processedDate: "19/10/2025",
