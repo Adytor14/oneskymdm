@@ -6,6 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Check, X, ChevronDown, ChevronRight } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/hooks/use-toast";
 
 const DataChangeRequestDetail = () => {
   const navigate = useNavigate();
@@ -14,6 +17,8 @@ const DataChangeRequestDetail = () => {
   const [isPrimaryInfoOpen, setIsPrimaryInfoOpen] = useState(true);
   const [isPersonalInfoOpen, setIsPersonalInfoOpen] = useState(true);
   const [isParentAffiliationOpen, setIsParentAffiliationOpen] = useState(true);
+  const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
+  const [approvalNote, setApprovalNote] = useState("");
 
   const mockRequest = {
     taskId: "9310282363735619197",
@@ -50,6 +55,26 @@ const DataChangeRequestDetail = () => {
       fields: [],
     },
   ];
+
+  const handleApprove = () => {
+    if (!approvalNote.trim()) {
+      toast({
+        title: "Approval Note Required",
+        description: "Please add an approval note before approving the DCR.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Handle approval logic here
+    toast({
+      title: "DCR Approved",
+      description: "The data change request has been successfully approved.",
+    });
+    setIsApproveDialogOpen(false);
+    setApprovalNote("");
+    navigate(-1);
+  };
 
   const CategorySection = ({ category, fields, isOpen, setIsOpen }: any) => (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -104,7 +129,13 @@ const DataChangeRequestDetail = () => {
                   <Button variant="outline" size="sm">Re-assign</Button>
                   <Button variant="destructive" size="sm">Reject</Button>
                   <Button variant="outline" size="sm">Save</Button>
-                  <Button className="bg-primary hover:bg-primary/90" size="sm">Approve</Button>
+                  <Button 
+                    className="bg-primary hover:bg-primary/90" 
+                    size="sm"
+                    onClick={() => setIsApproveDialogOpen(true)}
+                  >
+                    Approve
+                  </Button>
                 </div>
               </div>
             </CardHeader>
@@ -220,6 +251,39 @@ const DataChangeRequestDetail = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={isApproveDialogOpen} onOpenChange={setIsApproveDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Approve DCR</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">
+              Approval Note <span className="text-red-500">*</span>
+            </label>
+            <Textarea
+              placeholder="Add your approval note..."
+              value={approvalNote}
+              onChange={(e) => setApprovalNote(e.target.value)}
+              className="min-h-[120px] resize-none"
+            />
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsApproveDialogOpen(false);
+                setApprovalNote("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleApprove}>
+              Approve
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
