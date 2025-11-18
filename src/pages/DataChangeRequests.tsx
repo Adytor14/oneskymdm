@@ -1,10 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Eye } from "lucide-react";
+import { Eye, Clock } from "lucide-react";
 import { useNavigate, useParams, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface ChangeRequest {
   id: string;
@@ -29,6 +31,48 @@ const DataChangeRequests = () => {
   const { toast } = useToast();
   const [requests, setRequests] = useState<ChangeRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedTimeline, setSelectedTimeline] = useState<ChangeRequest | null>(null);
+  const [isTimelineOpen, setIsTimelineOpen] = useState(false);
+
+  const getDCRTypeName = (entityType: string, requestType: string) => {
+    const type = requestType.toLowerCase();
+    const entity = entityType.toLowerCase();
+    
+    if (entity === 'hcp' || entity === 'physician') {
+      if (type.includes('name') || type.includes('first')) return 'First Name Change - Physician';
+      if (type.includes('last')) return 'Last Name Change - Physician';
+      if (type.includes('address')) return 'Update Address - Physician';
+      if (type.includes('zip')) return 'Update ZIP - Physician';
+      if (type.includes('phone')) return 'Phone Update - Physician';
+      if (type.includes('email')) return 'Email Update - Physician';
+      return 'Update - Physician';
+    } else if (entity === 'hco' || entity === 'facility') {
+      if (type.includes('name')) return 'Name Change - Facility';
+      if (type.includes('address')) return 'Update Address - Facility';
+      if (type.includes('zip')) return 'Update ZIP - Facility';
+      if (type.includes('phone')) return 'Phone Update - Facility';
+      if (type.includes('email')) return 'Email Update - Facility';
+      return 'Update - Facility';
+    } else if (entity === 'address') {
+      if (type.includes('zip')) return 'Update ZIP';
+      return 'Update Address';
+    }
+    return requestType;
+  };
+
+  const formatPriority = (priority: string) => {
+    const p = priority.toLowerCase();
+    if (p === 'high') return 'High';
+    if (p === 'medium') return 'Medium';
+    if (p === 'low') return 'Low';
+    return priority;
+  };
+
+  const handleViewTimeline = (e: React.MouseEvent, request: ChangeRequest) => {
+    e.stopPropagation();
+    setSelectedTimeline(request);
+    setIsTimelineOpen(true);
+  };
 
   useEffect(() => {
     fetchRequests();
@@ -113,8 +157,9 @@ const DataChangeRequests = () => {
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Date Open</th>
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Days Open</th>
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Priority</th>
-            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Assigned to</th>
+            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Requested by</th>
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Last Updated</th>
+            <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View Timeline</th>
             <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">View</th>
           </tr>
         </thead>
@@ -126,23 +171,8 @@ const DataChangeRequests = () => {
               onClick={() => navigate(`/data-change-requests/${record.id}`)}
             >
               <td className="py-3 px-4">{record.dcr_id || `DCR-${record.id.slice(0, 8)}`}</td>
-              <td className="py-3 px-4">
-                <Badge 
-                  className="bg-blue-100 text-blue-700 hover:bg-blue-200 cursor-pointer transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const entityType = record.entity_type.toLowerCase();
-                    if (entityType === 'hcp') {
-                      navigate(`/hcp/${record.entity_id}`);
-                    } else if (entityType === 'hco') {
-                      navigate(`/hco/${record.entity_id}`);
-                    } else if (entityType === 'address') {
-                      navigate(`/address/${record.entity_id}`);
-                    }
-                  }}
-                >
-                  {record.entity_type}
-                </Badge>
+              <td className="py-3 px-4 text-sm">
+                {getDCRTypeName(record.entity_type, record.request_type)}
               </td>
               <td className="py-3 px-4 text-sm">
                 {new Date(record.created_at).toLocaleDateString("en-GB")}
@@ -153,31 +183,31 @@ const DataChangeRequests = () => {
               <td className="py-3 px-4">
                 <Badge
                   className={
-                    record.priority === "high"
+                    record.priority.toLowerCase() === "high"
                       ? "bg-red-100 text-red-700"
-                      : record.priority === "medium"
+                      : record.priority.toLowerCase() === "medium"
                       ? "bg-yellow-100 text-yellow-700"
                       : "bg-green-100 text-green-700"
                   }
                 >
-                  {record.priority}
-                </Badge>
-              </td>
-              <td className="py-3 px-4">
-                <Badge
-                  className={
-                    statusType === "open"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : statusType === "approved"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }
-                >
-                  {statusType.charAt(0).toUpperCase() + statusType.slice(1)}
+                  {formatPriority(record.priority)}
                 </Badge>
               </td>
               <td className="py-3 px-4 text-sm">
+                {record.requested_by || 'N/A'}
+              </td>
+              <td className="py-3 px-4 text-sm">
                 {new Date(record.updated_at).toLocaleDateString("en-GB")}
+              </td>
+              <td className="py-3 px-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => handleViewTimeline(e, record)}
+                  className="h-8 w-8 p-0"
+                >
+                  <Clock className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                </Button>
               </td>
               <td className="py-3 px-4">
                 <Eye className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
@@ -204,6 +234,70 @@ const DataChangeRequests = () => {
           {renderTable(requests, status)}
         </CardContent>
       </Card>
+
+      <Dialog open={isTimelineOpen} onOpenChange={setIsTimelineOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>DCR Timeline</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedTimeline && (
+              <>
+                <div className="border-l-2 border-primary pl-4 space-y-4">
+                  <div className="relative">
+                    <div className="absolute -left-[1.3rem] top-0 w-4 h-4 rounded-full bg-primary"></div>
+                    <div>
+                      <p className="font-medium">Request Created</p>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(selectedTimeline.created_at).toLocaleString()}
+                      </p>
+                      <p className="text-sm mt-1">By: {selectedTimeline.requested_by || 'Unknown'}</p>
+                      <p className="text-sm">Reason: {selectedTimeline.reason}</p>
+                    </div>
+                  </div>
+
+                  {selectedTimeline.updated_at !== selectedTimeline.created_at && (
+                    <div className="relative">
+                      <div className="absolute -left-[1.3rem] top-0 w-4 h-4 rounded-full bg-blue-500"></div>
+                      <div>
+                        <p className="font-medium">Request Updated</p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(selectedTimeline.updated_at).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedTimeline.approved_at && (
+                    <div className="relative">
+                      <div className="absolute -left-[1.3rem] top-0 w-4 h-4 rounded-full bg-green-500"></div>
+                      <div>
+                        <p className="font-medium">Request Approved</p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(selectedTimeline.approved_at).toLocaleString()}
+                        </p>
+                        <p className="text-sm mt-1">By: {selectedTimeline.approved_by || 'Unknown'}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedTimeline.status === 'rejected' && (
+                    <div className="relative">
+                      <div className="absolute -left-[1.3rem] top-0 w-4 h-4 rounded-full bg-red-500"></div>
+                      <div>
+                        <p className="font-medium">Request Rejected</p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(selectedTimeline.updated_at).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
