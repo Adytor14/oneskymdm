@@ -8,12 +8,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Eye, Search, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 const MergeMatchApproval = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const entityType = searchParams.get("type") || "hcp";
   const [activeStatusTab, setActiveStatusTab] = useState("pending");
   const [searchTerm, setSearchTerm] = useState("");
   const [scoreFilter, setScoreFilter] = useState("all");
@@ -23,7 +25,7 @@ const MergeMatchApproval = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [comment, setComment] = useState("");
 
-  const mockPendingData = [
+  const mockPendingDataHCP = [
     {
       requestId: "8f569b06",
       entityIds: "HCP1001, HCP2104",
@@ -32,36 +34,76 @@ const MergeMatchApproval = () => {
       processedDate: "16/10/2025",
     },
     {
-      requestId: "8f569b06",
-      entityIds: "HCP1002",
+      requestId: "8f569b07",
+      entityIds: "HCP1002, HCP3205",
       matchScore: 85,
       status: "Pending",
       processedDate: "17/10/2025",
     },
     {
-      requestId: "8f569b06",
-      entityIds: "HCP1003",
+      requestId: "8f569b08",
+      entityIds: "HCP1003, HCP4106",
       matchScore: 90,
       status: "Pending",
       processedDate: "18/10/2025",
     },
     {
-      requestId: "8f569b06",
-      entityIds: "HCP1004",
+      requestId: "8f569b09",
+      entityIds: "HCP1004, HCP5207",
       matchScore: 81,
       status: "Pending",
       processedDate: "19/10/2025",
     },
     {
-      requestId: "8f569b06",
-      entityIds: "HCP1005",
+      requestId: "8f569b10",
+      entityIds: "HCP1005, HCP6308",
       matchScore: 68,
       status: "Pending",
       processedDate: "20/10/2025",
     },
   ];
 
-  const mockEntityDetails = {
+  const mockPendingDataHCO = [
+    {
+      requestId: "9a671c01",
+      entityIds: "HCO2001, HCO3102",
+      matchScore: 75,
+      status: "Pending",
+      processedDate: "15/10/2025",
+    },
+    {
+      requestId: "9a671c02",
+      entityIds: "HCO2002, HCO4203",
+      matchScore: 88,
+      status: "Pending",
+      processedDate: "16/10/2025",
+    },
+    {
+      requestId: "9a671c03",
+      entityIds: "HCO2003, HCO5304",
+      matchScore: 92,
+      status: "Pending",
+      processedDate: "17/10/2025",
+    },
+    {
+      requestId: "9a671c04",
+      entityIds: "HCO2004, HCO6405",
+      matchScore: 79,
+      status: "Pending",
+      processedDate: "18/10/2025",
+    },
+    {
+      requestId: "9a671c05",
+      entityIds: "HCO2005, HCO7506",
+      matchScore: 83,
+      status: "Pending",
+      processedDate: "19/10/2025",
+    },
+  ];
+
+  const mockPendingData = entityType === "hco" ? mockPendingDataHCO : mockPendingDataHCP;
+
+  const mockEntityDetailsHCP: Record<string, any> = {
     HCP1001: {
       firstName: "Sarah",
       lastName: "Johnson",
@@ -84,7 +126,30 @@ const MergeMatchApproval = () => {
     },
   };
 
-  const mockResolvedData = [
+  const mockEntityDetailsHCO: Record<string, any> = {
+    HCO2001: {
+      name: "Boston General Hospital",
+      npiId: "9876543210",
+      orgId: "ORG-56789",
+      source: "Cerner",
+      mdmId: "MDM-HCO-501",
+      taxId: "12-3456789",
+      address: "456 Healthcare Ave, Boston, MA 02116, USA",
+    },
+    HCO3102: {
+      name: "Boston General Medical Center",
+      npiId: "9876543210",
+      orgId: "ORG-56789",
+      source: "Cerner",
+      mdmId: "MDM-HCO-501",
+      taxId: "12-3456789",
+      address: "456 Healthcare Ave, Boston, MA 02116, USA",
+    },
+  };
+
+  const mockEntityDetails = entityType === "hco" ? mockEntityDetailsHCO : mockEntityDetailsHCP;
+
+  const mockResolvedDataHCP = [
     {
       requestId: "8f569B06",
       entityIds: "HCP1001, HCP2104",
@@ -96,8 +161,8 @@ const MergeMatchApproval = () => {
       comments: "Accepted",
     },
     {
-      requestId: "8f569B06",
-      entityIds: "HCP1002",
+      requestId: "8f569B07",
+      entityIds: "HCP1002, HCP3205",
       matchScore: 85,
       status: "Rejected",
       processedDate: "17/10/2025",
@@ -106,8 +171,8 @@ const MergeMatchApproval = () => {
       comments: "Rejected",
     },
     {
-      requestId: "8f569B06",
-      entityIds: "HCP1003",
+      requestId: "8f569B08",
+      entityIds: "HCP1003, HCP4106",
       matchScore: 90,
       status: "Merged",
       processedDate: "18/10/2025",
@@ -116,8 +181,8 @@ const MergeMatchApproval = () => {
       comments: "Accepted",
     },
     {
-      requestId: "8f569B06",
-      entityIds: "HCP1004",
+      requestId: "8f569B09",
+      entityIds: "HCP1004, HCP5207",
       matchScore: 81,
       status: "Merged",
       processedDate: "19/10/2025",
@@ -126,8 +191,8 @@ const MergeMatchApproval = () => {
       comments: "Accepted",
     },
     {
-      requestId: "8f569B06",
-      entityIds: "HCP1005",
+      requestId: "8f569B10",
+      entityIds: "HCP1005, HCP6308",
       matchScore: 68,
       status: "Merged",
       processedDate: "20/10/2025",
@@ -136,6 +201,61 @@ const MergeMatchApproval = () => {
       comments: "Accepted",
     },
   ];
+
+  const mockResolvedDataHCO = [
+    {
+      requestId: "9a671C01",
+      entityIds: "HCO2001, HCO3102",
+      matchScore: 75,
+      status: "Merged",
+      processedDate: "15/10/2025",
+      resolvedDate: "21/10/2025",
+      resolvedBy: "Jane Smith",
+      comments: "Accepted",
+    },
+    {
+      requestId: "9a671C02",
+      entityIds: "HCO2002, HCO4203",
+      matchScore: 88,
+      status: "Merged",
+      processedDate: "16/10/2025",
+      resolvedDate: "20/10/2025",
+      resolvedBy: "Robert Johnson",
+      comments: "Accepted",
+    },
+    {
+      requestId: "9a671C03",
+      entityIds: "HCO2003, HCO5304",
+      matchScore: 92,
+      status: "Rejected",
+      processedDate: "17/10/2025",
+      resolvedDate: "22/10/2025",
+      resolvedBy: "Emily Davis",
+      comments: "Rejected - Different facilities",
+    },
+    {
+      requestId: "9a671C04",
+      entityIds: "HCO2004, HCO6405",
+      matchScore: 79,
+      status: "Merged",
+      processedDate: "18/10/2025",
+      resolvedDate: "23/10/2025",
+      resolvedBy: "Michael Brown",
+      comments: "Accepted",
+    },
+    {
+      requestId: "9a671C05",
+      entityIds: "HCO2005, HCO7506",
+      matchScore: 83,
+      status: "Deliberate Duplicate",
+      processedDate: "19/10/2025",
+      resolvedDate: "24/10/2025",
+      resolvedBy: "Sarah Wilson",
+      comments: "Marked as deliberate duplicate",
+    },
+  ];
+
+  const mockResolvedData = entityType === "hco" ? mockResolvedDataHCO : mockResolvedDataHCP;
 
   const handleViewRequest = (record: any) => {
     setSelectedRequest(record);
@@ -171,8 +291,12 @@ const MergeMatchApproval = () => {
   return (
     <div className="space-y-6 p-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Merge/Match Approval</h1>
-        <p className="text-muted-foreground mt-1">Review and approve match proposals</p>
+        <h1 className="text-3xl font-bold text-foreground">
+          Merge/Match Approval - {entityType === "hco" ? "Facility Accounts" : "Physician Accounts"}
+        </h1>
+        <p className="text-muted-foreground mt-1">
+          Review and approve merge/match requests for {entityType === "hco" ? "facility" : "physician"} accounts
+        </p>
       </div>
 
       <Tabs value={activeStatusTab} onValueChange={setActiveStatusTab}>
@@ -432,57 +556,95 @@ const MergeMatchApproval = () => {
               </div>
 
               {/* Entity Details */}
-              {selectedRequest.entityIds.split(", ").map((entityId: string, index: number) => (
-                <div key={entityId} className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">{entityId}</h3>
-                    <Button 
-                      variant="link" 
-                      className="text-primary p-0 h-auto"
-                      onClick={() => navigate(`/hcp/${entityId}`)}
-                    >
-                      View more
-                    </Button>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
-                    <div>
-                      <div className="text-muted-foreground mb-1">First Name</div>
-                      <div className={index === 0 ? "text-red-600 font-medium" : ""}>
-                        {mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.firstName}
+              {selectedRequest.entityIds.split(", ").map((entityId: string, index: number) => {
+                const details = mockEntityDetails[entityId as keyof typeof mockEntityDetails];
+                return (
+                  <div key={entityId} className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold">{entityId}</h3>
+                      <Button 
+                        variant="link" 
+                        className="text-primary p-0 h-auto"
+                        onClick={() => navigate(entityType === "hco" ? `/hco/${entityId}` : `/hcp/${entityId}`)}
+                      >
+                        View more
+                      </Button>
+                    </div>
+                    
+                    {entityType === "hco" ? (
+                      <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                        <div>
+                          <div className="text-muted-foreground mb-1">Facility Name</div>
+                          <div className={index === 0 ? "text-red-600 font-medium" : ""}>
+                            {details?.name}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground mb-1">NPI ID</div>
+                          <div>{details?.npiId}</div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground mb-1">ORG ID</div>
+                          <div>{details?.orgId}</div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground mb-1">Source</div>
+                          <div>{details?.source}</div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground mb-1">MDM ID</div>
+                          <div>{details?.mdmId}</div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground mb-1">Tax ID</div>
+                          <div>{details?.taxId}</div>
+                        </div>
+                        <div className="col-span-2">
+                          <div className="text-muted-foreground mb-1">Address</div>
+                          <div>{details?.address}</div>
+                        </div>
                       </div>
-                    </div>
-                    <div>
-                      <div className="text-muted-foreground mb-1">NPI ID</div>
-                      <div>{mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.npiId}</div>
-                    </div>
-                    <div>
-                      <div className="text-muted-foreground mb-1">Last Name</div>
-                      <div>{mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.lastName}</div>
-                    </div>
-                    <div>
-                      <div className="text-muted-foreground mb-1">ORG ID</div>
-                      <div>{mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.orgId}</div>
-                    </div>
-                    <div>
-                      <div className="text-muted-foreground mb-1">Source</div>
-                      <div>{mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.source}</div>
-                    </div>
-                    <div>
-                      <div className="text-muted-foreground mb-1">MDM ID</div>
-                      <div>{mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.mdmId}</div>
-                    </div>
-                    <div>
-                      <div className="text-muted-foreground mb-1">Medical License</div>
-                      <div>{mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.medicalLicense}</div>
-                    </div>
-                    <div>
-                      <div className="text-muted-foreground mb-1">Address</div>
-                      <div>{mockEntityDetails[entityId as keyof typeof mockEntityDetails]?.address}</div>
-                    </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                        <div>
+                          <div className="text-muted-foreground mb-1">First Name</div>
+                          <div className={index === 0 ? "text-red-600 font-medium" : ""}>
+                            {details?.firstName}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground mb-1">NPI ID</div>
+                          <div>{details?.npiId}</div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground mb-1">Last Name</div>
+                          <div>{details?.lastName}</div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground mb-1">ORG ID</div>
+                          <div>{details?.orgId}</div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground mb-1">Source</div>
+                          <div>{details?.source}</div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground mb-1">MDM ID</div>
+                          <div>{details?.mdmId}</div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground mb-1">Medical License</div>
+                          <div>{details?.medicalLicense}</div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground mb-1">Address</div>
+                          <div>{details?.address}</div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               {/* Comment Section */}
               <div className="space-y-2">
