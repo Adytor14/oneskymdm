@@ -8,6 +8,7 @@ import { ArrowLeft, Check, X, ChevronDown, ChevronRight } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 
 const DataChangeRequestDetail = () => {
@@ -19,6 +20,11 @@ const DataChangeRequestDetail = () => {
   const [isParentAffiliationOpen, setIsParentAffiliationOpen] = useState(true);
   const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
   const [approvalNote, setApprovalNote] = useState("");
+  const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
+  const [isReassignDialogOpen, setIsReassignDialogOpen] = useState(false);
+  const [selectedAssignee, setSelectedAssignee] = useState("");
 
   const mockRequest = {
     taskId: "9310282363735619197",
@@ -32,6 +38,34 @@ const DataChangeRequestDetail = () => {
     status: "Pending Review",
     comments: "Update the address of this HCP as he has relocated",
   };
+
+  const availableAssignees = [
+    { id: "1", name: "Ujjwal Sirothia", email: "ujjwal.sirothia@iponesky.com" },
+    { id: "2", name: "Rishiraj Acharyya", email: "rishiraj.acharya@iponesky.com" },
+    { id: "3", name: "Sarah Johnson", email: "sarah.johnson@iponesky.com" },
+    { id: "4", name: "Michael Chen", email: "michael.chen@iponesky.com" },
+  ];
+
+  const dcrHistory = [
+    {
+      action: "Created",
+      user: "Rishiraj Acharyya",
+      timestamp: "16/10/2025 09:30 AM",
+      note: "Initial DCR submission for address update",
+    },
+    {
+      action: "Assigned",
+      user: "System",
+      timestamp: "16/10/2025 09:31 AM",
+      note: "Automatically assigned to Ujjwal Sirothia",
+    },
+    {
+      action: "Reviewed",
+      user: "Ujjwal Sirothia",
+      timestamp: "16/10/2025 02:15 PM",
+      note: "Reviewed field changes - First Name and Last Name modifications detected",
+    },
+  ];
 
   const changeFields = [
     {
@@ -66,7 +100,6 @@ const DataChangeRequestDetail = () => {
       return;
     }
     
-    // Handle approval logic here
     toast({
       title: "DCR Approved",
       description: "The data change request has been successfully approved.",
@@ -74,6 +107,45 @@ const DataChangeRequestDetail = () => {
     setIsApproveDialogOpen(false);
     setApprovalNote("");
     navigate(-1);
+  };
+
+  const handleReject = () => {
+    if (!rejectionReason.trim()) {
+      toast({
+        title: "Rejection Reason Required",
+        description: "Please provide a reason for rejecting the DCR.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    toast({
+      title: "DCR Rejected",
+      description: "The data change request has been rejected.",
+      variant: "destructive",
+    });
+    setIsRejectDialogOpen(false);
+    setRejectionReason("");
+    navigate(-1);
+  };
+
+  const handleReassign = () => {
+    if (!selectedAssignee) {
+      toast({
+        title: "Assignee Required",
+        description: "Please select an assignee to reassign the DCR.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const assignee = availableAssignees.find(a => a.id === selectedAssignee);
+    toast({
+      title: "DCR Reassigned",
+      description: `The data change request has been reassigned to ${assignee?.name}.`,
+    });
+    setIsReassignDialogOpen(false);
+    setSelectedAssignee("");
   };
 
   const CategorySection = ({ category, fields, isOpen, setIsOpen }: any) => (
@@ -125,9 +197,15 @@ const DataChangeRequestDetail = () => {
               <div className="flex justify-between items-center">
                 <CardTitle className="text-lg">Change Request Review</CardTitle>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">DCR History</Button>
-                  <Button variant="outline" size="sm">Re-assign</Button>
-                  <Button variant="destructive" size="sm">Reject</Button>
+                  <Button variant="outline" size="sm" onClick={() => setIsHistoryDialogOpen(true)}>
+                    DCR History
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setIsReassignDialogOpen(true)}>
+                    Re-assign
+                  </Button>
+                  <Button variant="destructive" size="sm" onClick={() => setIsRejectDialogOpen(true)}>
+                    Reject
+                  </Button>
                   <Button variant="outline" size="sm">Save</Button>
                   <Button 
                     className="bg-primary hover:bg-primary/90" 
@@ -280,6 +358,106 @@ const DataChangeRequestDetail = () => {
             </Button>
             <Button onClick={handleApprove}>
               Approve
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Reject DCR</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">
+              Rejection Reason <span className="text-red-500">*</span>
+            </label>
+            <Textarea
+              placeholder="Provide reason for rejection..."
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              className="min-h-[120px] resize-none"
+            />
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsRejectDialogOpen(false);
+                setRejectionReason("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleReject}>
+              Reject
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isHistoryDialogOpen} onOpenChange={setIsHistoryDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>DCR History</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 max-h-[400px] overflow-y-auto">
+            {dcrHistory.map((item, index) => (
+              <div key={index} className="border-l-2 border-primary pl-4 py-2">
+                <div className="flex items-center justify-between mb-1">
+                  <Badge variant="outline">{item.action}</Badge>
+                  <span className="text-xs text-muted-foreground">{item.timestamp}</span>
+                </div>
+                <p className="text-sm font-medium">{item.user}</p>
+                <p className="text-sm text-muted-foreground mt-1">{item.note}</p>
+              </div>
+            ))}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsHistoryDialogOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isReassignDialogOpen} onOpenChange={setIsReassignDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Re-assign DCR</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">
+              Select Assignee <span className="text-red-500">*</span>
+            </label>
+            <Select value={selectedAssignee} onValueChange={setSelectedAssignee}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select an assignee" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableAssignees.map((assignee) => (
+                  <SelectItem key={assignee.id} value={assignee.id}>
+                    <div>
+                      <div className="font-medium">{assignee.name}</div>
+                      <div className="text-xs text-muted-foreground">{assignee.email}</div>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsReassignDialogOpen(false);
+                setSelectedAssignee("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleReassign}>
+              Re-assign
             </Button>
           </DialogFooter>
         </DialogContent>
