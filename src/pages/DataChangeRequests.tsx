@@ -1,12 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Clock } from "lucide-react";
+import { Eye, Clock, CalendarIcon, X } from "lucide-react";
 import { useNavigate, useParams, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface ChangeRequest {
   id: string;
@@ -33,6 +38,13 @@ const DataChangeRequests = () => {
   const [loading, setLoading] = useState(true);
   const [selectedTimeline, setSelectedTimeline] = useState<ChangeRequest | null>(null);
   const [isTimelineOpen, setIsTimelineOpen] = useState(false);
+  
+  // Filter states
+  const [selectedDCRType, setSelectedDCRType] = useState<string>("all");
+  const [selectedPriority, setSelectedPriority] = useState<string>("all");
+  const [selectedRequestedBy, setSelectedRequestedBy] = useState<string>("all");
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
 
   const getDCRTypeName = (entityType: string, requestType: string) => {
     const type = requestType.toLowerCase();
@@ -73,6 +85,32 @@ const DataChangeRequests = () => {
     setSelectedTimeline(request);
     setIsTimelineOpen(true);
   };
+
+  const clearFilters = () => {
+    setSelectedDCRType("all");
+    setSelectedPriority("all");
+    setSelectedRequestedBy("all");
+    setDateFrom(undefined);
+    setDateTo(undefined);
+  };
+
+  // Get unique values for filters
+  const uniqueDCRTypes = Array.from(new Set(requests.map(r => getDCRTypeName(r.entity_type, r.request_type))));
+  const uniqueRequestedBy = Array.from(new Set(requests.map(r => r.requested_by).filter(Boolean)));
+
+  // Apply filters to requests
+  const filteredRequests = requests.filter(request => {
+    const dcrType = getDCRTypeName(request.entity_type, request.request_type);
+    const matchesDCRType = selectedDCRType === "all" || dcrType === selectedDCRType;
+    const matchesPriority = selectedPriority === "all" || request.priority.toLowerCase() === selectedPriority.toLowerCase();
+    const matchesRequestedBy = selectedRequestedBy === "all" || request.requested_by === selectedRequestedBy;
+    
+    const requestDate = new Date(request.created_at);
+    const matchesDateFrom = !dateFrom || requestDate >= dateFrom;
+    const matchesDateTo = !dateTo || requestDate <= dateTo;
+    
+    return matchesDCRType && matchesPriority && matchesRequestedBy && matchesDateFrom && matchesDateTo;
+  });
 
   useEffect(() => {
     fetchRequests();
@@ -226,12 +264,147 @@ const DataChangeRequests = () => {
         <h1 className="text-3xl font-bold">Data Change Requests</h1>
       </div>
 
+      {/* Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Filters</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* DCR Type Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">DCR Type</label>
+              <Select value={selectedDCRType} onValueChange={setSelectedDCRType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  {uniqueDCRTypes.map(type => (
+                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Priority Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Priority</label>
+              <Select value={selectedPriority} onValueChange={setSelectedPriority}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Priorities" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Priorities</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Requested By Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Requested By</label>
+              <Select value={selectedRequestedBy} onValueChange={setSelectedRequestedBy}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Users" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Users</SelectItem>
+                  {uniqueRequestedBy.map(user => (
+                    <SelectItem key={user} value={user}>{user}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Clear Filters Button */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">&nbsp;</label>
+              <Button 
+                variant="outline" 
+                onClick={clearFilters}
+                className="w-full"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Clear Filters
+              </Button>
+            </div>
+          </div>
+
+          {/* Date Range Filters */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            {/* Date From */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Date From</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !dateFrom && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateFrom ? format(dateFrom, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dateFrom}
+                    onSelect={setDateFrom}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Date To */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Date To</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !dateTo && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateTo ? format(dateTo, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dateTo}
+                    onSelect={setDateTo}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+
+          {/* Filter Summary */}
+          <div className="mt-4 text-sm text-muted-foreground">
+            Showing {filteredRequests.length} of {requests.length} requests
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">{getTitle()}</CardTitle>
         </CardHeader>
         <CardContent>
-          {renderTable(requests, status)}
+          {renderTable(filteredRequests, status)}
         </CardContent>
       </Card>
 
