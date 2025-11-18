@@ -206,7 +206,6 @@ const DataChangeRequestDetail = () => {
                   <Button variant="destructive" size="sm" onClick={() => setIsRejectDialogOpen(true)}>
                     Reject
                   </Button>
-                  <Button variant="outline" size="sm">Save</Button>
                   <Button 
                     className="bg-primary hover:bg-primary/90" 
                     size="sm"
