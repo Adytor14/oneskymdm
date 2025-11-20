@@ -155,8 +155,8 @@ const TopAgencies = () => {
     {
       title: "Total Facility Accounts",
       value: "300",
-      secondaryValue: "Total Physician Accounts",
-      secondarySubtitle: "800",
+      secondarySubtitle: "Total Physician Accounts",
+      secondaryValue: "800",
       icon: Building2,
       bgColor: "bg-green-50",
       iconColor: "text-green-600",
