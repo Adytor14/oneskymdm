@@ -213,20 +213,58 @@ const DataChangeRequestDetail = () => {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
-        <h1 className="text-2xl font-bold">Data Change Request Detail</h1>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <h1 className="text-2xl font-bold">Data Change Request Detail</h1>
+        </div>
+        <Badge 
+          className={`text-sm px-4 py-2 ${
+            request.status.toLowerCase() === "approved" 
+              ? "bg-green-500 hover:bg-green-600 text-white" 
+              : request.status.toLowerCase() === "rejected" 
+              ? "bg-red-500 hover:bg-red-600 text-white" 
+              : "bg-orange-500 hover:bg-orange-600 text-white"
+          }`}
+        >
+          {request.status}
+        </Badge>
       </div>
 
       <div className="flex gap-6">
         <div className="flex-1">
-          <Card>
-            <CardHeader className="border-b">
+          <Card className={`${
+            request.status.toLowerCase() === "approved" 
+              ? "border-l-4 border-l-green-500" 
+              : request.status.toLowerCase() === "rejected" 
+              ? "border-l-4 border-l-red-500" 
+              : "border-l-4 border-l-orange-500"
+          }`}>
+            <CardHeader className={`border-b ${
+              request.status.toLowerCase() === "approved" 
+                ? "bg-green-50 dark:bg-green-950/20" 
+                : request.status.toLowerCase() === "rejected" 
+                ? "bg-red-50 dark:bg-red-950/20" 
+                : "bg-orange-50 dark:bg-orange-950/20"
+            }`}>
               <div className="flex justify-between items-center">
-                <CardTitle className="text-lg">Change Request Review</CardTitle>
+                <div className="flex items-center gap-3">
+                  <CardTitle className="text-lg">Change Request Review</CardTitle>
+                  <Badge 
+                    className={`${
+                      request.status.toLowerCase() === "approved" 
+                        ? "bg-green-500 hover:bg-green-600 text-white" 
+                        : request.status.toLowerCase() === "rejected" 
+                        ? "bg-red-500 hover:bg-red-600 text-white" 
+                        : "bg-orange-500 hover:bg-orange-600 text-white"
+                    }`}
+                  >
+                    {request.status}
+                  </Badge>
+                </div>
                 {isActionable && (
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={() => setIsHistoryDialogOpen(true)}>
@@ -313,8 +351,20 @@ const DataChangeRequestDetail = () => {
           </Card>
         </div>
 
-        <Card className="w-80">
-          <CardHeader className="bg-yellow-50 border-b">
+        <Card className={`w-80 ${
+          request.status.toLowerCase() === "approved" 
+            ? "border-l-4 border-l-green-500" 
+            : request.status.toLowerCase() === "rejected" 
+            ? "border-l-4 border-l-red-500" 
+            : "border-l-4 border-l-orange-500"
+        }`}>
+          <CardHeader className={`border-b ${
+            request.status.toLowerCase() === "approved" 
+              ? "bg-green-50 dark:bg-green-950/20" 
+              : request.status.toLowerCase() === "rejected" 
+              ? "bg-red-50 dark:bg-red-950/20" 
+              : "bg-orange-50 dark:bg-orange-950/20"
+          }`}>
             <CardTitle className="text-lg">Request Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 pt-4">
@@ -352,11 +402,15 @@ const DataChangeRequestDetail = () => {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Status</p>
-              <Badge className={
-                request.status.toLowerCase() === "approved" ? "bg-green-500 hover:bg-green-600" :
-                request.status.toLowerCase() === "rejected" ? "bg-red-500 hover:bg-red-600" :
-                "bg-orange-500 hover:bg-orange-600"
-              }>{request.status}</Badge>
+              <Badge className={`${
+                request.status.toLowerCase() === "approved" 
+                  ? "bg-green-500 hover:bg-green-600 text-white" 
+                  : request.status.toLowerCase() === "rejected" 
+                  ? "bg-red-500 hover:bg-red-600 text-white" 
+                  : "bg-orange-500 hover:bg-orange-600 text-white"
+              }`}>
+                {request.status}
+              </Badge>
             </div>
             {request.approved_by && (
               <div>
