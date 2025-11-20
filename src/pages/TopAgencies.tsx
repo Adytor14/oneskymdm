@@ -20,7 +20,7 @@ const TopAgencies = () => {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      const allIds = agencies.filter(a => a.status === "Active").map((_, index) => index.toString());
+      const allIds = agencies.filter((a) => a.status === "Active").map((_, index) => index.toString());
       setSelectedRows(new Set(allIds));
     } else {
       setSelectedRows(new Set());
@@ -153,9 +153,9 @@ const TopAgencies = () => {
       iconColor: "text-blue-600",
     },
     {
-      title: "Total Facility Accounts",
+      title: "800",
       value: "300",
-      secondaryValue: "800",
+      secondaryValue: "Total Facility Accounts",
       secondarySubtitle: "Total Physician Accounts",
       icon: Building2,
       bgColor: "bg-green-50",
@@ -390,7 +390,10 @@ const TopAgencies = () => {
                   <tr className="border-b">
                     <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground whitespace-nowrap">
                       <Checkbox
-                        checked={selectedRows.size > 0 && selectedRows.size === agencies.filter(a => a.status === "Active").length}
+                        checked={
+                          selectedRows.size > 0 &&
+                          selectedRows.size === agencies.filter((a) => a.status === "Active").length
+                        }
                         onCheckedChange={handleSelectAll}
                       />
                     </th>
