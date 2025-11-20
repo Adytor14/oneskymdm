@@ -700,45 +700,6 @@ const Index = () => {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   )}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      const activeRecords = mockHCPs.filter((record) => record.status === "Active");
-                      const preparedData = activeRecords.map((record, index) => {
-                        const npiId = `12345${6789 + index}0`;
-                        const city = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5];
-                        const state = ["NY", "CA", "IL", "TX", "AZ"][index % 5];
-                        const subSpeciality = record.speciality[0] === "Cardiology" ? "Interventional" : "General";
-                        const distinctPatients = Math.floor(Math.random() * 500) + 100;
-                        const growth = Math.floor(Math.random() * 20) + 1;
-                        const addressableCount = Math.floor(Math.random() * 300) + 50;
-
-                        return {
-                          Name: `Dr. ${record.firstName} ${record.lastName}`,
-                          NPI: npiId,
-                          City: city,
-                          State: state,
-                          "One ID": record.mdmId,
-                          Speciality: record.speciality[0],
-                          "Sub Speciality": subSpeciality,
-                          "Assigned Identifiers": record.identifiers.join(", "),
-                          "Distinct Patients": distinctPatients,
-                          "Growth %": `${growth}%`,
-                          "Addressable Count": addressableCount,
-                        };
-                      });
-
-                      exportToExcel(preparedData, `Physician_Accounts_${new Date().toISOString().split("T")[0]}`);
-                      toast({
-                        title: "Export successful",
-                        description: "Physician accounts data has been exported to Excel",
-                      });
-                    }}
-                  >
-                    <FileSpreadsheet className="h-4 w-4 mr-2" />
-                    Export to Excel
-                  </Button>
                 </div>
               </div>
 
@@ -1253,37 +1214,6 @@ const Index = () => {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   )}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      const activeRecords = mockHCOs.filter((record) => record.status === "Active");
-                      const preparedData = activeRecords.map((record, index) => {
-                        const distinctPatients = Math.floor(Math.random() * 2000) + 500;
-                        const growth = Math.floor(Math.random() * 25) + 5;
-                        const addressableCount = Math.floor(Math.random() * 1000) + 200;
-
-                        return {
-                          Name: record.name,
-                          "Org ID": record.orgId,
-                          "Skyra MDM ID": record.mdmId,
-                          Identifiers: `NPI-${record.mdmId.slice(-6)}`,
-                          "Distinct Patients": distinctPatients,
-                          "Growth %": `${growth}%`,
-                          "Addressable Count": addressableCount,
-                        };
-                      });
-
-                      exportToExcel(preparedData, `Facility_Accounts_${new Date().toISOString().split("T")[0]}`);
-                      toast({
-                        title: "Export successful",
-                        description: "Facility accounts data has been exported to Excel",
-                      });
-                    }}
-                  >
-                    <FileSpreadsheet className="h-4 w-4 mr-2" />
-                    Export to Excel
-                  </Button>
                 </div>
               </div>
 
