@@ -79,6 +79,8 @@ const RulesManagement = () => {
   const [isCreateSurvivorshipDialogOpen, setIsCreateSurvivorshipDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [ruleToDelete, setRuleToDelete] = useState<string | null>(null);
+  const [survivorshipDeleteDialogOpen, setSurvivorshipDeleteDialogOpen] = useState(false);
+  const [survivorshipRuleToDelete, setSurvivorshipRuleToDelete] = useState<string | null>(null);
   
   // New survivorship rule form state
   const [newSurvivorshipRule, setNewSurvivorshipRule] = useState({
@@ -195,6 +197,37 @@ const RulesManagement = () => {
 
       fetchRules();
       setIsSurvivorshipEditMode(false);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteSurvivorshipRule = async () => {
+    if (!survivorshipRuleToDelete) return;
+
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("survivorship_rules")
+        .delete()
+        .eq("id", survivorshipRuleToDelete);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Survivorship rule deleted successfully",
+      });
+
+      setSurvivorshipDeleteDialogOpen(false);
+      setSurvivorshipRuleToDelete(null);
+      fetchRules();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -1181,7 +1214,7 @@ const RulesManagement = () => {
                     </div>
                   ) : (
                     <div className="border rounded-lg overflow-hidden bg-card shadow-sm">
-                      <div className="grid grid-cols-[2fr,1.5fr,3fr] gap-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 font-semibold border-b-2 border-purple-200 dark:border-purple-800">
+                      <div className="grid grid-cols-[2fr,1.5fr,3fr,auto] gap-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 font-semibold border-b-2 border-purple-200 dark:border-purple-800">
                         <div className="flex items-center gap-2">
                           <Database className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                           <span>Attribute Name</span>
@@ -1194,6 +1227,7 @@ const RulesManagement = () => {
                           <Shield className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                           <span>Value/Priority</span>
                         </div>
+                        <div className="text-center">Actions</div>
                       </div>
                       <div className="divide-y">
                         {editedSurvivorshipRules.map((rule, idx) => {
@@ -1208,7 +1242,7 @@ const RulesManagement = () => {
                           return (
                             <div
                               key={rule.id}
-                              className={`grid grid-cols-[2fr,1.5fr,3fr] gap-4 p-4 items-center hover:shadow-md transition-all duration-200 border-l-4 ${colors.border} ${colors.bg} animate-fade-in`}
+                              className={`grid grid-cols-[2fr,1.5fr,3fr,auto] gap-4 p-4 items-center hover:shadow-md transition-all duration-200 border-l-4 ${colors.border} ${colors.bg} animate-fade-in`}
                               style={{ animationDelay: `${idx * 0.05}s` }}
                             >
                               <div className="font-semibold text-foreground flex items-center gap-2">
@@ -1243,6 +1277,19 @@ const RulesManagement = () => {
                                   className="bg-background text-foreground border-2 transition-all hover:border-purple-300 dark:hover:border-purple-700 focus:border-purple-500"
                                   placeholder="Enter value or priority"
                                 />
+                              </div>
+                              <div className="flex justify-center">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSurvivorshipRuleToDelete(rule.id);
+                                    setSurvivorshipDeleteDialogOpen(true);
+                                  }}
+                                  className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
                               </div>
                             </div>
                           );
@@ -1290,6 +1337,38 @@ const RulesManagement = () => {
                 </>
               ) : (
                 "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Survivorship Rule Delete Confirmation Dialog */}
+      <AlertDialog open={survivorshipDeleteDialogOpen} onOpenChange={setSurvivorshipDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-destructive" />
+              Delete Survivorship Rule
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this survivorship rule? This action cannot be undone and will permanently remove the rule from your configuration.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteSurvivorshipRule}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={saving}
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Rule"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
