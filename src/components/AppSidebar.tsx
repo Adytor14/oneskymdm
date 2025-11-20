@@ -62,23 +62,28 @@ export function AppSidebar() {
   const [mergeMatchOpen, setMergeMatchOpen] = useState(false);
 
   useEffect(() => {
-    checkAdminStatus();
+    checkUserRole();
   }, []);
 
-  const checkAdminStatus = async () => {
+  const checkUserRole = async () => {
     try {
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) return;
 
+      // Check if user is admin
       const { data, error } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
 
       if (!error && data) {
         setIsAdmin(true);
+      } else {
+        // If not admin, they might be data_steward (which also hides these sections)
+        setIsAdmin(false);
       }
     } catch (error) {
-      console.error("Error checking admin status:", error);
+      console.error("Error checking user role:", error);
+      setIsAdmin(false);
     }
   };
 
