@@ -80,11 +80,12 @@ const HCOList = () => {
   const activeCount = mockHCOs.filter(hco => hco.status === "Active").length;
   const inactiveCount = mockHCOs.filter(hco => hco.status === "Inactive").length;
   const pendingCount = 0; // No pending in current data
+  const growthPercentage = ((activeCount / mockHCOs.length) * 100).toFixed(1);
 
   const metrics = [
     { title: "Total Facility Accounts", value: mockHCOs.length.toString(), icon: Building2, bgColor: "bg-blue-50", iconColor: "text-blue-600" },
     { title: "Active Facility Accounts", value: activeCount.toString(), icon: TrendingUp, bgColor: "bg-green-50", iconColor: "text-green-600" },
-    { title: "Inactive Facility Accounts", value: inactiveCount.toString(), icon: AlertCircle, bgColor: "bg-gray-50", iconColor: "text-gray-600" },
+    { title: "Growth", value: `${growthPercentage}%`, icon: TrendingUp, bgColor: "bg-emerald-50", iconColor: "text-emerald-600" },
   ];
 
   const handleSelectAll = (checked: boolean) => {
