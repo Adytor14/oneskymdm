@@ -39,6 +39,9 @@ const DataChangeRequestDetail = () => {
     comments: "Update the address of this HCP as he has relocated",
   };
 
+  // Check if DCR is in an actionable state (not approved or rejected)
+  const isActionable = mockRequest.status !== "Approved" && mockRequest.status !== "Rejected";
+
   const availableAssignees = [
     { id: "1", name: "Ujjwal Sirothia", email: "ujjwal.sirothia@iponesky.com" },
     { id: "2", name: "Rishiraj Acharyya", email: "rishiraj.acharya@iponesky.com" },
@@ -159,12 +162,22 @@ const DataChangeRequestDetail = () => {
         </CollapsibleTrigger>
         <CollapsibleContent>
           {fields.map((field: any, idx: number) => (
-            <div key={idx} className="grid grid-cols-3 gap-4 p-3 border-t items-center hover:bg-muted/25">
+            <div key={idx} className={`grid ${isActionable ? 'grid-cols-4' : 'grid-cols-3'} gap-4 p-3 border-t items-center hover:bg-muted/25`}>
               <div className="text-muted-foreground">{field.attribute}</div>
               <div>{field.currentValue}</div>
               <div className={field.hasChange ? "text-orange-600 font-medium" : ""}>
                 {field.changeRequest}
               </div>
+              {isActionable && (
+                <div className="flex gap-2">
+                  <Button size="icon" variant="ghost" className="h-8 w-8">
+                    <Check className="h-4 w-4 text-green-600" />
+                  </Button>
+                  <Button size="icon" variant="ghost" className="h-8 w-8">
+                    <X className="h-4 w-4 text-red-600" />
+                  </Button>
+                </div>
+              )}
             </div>
           ))}
         </CollapsibleContent>
@@ -186,7 +199,29 @@ const DataChangeRequestDetail = () => {
         <div className="flex-1">
           <Card>
             <CardHeader className="border-b">
-              <CardTitle className="text-lg">Change Request Review</CardTitle>
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg">Change Request Review</CardTitle>
+                {isActionable && (
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setIsHistoryDialogOpen(true)}>
+                      DCR History
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setIsReassignDialogOpen(true)}>
+                      Re-assign
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => setIsRejectDialogOpen(true)}>
+                      Reject
+                    </Button>
+                    <Button 
+                      className="bg-primary hover:bg-primary/90" 
+                      size="sm"
+                      onClick={() => setIsApproveDialogOpen(true)}
+                    >
+                      Approve
+                    </Button>
+                  </div>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="p-0">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -211,10 +246,11 @@ const DataChangeRequestDetail = () => {
                 </div>
 
                 <TabsContent value="dcr-fields" className="m-0">
-                  <div className="grid grid-cols-3 gap-4 p-3 bg-primary text-primary-foreground font-medium">
+                  <div className={`grid ${isActionable ? 'grid-cols-4' : 'grid-cols-3'} gap-4 p-3 bg-primary text-primary-foreground font-medium`}>
                     <div>Attributes</div>
                     <div>Current Value</div>
                     <div>Change Request</div>
+                    {isActionable && <div>Action</div>}
                   </div>
                   <CategorySection
                     category="Primary Information"
