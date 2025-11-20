@@ -215,6 +215,12 @@ const Index = () => {
     { title: "Growth", value: "6.1%", bgColor: "bg-gray-50" },
   ];
 
+  const hcoMetrics = [
+    { title: "Total Facility Accounts", value: "1,324", bgColor: "bg-blue-50" },
+    { title: "Active Facilities", value: "1,198", bgColor: "bg-green-50" },
+    { title: "Growth", value: "4.3%", bgColor: "bg-gray-50" },
+  ];
+
   const masterDataRecords = [
     {
       name: "Dr. Sarah Johnson",
