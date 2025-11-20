@@ -28,6 +28,7 @@ import {
 
 interface RuleAttribute {
   id?: string;
+  tempId?: string; // For tracking attributes during creation
   attribute_name: string;
   match_category: "exact" | "fuzzy";
   weightage: number | null;
@@ -109,11 +110,11 @@ const RulesManagement = () => {
     threshold_max: 100,
     is_active: true,
     attributes: [
-      { attribute_name: "NPI", match_category: "exact" as "exact" | "fuzzy", weightage: null },
-      { attribute_name: "First Name", match_category: "fuzzy" as "exact" | "fuzzy", weightage: 25 },
-      { attribute_name: "Last Name", match_category: "fuzzy" as "exact" | "fuzzy", weightage: 25 },
-      { attribute_name: "ZIP", match_category: "exact" as "exact" | "fuzzy", weightage: null },
-      { attribute_name: "Address", match_category: "fuzzy" as "exact" | "fuzzy", weightage: 50 },
+      { tempId: "attr-1", attribute_name: "NPI", match_category: "exact" as "exact" | "fuzzy", weightage: null },
+      { tempId: "attr-2", attribute_name: "First Name", match_category: "fuzzy" as "exact" | "fuzzy", weightage: 25 },
+      { tempId: "attr-3", attribute_name: "Last Name", match_category: "fuzzy" as "exact" | "fuzzy", weightage: 25 },
+      { tempId: "attr-4", attribute_name: "ZIP", match_category: "exact" as "exact" | "fuzzy", weightage: null },
+      { tempId: "attr-5", attribute_name: "Address", match_category: "fuzzy" as "exact" | "fuzzy", weightage: 50 },
     ],
   });
 
@@ -467,11 +468,11 @@ const RulesManagement = () => {
       threshold_max: 100,
       is_active: true,
       attributes: [
-        { attribute_name: "NPI", match_category: "exact", weightage: null },
-        { attribute_name: "First Name", match_category: "fuzzy", weightage: 25 },
-        { attribute_name: "Last Name", match_category: "fuzzy", weightage: 25 },
-        { attribute_name: "ZIP", match_category: "exact", weightage: null },
-        { attribute_name: "Address", match_category: "fuzzy", weightage: 50 },
+        { tempId: "attr-1", attribute_name: "NPI", match_category: "exact", weightage: null },
+        { tempId: "attr-2", attribute_name: "First Name", match_category: "fuzzy", weightage: 25 },
+        { tempId: "attr-3", attribute_name: "Last Name", match_category: "fuzzy", weightage: 25 },
+        { tempId: "attr-4", attribute_name: "ZIP", match_category: "exact", weightage: null },
+        { tempId: "attr-5", attribute_name: "Address", match_category: "fuzzy", weightage: 50 },
       ],
     });
   };
@@ -484,7 +485,9 @@ const RulesManagement = () => {
       threshold_min: rule.threshold_min || 90,
       threshold_max: rule.threshold_max || 100,
       is_active: rule.is_active,
-      attributes: rule.attributes.map((attr) => ({
+      attributes: rule.attributes.map((attr, idx) => ({
+        id: attr.id,
+        tempId: attr.id || `edit-attr-${idx}`,
         attribute_name: attr.attribute_name,
         match_category: attr.match_category,
         weightage: attr.weightage,
@@ -652,7 +655,10 @@ const RulesManagement = () => {
               id="rule-name"
               placeholder="e.g., Primary HCP Matching Rule"
               value={formData.rule_name}
-              onChange={(e) => setFormData({ ...formData, rule_name: e.target.value })}
+              onChange={(e) => {
+                const value = e.target.value;
+                setFormData((prev) => ({ ...prev, rule_name: value }));
+              }}
               className="text-base"
             />
           </div>
@@ -665,7 +671,9 @@ const RulesManagement = () => {
               </Label>
               <Select
                 value={formData.match_type}
-                onValueChange={(value: any) => setFormData({ ...formData, match_type: value })}
+                onValueChange={(value: any) => {
+                  setFormData((prev) => ({ ...prev, match_type: value }));
+                }}
               >
                 <SelectTrigger id="match-type">
                   <SelectValue />
@@ -683,7 +691,9 @@ const RulesManagement = () => {
               <div className="flex items-center h-10 px-3 border rounded-md">
                 <Switch
                   checked={formData.is_active}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                  onCheckedChange={(checked) => {
+                    setFormData((prev) => ({ ...prev, is_active: checked }));
+                  }}
                 />
                 <span className="ml-2 text-sm">{formData.is_active ? "Active" : "Inactive"}</span>
               </div>
@@ -707,60 +717,71 @@ const RulesManagement = () => {
               </div>
 
               <div className="divide-y">
-                {formData.attributes.map((attr, idx) => (
-                  <div
-                    key={idx}
-                    className="grid grid-cols-[2fr,2fr,1fr] gap-4 p-4 items-center hover:bg-muted/50 transition-colors"
-                  >
-                    <Input
-                      value={attr.attribute_name}
-                      onChange={(e) => {
-                        const newAttrs = [...formData.attributes];
-                        newAttrs[idx].attribute_name = e.target.value;
-                        setFormData({ ...formData, attributes: newAttrs });
-                      }}
-                      placeholder="Attribute name"
-                    />
-
-                    <RadioGroup
-                      value={attr.match_category}
-                      onValueChange={(value: any) => {
-                        const newAttrs = [...formData.attributes];
-                        newAttrs[idx].match_category = value;
-                        setFormData({ ...formData, attributes: newAttrs });
-                      }}
-                      className="flex gap-6"
+                {formData.attributes.map((attr, idx) => {
+                  const uniqueKey = attr.tempId || `attr-${idx}-${attr.attribute_name}`;
+                  return (
+                    <div
+                      key={uniqueKey}
+                      className="grid grid-cols-[2fr,2fr,1fr] gap-4 p-4 items-center hover:bg-muted/50 transition-colors"
                     >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="exact" id={`exact-${idx}`} />
-                        <Label htmlFor={`exact-${idx}`} className="font-normal cursor-pointer">
-                          Exact
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="fuzzy" id={`fuzzy-${idx}`} />
-                        <Label htmlFor={`fuzzy-${idx}`} className="font-normal cursor-pointer">
-                          Fuzzy
-                        </Label>
-                      </div>
-                    </RadioGroup>
+                      <Input
+                        value={attr.attribute_name}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setFormData((prev) => {
+                            const newAttrs = [...prev.attributes];
+                            newAttrs[idx] = { ...newAttrs[idx], attribute_name: value };
+                            return { ...prev, attributes: newAttrs };
+                          });
+                        }}
+                        placeholder="Attribute name"
+                      />
 
-                    <Input
-                      type="number"
-                      value={attr.weightage || ""}
-                      onChange={(e) => {
-                        const newAttrs = [...formData.attributes];
-                        newAttrs[idx].weightage = e.target.value ? parseInt(e.target.value) : null;
-                        setFormData({ ...formData, attributes: newAttrs });
-                      }}
-                      placeholder="N/A"
-                      disabled={attr.match_category === "exact"}
-                      className="text-center"
-                      min="0"
-                      max="100"
-                    />
-                  </div>
-                ))}
+                      <RadioGroup
+                        value={attr.match_category}
+                        onValueChange={(value: any) => {
+                          setFormData((prev) => {
+                            const newAttrs = [...prev.attributes];
+                            newAttrs[idx] = { ...newAttrs[idx], match_category: value };
+                            return { ...prev, attributes: newAttrs };
+                          });
+                        }}
+                        className="flex gap-6"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="exact" id={`exact-${uniqueKey}`} />
+                          <Label htmlFor={`exact-${uniqueKey}`} className="font-normal cursor-pointer">
+                            Exact
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="fuzzy" id={`fuzzy-${uniqueKey}`} />
+                          <Label htmlFor={`fuzzy-${uniqueKey}`} className="font-normal cursor-pointer">
+                            Fuzzy
+                          </Label>
+                        </div>
+                      </RadioGroup>
+
+                      <Input
+                        type="number"
+                        value={attr.weightage ?? ""}
+                        onChange={(e) => {
+                          const value = e.target.value ? parseInt(e.target.value) : null;
+                          setFormData((prev) => {
+                            const newAttrs = [...prev.attributes];
+                            newAttrs[idx] = { ...newAttrs[idx], weightage: value };
+                            return { ...prev, attributes: newAttrs };
+                          });
+                        }}
+                        placeholder="N/A"
+                        disabled={attr.match_category === "exact"}
+                        className="text-center"
+                        min="0"
+                        max="100"
+                      />
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -768,13 +789,18 @@ const RulesManagement = () => {
               variant="outline"
               size="sm"
               onClick={() => {
-                setFormData({
-                  ...formData,
+                setFormData((prev) => ({
+                  ...prev,
                   attributes: [
-                    ...formData.attributes,
-                    { attribute_name: "", match_category: "exact", weightage: null },
+                    ...prev.attributes,
+                    { 
+                      tempId: `attr-${Date.now()}`,
+                      attribute_name: "", 
+                      match_category: "exact", 
+                      weightage: null 
+                    },
                   ],
-                });
+                }));
               }}
               className="w-full"
             >
@@ -793,7 +819,10 @@ const RulesManagement = () => {
                 <Input
                   type="number"
                   value={formData.threshold_min}
-                  onChange={(e) => setFormData({ ...formData, threshold_min: parseInt(e.target.value) })}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    setFormData((prev) => ({ ...prev, threshold_min: value }));
+                  }}
                   min="0"
                   max="100"
                   placeholder="Min"
@@ -804,7 +833,10 @@ const RulesManagement = () => {
                 <Input
                   type="number"
                   value={formData.threshold_max}
-                  onChange={(e) => setFormData({ ...formData, threshold_max: parseInt(e.target.value) })}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    setFormData((prev) => ({ ...prev, threshold_max: value }));
+                  }}
                   min="0"
                   max="100"
                   placeholder="Max"
