@@ -482,23 +482,48 @@ const RulesManagement = () => {
 
   const RuleCard = ({ rule }: { rule: MergeMatchRule }) => (
     <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:shadow-lg border-2",
-      rule.is_active ? "border-primary/20" : "border-muted opacity-60"
+      "group relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-fade-in",
+      rule.is_active 
+        ? "border-l-4 border-l-green-500 bg-gradient-to-br from-green-50/50 to-background dark:from-green-950/20 dark:to-background shadow-md" 
+        : "border-l-4 border-l-gray-400 bg-gradient-to-br from-gray-50/50 to-background dark:from-gray-900/20 dark:to-background opacity-75 hover:opacity-90"
     )}>
-      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full" />
+      {rule.is_active ? (
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/10 via-green-400/5 to-transparent rounded-bl-full" />
+      ) : (
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-400/10 via-gray-300/5 to-transparent rounded-bl-full" />
+      )}
       
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-3 relative">
         <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <CardTitle className="text-lg font-semibold flex items-center gap-2">
-              {rule.rule_name}
-              {rule.is_active && (
-                <Badge variant="default" className="text-xs bg-green-500">
-                  Active
-                </Badge>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-lg font-semibold">
+                {rule.rule_name}
+              </CardTitle>
+              <Badge 
+                className={cn(
+                  "text-xs font-semibold",
+                  rule.is_active 
+                    ? "bg-green-500 hover:bg-green-600 text-white" 
+                    : "bg-gray-400 hover:bg-gray-500 text-white"
+                )}
+              >
+                {rule.is_active ? (
+                  <><Check className="h-3 w-3 mr-1" /> Active</>
+                ) : (
+                  <><X className="h-3 w-3 mr-1" /> Inactive</>
+                )}
+              </Badge>
+            </div>
+            <Badge 
+              variant="secondary" 
+              className={cn(
+                "text-xs font-medium",
+                rule.match_type === "automatic" && "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
+                rule.match_type === "suspect" && "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300",
+                rule.match_type === "negative" && "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300"
               )}
-            </CardTitle>
-            <Badge variant="secondary" className="text-xs">
+            >
               {rule.match_type.toUpperCase()}
             </Badge>
           </div>
@@ -506,7 +531,7 @@ const RulesManagement = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-primary/10"
               onClick={() => openEditDialog(rule)}
             >
               <Pencil className="h-4 w-4" />
@@ -514,7 +539,7 @@ const RulesManagement = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive"
+              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-all duration-200 text-destructive hover:bg-destructive/10"
               onClick={() => {
                 setRuleToDelete(rule.id);
                 setDeleteDialogOpen(true);
@@ -526,18 +551,26 @@ const RulesManagement = () => {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 relative">
         <div className="space-y-2">
           {rule.attributes.slice(0, 4).map((attr, idx) => (
             <div
               key={idx}
-              className="flex items-center justify-between p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+              className={cn(
+                "flex items-center justify-between p-2.5 rounded-lg transition-all duration-200 hover:scale-[1.02]",
+                rule.is_active 
+                  ? "bg-green-50/50 hover:bg-green-100/70 dark:bg-green-950/20 dark:hover:bg-green-950/30" 
+                  : "bg-muted/50 hover:bg-muted"
+              )}
             >
               <span className="text-sm font-medium">{attr.attribute_name}</span>
               <div className="flex items-center gap-2">
                 <Badge
                   variant={attr.match_category === "exact" ? "default" : "outline"}
-                  className="text-xs"
+                  className={cn(
+                    "text-xs font-medium",
+                    attr.match_category === "exact" && rule.is_active && "bg-green-600 hover:bg-green-700"
+                  )}
                 >
                   {attr.match_category === "exact" ? "Exact" : `Fuzzy ${attr.weightage}%`}
                 </Badge>
@@ -545,28 +578,40 @@ const RulesManagement = () => {
             </div>
           ))}
           {rule.attributes.length > 4 && (
-            <p className="text-xs text-muted-foreground text-center">
+            <p className="text-xs text-muted-foreground text-center py-1">
               +{rule.attributes.length - 4} more attributes
             </p>
           )}
         </div>
 
         {(rule.threshold_min !== null || rule.threshold_max !== null) && (
-          <div className="pt-2 border-t">
-            <p className="text-xs text-muted-foreground">
-              Threshold: {rule.threshold_min}% - {rule.threshold_max}%
-            </p>
+          <div className={cn(
+            "pt-2 border-t",
+            rule.is_active ? "border-green-200 dark:border-green-900" : "border-border"
+          )}>
+            <div className="flex items-center gap-2">
+              <Settings className="h-3 w-3 text-muted-foreground" />
+              <p className="text-xs font-medium text-muted-foreground">
+                Threshold: {rule.threshold_min}% - {rule.threshold_max}%
+              </p>
+            </div>
           </div>
         )}
 
-        <div className="pt-2 border-t flex items-center justify-between">
+        <div className={cn(
+          "pt-2 border-t flex items-center justify-between",
+          rule.is_active ? "border-green-200 dark:border-green-900" : "border-border"
+        )}>
           <p className="text-xs text-muted-foreground">
             {new Date(rule.created_at).toLocaleDateString()}
           </p>
           <Switch
             checked={rule.is_active}
             onCheckedChange={() => handleToggleRuleStatus(rule.id, rule.is_active)}
-            className="scale-75"
+            className={cn(
+              "scale-90 transition-all",
+              rule.is_active && "data-[state=checked]:bg-green-500"
+            )}
           />
         </div>
       </CardContent>
@@ -865,18 +910,22 @@ const RulesManagement = () => {
               ) : (
                 <div className="space-y-8">
                   {/* Automatic Rules */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-1 bg-green-500 rounded-full" />
-                      <h3 className="text-xl font-semibold">Automatic Matches</h3>
-                      <Badge variant="secondary">{filteredRules("automatic").length}</Badge>
+                  <div className="space-y-4 animate-fade-in">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-green-50 to-transparent dark:from-green-950/20 dark:to-transparent border-l-4 border-green-500">
+                      <div className="h-10 w-10 rounded-full bg-green-500 flex items-center justify-center">
+                        <Check className="h-5 w-5 text-white" />
+                      </div>
+                      <h3 className="text-xl font-bold">Automatic Matches</h3>
+                      <Badge className="bg-green-500 hover:bg-green-600 text-white">{filteredRules("automatic").length}</Badge>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {filteredRules("automatic").map((rule) => (
-                        <RuleCard key={rule.id} rule={rule} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredRules("automatic").map((rule, idx) => (
+                        <div key={rule.id} style={{ animationDelay: `${idx * 50}ms` }} className="animate-fade-in">
+                          <RuleCard rule={rule} />
+                        </div>
                       ))}
                       {filteredRules("automatic").length === 0 && (
-                        <Card className="border-dashed border-2 flex items-center justify-center min-h-[200px]">
+                        <Card className="border-dashed border-2 flex items-center justify-center min-h-[200px] col-span-full">
                           <p className="text-muted-foreground">No automatic rules yet</p>
                         </Card>
                       )}
@@ -884,18 +933,22 @@ const RulesManagement = () => {
                   </div>
 
                   {/* Suspect Rules */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-1 bg-yellow-500 rounded-full" />
-                      <h3 className="text-xl font-semibold">Suspect Matches</h3>
-                      <Badge variant="secondary">{filteredRules("suspect").length}</Badge>
+                  <div className="space-y-4 animate-fade-in" style={{ animationDelay: "100ms" }}>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-orange-50 to-transparent dark:from-orange-950/20 dark:to-transparent border-l-4 border-orange-500">
+                      <div className="h-10 w-10 rounded-full bg-orange-500 flex items-center justify-center">
+                        <GitMerge className="h-5 w-5 text-white" />
+                      </div>
+                      <h3 className="text-xl font-bold">Suspect Matches</h3>
+                      <Badge className="bg-orange-500 hover:bg-orange-600 text-white">{filteredRules("suspect").length}</Badge>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {filteredRules("suspect").map((rule) => (
-                        <RuleCard key={rule.id} rule={rule} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredRules("suspect").map((rule, idx) => (
+                        <div key={rule.id} style={{ animationDelay: `${idx * 50}ms` }} className="animate-fade-in">
+                          <RuleCard rule={rule} />
+                        </div>
                       ))}
                       {filteredRules("suspect").length === 0 && (
-                        <Card className="border-dashed border-2 flex items-center justify-center min-h-[200px]">
+                        <Card className="border-dashed border-2 flex items-center justify-center min-h-[200px] col-span-full">
                           <p className="text-muted-foreground">No suspect rules yet</p>
                         </Card>
                       )}
@@ -903,18 +956,22 @@ const RulesManagement = () => {
                   </div>
 
                   {/* Negative Rules */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-1 bg-red-500 rounded-full" />
-                      <h3 className="text-xl font-semibold">Negative Matches</h3>
-                      <Badge variant="secondary">{filteredRules("negative").length}</Badge>
+                  <div className="space-y-4 animate-fade-in" style={{ animationDelay: "200ms" }}>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-red-50 to-transparent dark:from-red-950/20 dark:to-transparent border-l-4 border-red-500">
+                      <div className="h-10 w-10 rounded-full bg-red-500 flex items-center justify-center">
+                        <X className="h-5 w-5 text-white" />
+                      </div>
+                      <h3 className="text-xl font-bold">Negative Matches</h3>
+                      <Badge className="bg-red-500 hover:bg-red-600 text-white">{filteredRules("negative").length}</Badge>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {filteredRules("negative").map((rule) => (
-                        <RuleCard key={rule.id} rule={rule} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredRules("negative").map((rule, idx) => (
+                        <div key={rule.id} style={{ animationDelay: `${idx * 50}ms` }} className="animate-fade-in">
+                          <RuleCard rule={rule} />
+                        </div>
                       ))}
                       {filteredRules("negative").length === 0 && (
-                        <Card className="border-dashed border-2 flex items-center justify-center min-h-[200px]">
+                        <Card className="border-dashed border-2 flex items-center justify-center min-h-[200px] col-span-full">
                           <p className="text-muted-foreground">No negative rules yet</p>
                         </Card>
                       )}
