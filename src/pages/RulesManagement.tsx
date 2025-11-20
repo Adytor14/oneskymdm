@@ -57,14 +57,16 @@ interface SurvivorshipRule {
 
 // Validation schema for survivorship rules
 const survivorshipRuleSchema = z.object({
-  attribute_name: z.string()
+  attribute_name: z
+    .string()
     .trim()
     .min(1, { message: "Attribute name is required" })
     .max(100, { message: "Attribute name must be less than 100 characters" }),
   rule_type: z.enum(["status", "priority", "recency", "aggregation"], {
     errorMap: () => ({ message: "Please select a valid rule type" }),
   }),
-  rule_value: z.string()
+  rule_value: z
+    .string()
     .trim()
     .min(1, { message: "Value/Priority is required" })
     .max(500, { message: "Value/Priority must be less than 500 characters" }),
@@ -81,7 +83,7 @@ const RulesManagement = () => {
   const [ruleToDelete, setRuleToDelete] = useState<string | null>(null);
   const [survivorshipDeleteDialogOpen, setSurvivorshipDeleteDialogOpen] = useState(false);
   const [survivorshipRuleToDelete, setSurvivorshipRuleToDelete] = useState<string | null>(null);
-  
+
   // New survivorship rule form state
   const [newSurvivorshipRule, setNewSurvivorshipRule] = useState({
     attribute_name: "",
@@ -89,14 +91,14 @@ const RulesManagement = () => {
     rule_value: "",
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  
+
   const [mergeMatchRules, setMergeMatchRules] = useState<MergeMatchRule[]>([]);
   const [survivorshipRules, setSurvivorshipRules] = useState<SurvivorshipRule[]>([]);
   const [editedSurvivorshipRules, setEditedSurvivorshipRules] = useState<SurvivorshipRule[]>([]);
   const [editingRule, setEditingRule] = useState<MergeMatchRule | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  
+
   const { toast } = useToast();
 
   // Form state for creating/editing rules
@@ -124,7 +126,7 @@ const RulesManagement = () => {
     try {
       // Convert entity tab to uppercase for database query
       const entityType = activeEntityTab === "hcp" ? "HCP" : "HCO";
-      
+
       // Fetch merge/match rules
       const { data: rulesData, error: rulesError } = await supabase
         .from("merge_match_rules")
@@ -137,16 +139,13 @@ const RulesManagement = () => {
       // Fetch attributes for each rule
       const rulesWithAttributes = await Promise.all(
         (rulesData || []).map(async (rule) => {
-          const { data: attrsData } = await supabase
-            .from("rule_attributes")
-            .select("*")
-            .eq("rule_id", rule.id);
+          const { data: attrsData } = await supabase.from("rule_attributes").select("*").eq("rule_id", rule.id);
 
           return {
             ...rule,
             attributes: attrsData || [],
           };
-        })
+        }),
       );
 
       setMergeMatchRules(rulesWithAttributes);
@@ -184,7 +183,7 @@ const RulesManagement = () => {
             rule_value: rule.rule_value,
           })
           .eq("id", rule.id);
-        
+
         if (error) throw error;
       });
 
@@ -213,10 +212,7 @@ const RulesManagement = () => {
 
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from("survivorship_rules")
-        .delete()
-        .eq("id", survivorshipRuleToDelete);
+      const { error } = await supabase.from("survivorship_rules").delete().eq("id", survivorshipRuleToDelete);
 
       if (error) throw error;
 
@@ -239,11 +235,7 @@ const RulesManagement = () => {
     }
   };
 
-  const handleSurvivorshipRuleChange = (
-    idx: number,
-    field: "rule_type" | "rule_value",
-    value: string
-  ) => {
+  const handleSurvivorshipRuleChange = (idx: number, field: "rule_type" | "rule_value", value: string) => {
     const newRules = [...editedSurvivorshipRules];
     newRules[idx] = { ...newRules[idx], [field]: value };
     setEditedSurvivorshipRules(newRules);
@@ -274,15 +266,13 @@ const RulesManagement = () => {
       const { data: userData } = await supabase.auth.getUser();
       const entityType = activeEntityTab === "hcp" ? "HCP" : "HCO";
 
-      const { error } = await supabase
-        .from("survivorship_rules")
-        .insert({
-          entity_type: entityType,
-          attribute_name: newSurvivorshipRule.attribute_name.trim(),
-          rule_type: newSurvivorshipRule.rule_type,
-          rule_value: newSurvivorshipRule.rule_value.trim(),
-          created_by: userData.user?.id,
-        });
+      const { error } = await supabase.from("survivorship_rules").insert({
+        entity_type: entityType,
+        attribute_name: newSurvivorshipRule.attribute_name.trim(),
+        rule_type: newSurvivorshipRule.rule_type,
+        rule_value: newSurvivorshipRule.rule_value.trim(),
+        created_by: userData.user?.id,
+      });
 
       if (error) throw error;
 
@@ -315,7 +305,7 @@ const RulesManagement = () => {
     try {
       const { data: userData } = await supabase.auth.getUser();
       const entityType = activeEntityTab === "hcp" ? "HCP" : "HCO";
-      
+
       const { data: ruleData, error: ruleError } = await supabase
         .from("merge_match_rules")
         .insert({
@@ -340,9 +330,7 @@ const RulesManagement = () => {
         weightage: attr.weightage,
       }));
 
-      const { error: attrsError } = await supabase
-        .from("rule_attributes")
-        .insert(attributesToInsert);
+      const { error: attrsError } = await supabase.from("rule_attributes").insert(attributesToInsert);
 
       if (attrsError) throw attrsError;
 
@@ -367,7 +355,7 @@ const RulesManagement = () => {
 
   const handleUpdateRule = async () => {
     if (!editingRule) return;
-    
+
     setSaving(true);
     try {
       const { error: ruleError } = await supabase
@@ -394,9 +382,7 @@ const RulesManagement = () => {
         weightage: attr.weightage,
       }));
 
-      const { error: attrsError } = await supabase
-        .from("rule_attributes")
-        .insert(attributesToInsert);
+      const { error: attrsError } = await supabase.from("rule_attributes").insert(attributesToInsert);
 
       if (attrsError) throw attrsError;
 
@@ -429,10 +415,7 @@ const RulesManagement = () => {
       await supabase.from("rule_attributes").delete().eq("rule_id", ruleToDelete);
 
       // Delete rule
-      const { error } = await supabase
-        .from("merge_match_rules")
-        .delete()
-        .eq("id", ruleToDelete);
+      const { error } = await supabase.from("merge_match_rules").delete().eq("id", ruleToDelete);
 
       if (error) throw error;
 
@@ -457,10 +440,7 @@ const RulesManagement = () => {
 
   const handleToggleRuleStatus = async (ruleId: string, currentStatus: boolean) => {
     try {
-      const { error } = await supabase
-        .from("merge_match_rules")
-        .update({ is_active: !currentStatus })
-        .eq("id", ruleId);
+      const { error } = await supabase.from("merge_match_rules").update({ is_active: !currentStatus }).eq("id", ruleId);
 
       if (error) throw error;
 
@@ -514,47 +494,52 @@ const RulesManagement = () => {
   };
 
   const RuleCard = ({ rule }: { rule: MergeMatchRule }) => (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-fade-in",
-      rule.is_active 
-        ? "border-l-4 border-l-green-500 bg-gradient-to-br from-green-50/50 to-background dark:from-green-950/20 dark:to-background shadow-md" 
-        : "border-l-4 border-l-gray-400 bg-gradient-to-br from-gray-50/50 to-background dark:from-gray-900/20 dark:to-background opacity-75 hover:opacity-90"
-    )}>
+    <Card
+      className={cn(
+        "group relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-fade-in",
+        rule.is_active
+          ? "border-l-4 border-l-green-500 bg-gradient-to-br from-green-50/50 to-background dark:from-green-950/20 dark:to-background shadow-md"
+          : "border-l-4 border-l-gray-400 bg-gradient-to-br from-gray-50/50 to-background dark:from-gray-900/20 dark:to-background opacity-75 hover:opacity-90",
+      )}
+    >
       {rule.is_active ? (
         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/10 via-green-400/5 to-transparent rounded-bl-full" />
       ) : (
         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-400/10 via-gray-300/5 to-transparent rounded-bl-full" />
       )}
-      
+
       <CardHeader className="pb-3 relative">
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <CardTitle className="text-lg font-semibold">
-                {rule.rule_name}
-              </CardTitle>
-              <Badge 
+              <CardTitle className="text-lg font-semibold">{rule.rule_name}</CardTitle>
+              <Badge
                 className={cn(
                   "text-xs font-semibold",
-                  rule.is_active 
-                    ? "bg-green-500 hover:bg-green-600 text-white" 
-                    : "bg-gray-400 hover:bg-gray-500 text-white"
+                  rule.is_active
+                    ? "bg-green-500 hover:bg-green-600 text-white"
+                    : "bg-gray-400 hover:bg-gray-500 text-white",
                 )}
               >
                 {rule.is_active ? (
-                  <><Check className="h-3 w-3 mr-1" /> Active</>
+                  <>
+                    <Check className="h-3 w-3 mr-1" /> Active
+                  </>
                 ) : (
-                  <><X className="h-3 w-3 mr-1" /> Inactive</>
+                  <>
+                    <X className="h-3 w-3 mr-1" /> Inactive
+                  </>
                 )}
               </Badge>
             </div>
-            <Badge 
-              variant="secondary" 
+            <Badge
+              variant="secondary"
               className={cn(
                 "text-xs font-medium",
                 rule.match_type === "automatic" && "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
-                rule.match_type === "suspect" && "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300",
-                rule.match_type === "negative" && "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300"
+                rule.match_type === "suspect" &&
+                  "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300",
+                rule.match_type === "negative" && "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
               )}
             >
               {rule.match_type.toUpperCase()}
@@ -580,9 +565,9 @@ const RulesManagement = () => {
               key={idx}
               className={cn(
                 "flex items-center justify-between p-2.5 rounded-lg transition-all duration-200 hover:scale-[1.02]",
-                rule.is_active 
-                  ? "bg-green-50/50 hover:bg-green-100/70 dark:bg-green-950/20 dark:hover:bg-green-950/30" 
-                  : "bg-muted/50 hover:bg-muted"
+                rule.is_active
+                  ? "bg-green-50/50 hover:bg-green-100/70 dark:bg-green-950/20 dark:hover:bg-green-950/30"
+                  : "bg-muted/50 hover:bg-muted",
               )}
             >
               <span className="text-sm font-medium">{attr.attribute_name}</span>
@@ -591,7 +576,7 @@ const RulesManagement = () => {
                   variant={attr.match_category === "exact" ? "default" : "outline"}
                   className={cn(
                     "text-xs font-medium",
-                    attr.match_category === "exact" && rule.is_active && "bg-green-600 hover:bg-green-700"
+                    attr.match_category === "exact" && rule.is_active && "bg-green-600 hover:bg-green-700",
                   )}
                 >
                   {attr.match_category === "exact" ? "Exact" : `Fuzzy ${attr.weightage}%`}
@@ -607,10 +592,9 @@ const RulesManagement = () => {
         </div>
 
         {(rule.threshold_min !== null || rule.threshold_max !== null) && (
-          <div className={cn(
-            "pt-2 border-t",
-            rule.is_active ? "border-green-200 dark:border-green-900" : "border-border"
-          )}>
+          <div
+            className={cn("pt-2 border-t", rule.is_active ? "border-green-200 dark:border-green-900" : "border-border")}
+          >
             <div className="flex items-center gap-2">
               <Settings className="h-3 w-3 text-muted-foreground" />
               <p className="text-xs font-medium text-muted-foreground">
@@ -620,20 +604,17 @@ const RulesManagement = () => {
           </div>
         )}
 
-        <div className={cn(
-          "pt-2 border-t flex items-center justify-between",
-          rule.is_active ? "border-green-200 dark:border-green-900" : "border-border"
-        )}>
-          <p className="text-xs text-muted-foreground">
-            {new Date(rule.created_at).toLocaleDateString()}
-          </p>
+        <div
+          className={cn(
+            "pt-2 border-t flex items-center justify-between",
+            rule.is_active ? "border-green-200 dark:border-green-900" : "border-border",
+          )}
+        >
+          <p className="text-xs text-muted-foreground">{new Date(rule.created_at).toLocaleDateString()}</p>
           <Switch
             checked={rule.is_active}
             onCheckedChange={() => handleToggleRuleStatus(rule.id, rule.is_active)}
-            className={cn(
-              "scale-90 transition-all",
-              rule.is_active && "data-[state=checked]:bg-green-500"
-            )}
+            className={cn("scale-90 transition-all", rule.is_active && "data-[state=checked]:bg-green-500")}
           />
         </div>
       </CardContent>
@@ -704,9 +685,7 @@ const RulesManagement = () => {
                   checked={formData.is_active}
                   onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
                 />
-                <span className="ml-2 text-sm">
-                  {formData.is_active ? "Active" : "Inactive"}
-                </span>
+                <span className="ml-2 text-sm">{formData.is_active ? "Active" : "Inactive"}</span>
               </div>
             </div>
           </div>
@@ -719,17 +698,20 @@ const RulesManagement = () => {
               <Settings className="h-4 w-4" />
               Matching Attributes
             </Label>
-            
+
             <div className="border rounded-lg overflow-hidden">
               <div className="bg-primary text-primary-foreground grid grid-cols-[2fr,2fr,1fr] gap-4 p-4 font-semibold text-sm">
                 <div>Attribute</div>
                 <div>Match Category</div>
                 <div className="text-center">Weight (%)</div>
               </div>
-              
+
               <div className="divide-y">
                 {formData.attributes.map((attr, idx) => (
-                  <div key={idx} className="grid grid-cols-[2fr,2fr,1fr] gap-4 p-4 items-center hover:bg-muted/50 transition-colors">
+                  <div
+                    key={idx}
+                    className="grid grid-cols-[2fr,2fr,1fr] gap-4 p-4 items-center hover:bg-muted/50 transition-colors"
+                  >
                     <Input
                       value={attr.attribute_name}
                       onChange={(e) => {
@@ -739,7 +721,7 @@ const RulesManagement = () => {
                       }}
                       placeholder="Attribute name"
                     />
-                    
+
                     <RadioGroup
                       value={attr.match_category}
                       onValueChange={(value: any) => {
@@ -762,7 +744,7 @@ const RulesManagement = () => {
                         </Label>
                       </div>
                     </RadioGroup>
-                    
+
                     <Input
                       type="number"
                       value={attr.weightage || ""}
@@ -811,9 +793,7 @@ const RulesManagement = () => {
                 <Input
                   type="number"
                   value={formData.threshold_min}
-                  onChange={(e) =>
-                    setFormData({ ...formData, threshold_min: parseInt(e.target.value) })
-                  }
+                  onChange={(e) => setFormData({ ...formData, threshold_min: parseInt(e.target.value) })}
                   min="0"
                   max="100"
                   placeholder="Min"
@@ -824,9 +804,7 @@ const RulesManagement = () => {
                 <Input
                   type="number"
                   value={formData.threshold_max}
-                  onChange={(e) =>
-                    setFormData({ ...formData, threshold_max: parseInt(e.target.value) })
-                  }
+                  onChange={(e) => setFormData({ ...formData, threshold_max: parseInt(e.target.value) })}
                   min="0"
                   max="100"
                   placeholder="Max"
@@ -846,10 +824,7 @@ const RulesManagement = () => {
           >
             Cancel
           </Button>
-          <Button
-            onClick={isEdit ? handleUpdateRule : handleCreateRule}
-            disabled={saving || !formData.rule_name}
-          >
+          <Button onClick={isEdit ? handleUpdateRule : handleCreateRule} disabled={saving || !formData.rule_name}>
             {saving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -879,9 +854,7 @@ const RulesManagement = () => {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               Rules Management
             </h1>
-            <p className="text-muted-foreground text-lg">
-              Configure intelligent merge, match, and survivorship rules
-            </p>
+            <p className="text-muted-foreground text-lg">Configure intelligent merge, match, and survivorship rules</p>
           </div>
         </div>
 
@@ -938,7 +911,9 @@ const RulesManagement = () => {
                         <Check className="h-5 w-5 text-white" />
                       </div>
                       <h3 className="text-xl font-bold">Automatic Matches</h3>
-                      <Badge className="bg-green-500 hover:bg-green-600 text-white">{filteredRules("automatic").length}</Badge>
+                      <Badge className="bg-green-500 hover:bg-green-600 text-white">
+                        {filteredRules("automatic").length}
+                      </Badge>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {filteredRules("automatic").map((rule, idx) => (
@@ -961,7 +936,9 @@ const RulesManagement = () => {
                         <GitMerge className="h-5 w-5 text-white" />
                       </div>
                       <h3 className="text-xl font-bold">Suspect Matches</h3>
-                      <Badge className="bg-orange-500 hover:bg-orange-600 text-white">{filteredRules("suspect").length}</Badge>
+                      <Badge className="bg-orange-500 hover:bg-orange-600 text-white">
+                        {filteredRules("suspect").length}
+                      </Badge>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {filteredRules("suspect").map((rule, idx) => (
@@ -984,16 +961,6 @@ const RulesManagement = () => {
           {/* Survivorship Rules Tab */}
           <TabsContent value="survivorship" className="space-y-6 animate-fade-in">
             {/* Modern Header */}
-            <div className="flex items-center justify-between bg-gradient-to-r from-primary/10 to-accent/10 dark:from-primary/20 dark:to-accent/20 p-6 rounded-lg border border-primary/30 dark:border-primary/40">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-lg">
-                  <Shield className="h-6 w-6 text-primary dark:text-primary" />
-                </div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Survivorship Rules
-                </h2>
-              </div>
-            </div>
 
             <Tabs value={activeEntityTab} onValueChange={setActiveEntityTab}>
               <TabsList className="bg-muted">
@@ -1019,10 +986,7 @@ const RulesManagement = () => {
                       Attribute Level Survivorship
                     </CardTitle>
                     <div className="flex gap-2">
-                      <Dialog
-                        open={isCreateSurvivorshipDialogOpen}
-                        onOpenChange={setIsCreateSurvivorshipDialogOpen}
-                      >
+                      <Dialog open={isCreateSurvivorshipDialogOpen} onOpenChange={setIsCreateSurvivorshipDialogOpen}>
                         <DialogTrigger asChild>
                           <Button variant="outline" className="border-primary text-primary hover:bg-primary/10">
                             <Plus className="h-4 w-4 mr-2" />
@@ -1198,13 +1162,29 @@ const RulesManagement = () => {
                       <div className="divide-y">
                         {editedSurvivorshipRules.map((rule, idx) => {
                           const ruleTypeColors = {
-                            status: { bg: "bg-primary/5 dark:bg-primary/10", border: "border-l-primary/60", badge: "bg-primary/10 dark:bg-primary/20 text-primary" },
-                            priority: { bg: "bg-accent/5 dark:bg-accent/10", border: "border-l-accent/60", badge: "bg-accent/10 dark:bg-accent/20 text-accent" },
-                            recency: { bg: "bg-warning/5 dark:bg-warning/10", border: "border-l-warning/60", badge: "bg-warning/10 dark:bg-warning/20 text-warning dark:text-warning" },
-                            aggregation: { bg: "bg-success/5 dark:bg-success/10", border: "border-l-success/60", badge: "bg-success/10 dark:bg-success/20 text-success dark:text-success" },
+                            status: {
+                              bg: "bg-primary/5 dark:bg-primary/10",
+                              border: "border-l-primary/60",
+                              badge: "bg-primary/10 dark:bg-primary/20 text-primary",
+                            },
+                            priority: {
+                              bg: "bg-accent/5 dark:bg-accent/10",
+                              border: "border-l-accent/60",
+                              badge: "bg-accent/10 dark:bg-accent/20 text-accent",
+                            },
+                            recency: {
+                              bg: "bg-warning/5 dark:bg-warning/10",
+                              border: "border-l-warning/60",
+                              badge: "bg-warning/10 dark:bg-warning/20 text-warning dark:text-warning",
+                            },
+                            aggregation: {
+                              bg: "bg-success/5 dark:bg-success/10",
+                              border: "border-l-success/60",
+                              badge: "bg-success/10 dark:bg-success/20 text-success dark:text-success",
+                            },
                           };
                           const colors = ruleTypeColors[rule.rule_type] || ruleTypeColors.status;
-                          
+
                           return (
                             <div
                               key={rule.id}
@@ -1212,18 +1192,16 @@ const RulesManagement = () => {
                               style={{ animationDelay: `${idx * 0.05}s` }}
                             >
                               <div className="font-semibold text-foreground flex items-center gap-2">
-                                <Badge className={`${colors.badge} text-xs`}>
-                                  {rule.attribute_name}
-                                </Badge>
+                                <Badge className={`${colors.badge} text-xs`}>{rule.attribute_name}</Badge>
                               </div>
                               <div>
                                 <Select
                                   value={rule.rule_type}
-                                  onValueChange={(value: any) =>
-                                    handleSurvivorshipRuleChange(idx, "rule_type", value)
-                                  }
+                                  onValueChange={(value: any) => handleSurvivorshipRuleChange(idx, "rule_type", value)}
                                 >
-                                  <SelectTrigger className={`w-full bg-background border-2 transition-all hover:border-primary/50`}>
+                                  <SelectTrigger
+                                    className={`w-full bg-background border-2 transition-all hover:border-primary/50`}
+                                  >
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent className="bg-background">
@@ -1237,9 +1215,7 @@ const RulesManagement = () => {
                               <div>
                                 <Input
                                   value={rule.rule_value}
-                                  onChange={(e) =>
-                                    handleSurvivorshipRuleChange(idx, "rule_value", e.target.value)
-                                  }
+                                  onChange={(e) => handleSurvivorshipRuleChange(idx, "rule_value", e.target.value)}
                                   className="bg-background text-foreground border-2 transition-all hover:border-primary/50 focus:border-primary"
                                   placeholder="Enter value or priority"
                                 />
@@ -1318,7 +1294,8 @@ const RulesManagement = () => {
               Delete Survivorship Rule
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this survivorship rule? This action cannot be undone and will permanently remove the rule from your configuration.
+              Are you sure you want to delete this survivorship rule? This action cannot be undone and will permanently
+              remove the rule from your configuration.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
