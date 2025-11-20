@@ -6,8 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { mockHCOs } from "@/lib/mockData";
-import { Search, Eye, Building2, TrendingUp, AlertCircle, Clock, Download, FileJson, FileSpreadsheet, FileText, ArrowUpDown, ArrowUp, ArrowDown, Database, ChevronsUpDown, Check, X } from "lucide-react";
+import { Search, Eye, Building2, TrendingUp, AlertCircle, Clock, Download, FileJson, FileSpreadsheet, FileText, ArrowUpDown, ArrowUp, ArrowDown, Database, ChevronsUpDown, Check, X, SlidersHorizontal } from "lucide-react";
 import { exportToExcel, exportToJSON, exportHCOToPDF, prepareHCOForExport } from "@/lib/exportUtils";
 import {
   DropdownMenu,
@@ -19,6 +20,14 @@ import { useToast } from "@/hooks/use-toast";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 const HCOList = () => {
@@ -34,6 +43,15 @@ const HCOList = () => {
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [serviceLine, setServiceLine] = useState<"HH" | "HOS">("HH");
+  
+  // Additional filter states
+  const [payerFilter, setPayerFilter] = useState("all");
+  const [facilityTypeFilter, setFacilityTypeFilter] = useState("all");
+  const [bedCountFilter, setBedCountFilter] = useState("all");
+  const [affiliationsFilter, setAffiliationsFilter] = useState("all");
+  const [patientVolumeFilter, setPatientVolumeFilter] = useState("all");
+  const [deliberateDuplicates, setDeliberateDuplicates] = useState(false);
+  const [showAdditionalFilters, setShowAdditionalFilters] = useState(false);
 
   const states = ["California", "Texas", "Florida", "New York", "Illinois"];
   const counties = ["Los Angeles", "Harris", "Miami-Dade", "Kings", "Cook"];
@@ -111,6 +129,12 @@ const HCOList = () => {
     setSelectedQuarters([]);
     setZipCode("");
     setSearchTerm("");
+    setPayerFilter("all");
+    setFacilityTypeFilter("all");
+    setBedCountFilter("all");
+    setAffiliationsFilter("all");
+    setPatientVolumeFilter("all");
+    setDeliberateDuplicates(false);
   };
 
   const handleExport = (format: 'excel' | 'json' | 'pdf') => {
@@ -161,15 +185,122 @@ const HCOList = () => {
               <Database className="h-5 w-5" />
               Filters for Analysis
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearAllFilters}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-4 w-4 mr-2" />
-              Clear Filters
-            </Button>
+            <div className="flex gap-2">
+              <Sheet open={showAdditionalFilters} onOpenChange={setShowAdditionalFilters}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <SlidersHorizontal className="h-4 w-4 mr-2" />
+                    Additional Filters
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[400px] sm:w-[540px]">
+                  <SheetHeader>
+                    <SheetTitle>Additional Filters</SheetTitle>
+                    <SheetDescription>
+                      Configure advanced filtering options for your analysis
+                    </SheetDescription>
+                  </SheetHeader>
+                  <div className="space-y-4 mt-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Payer Type</label>
+                      <Select value={payerFilter} onValueChange={setPayerFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Payers" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="all">All Payers</SelectItem>
+                          <SelectItem value="medicare">Medicare</SelectItem>
+                          <SelectItem value="medicaid">Medicaid</SelectItem>
+                          <SelectItem value="private">Private Insurance</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Facility Type</label>
+                      <Select value={facilityTypeFilter} onValueChange={setFacilityTypeFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Facility Types" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="all">All Facility Types</SelectItem>
+                          <SelectItem value="hospital">Hospital</SelectItem>
+                          <SelectItem value="clinic">Clinic</SelectItem>
+                          <SelectItem value="nursing-home">Nursing Home</SelectItem>
+                          <SelectItem value="urgent-care">Urgent Care</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Bed Count</label>
+                      <Select value={bedCountFilter} onValueChange={setBedCountFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Bed Counts" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="all">All Bed Counts</SelectItem>
+                          <SelectItem value="0-50">0 - 50</SelectItem>
+                          <SelectItem value="50-100">50 - 100</SelectItem>
+                          <SelectItem value="100-250">100 - 250</SelectItem>
+                          <SelectItem value="250+">250+</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Affiliations</label>
+                      <Select value={affiliationsFilter} onValueChange={setAffiliationsFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Affiliations" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="all">All Affiliations</SelectItem>
+                          <SelectItem value="hospital-network">Hospital Network</SelectItem>
+                          <SelectItem value="independent">Independent</SelectItem>
+                          <SelectItem value="academic">Academic Center</SelectItem>
+                          <SelectItem value="corporate">Corporate Chain</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Patient Volume</label>
+                      <Select value={patientVolumeFilter} onValueChange={setPatientVolumeFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Volumes" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover z-50">
+                          <SelectItem value="all">All Volumes</SelectItem>
+                          <SelectItem value="0-1000">0 - 1,000</SelectItem>
+                          <SelectItem value="1000-5000">1,000 - 5,000</SelectItem>
+                          <SelectItem value="5000-10000">5,000 - 10,000</SelectItem>
+                          <SelectItem value="10000+">10,000+</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="deliberate-duplicates-hco"
+                        checked={deliberateDuplicates}
+                        onCheckedChange={(checked) => setDeliberateDuplicates(checked as boolean)}
+                      />
+                      <Label
+                        htmlFor="deliberate-duplicates-hco"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Deliberate Duplicates
+                      </Label>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearAllFilters}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Clear Filters
+              </Button>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
