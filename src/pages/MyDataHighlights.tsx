@@ -18,6 +18,8 @@ import {
   ArrowUpRight,
   Check,
   ChevronsUpDown,
+  Download,
+  FileJson,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -25,6 +27,15 @@ import { getOrganizationTheme } from "@/lib/organizationThemes";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { exportToExcel } from "@/lib/exportUtils";
 
 const MyDataHighlights = () => {
   const navigate = useNavigate();
@@ -38,6 +49,10 @@ const MyDataHighlights = () => {
   const [selectedCounties, setSelectedCounties] = useState<string[]>([]);
   const [selectedQuarters, setSelectedQuarters] = useState<string[]>([]);
   const [selectedPayers, setSelectedPayers] = useState<string[]>([]);
+
+  // Row selection states
+  const [selectedHcpRows, setSelectedHcpRows] = useState<string[]>([]);
+  const [selectedHcoRows, setSelectedHcoRows] = useState<string[]>([]);
 
   // Get current organization theme
   const currentTheme = getOrganizationTheme(selectedOrganization);
@@ -86,6 +101,181 @@ const MyDataHighlights = () => {
     setSelectedCounties([]);
     setSelectedQuarters([]);
     setSelectedPayers([]);
+  };
+
+  // Row selection handlers
+  const handleSelectAllHcp = (checked: boolean) => {
+    if (checked) {
+      const visibleHcpIds = mockHCPs
+        .filter((record) => record.status === "Active")
+        .slice(0, 10)
+        .map((record) => record.id);
+      setSelectedHcpRows(visibleHcpIds);
+    } else {
+      setSelectedHcpRows([]);
+    }
+  };
+
+  const handleSelectHcpRow = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedHcpRows([...selectedHcpRows, id]);
+    } else {
+      setSelectedHcpRows(selectedHcpRows.filter((rowId) => rowId !== id));
+    }
+  };
+
+  const handleSelectAllHco = (checked: boolean) => {
+    if (checked) {
+      const visibleHcoIds = mockHCOs
+        .filter((record) => record.status === "Active")
+        .slice(0, 10)
+        .map((record) => record.id);
+      setSelectedHcoRows(visibleHcoIds);
+    } else {
+      setSelectedHcoRows([]);
+    }
+  };
+
+  const handleSelectHcoRow = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedHcoRows([...selectedHcoRows, id]);
+    } else {
+      setSelectedHcoRows(selectedHcoRows.filter((rowId) => rowId !== id));
+    }
+  };
+
+  // Export handlers
+  const handleHcpExport = (format: "excel" | "json" | "pdf") => {
+    const selectedData = mockHCPs.filter((hcp) => selectedHcpRows.includes(hcp.id));
+
+    if (selectedData.length === 0) {
+      toast({
+        title: "No rows selected",
+        description: "Please select at least one row to export.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      if (format === "excel") {
+        const excelData = selectedData.map((hcp, index) => ({
+          Name: `Dr. ${hcp.firstName} ${hcp.lastName}`,
+          NPI: `12345${6789 + index}0`,
+          City: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
+          State: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
+          "One ID": hcp.mdmId,
+          Speciality: hcp.speciality[0],
+          "Sub Speciality": hcp.speciality[0] === "Cardiology" ? "Interventional" : "General",
+          "Assigned Identifiers": hcp.identifiers.join(", "),
+          "Distinct Patients count": Math.floor(Math.random() * 500) + 100,
+          "Growth %": Math.floor(Math.random() * 20) + 1,
+          "Addressable count": Math.floor(Math.random() * 300) + 50,
+        }));
+        exportToExcel(excelData, "physician_accounts_export");
+      } else if (format === "json") {
+        const jsonData = JSON.stringify(selectedData, null, 2);
+        const blob = new Blob([jsonData], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "physician_accounts_export.json";
+        link.click();
+        URL.revokeObjectURL(url);
+      } else if (format === "pdf") {
+        const doc = new jsPDF();
+        const tableData = selectedData.map((hcp, index) => [
+          `Dr. ${hcp.firstName} ${hcp.lastName}`,
+          `12345${6789 + index}0`,
+          ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
+          ["NY", "CA", "IL", "TX", "AZ"][index % 5],
+          hcp.mdmId,
+          hcp.speciality[0],
+        ]);
+
+        autoTable(doc, {
+          head: [["Name", "NPI", "City", "State", "One ID", "Speciality"]],
+          body: tableData,
+        });
+
+        doc.save("physician_accounts_export.pdf");
+      }
+
+      toast({
+        title: "Export successful",
+        description: `${selectedData.length} physician account(s) exported as ${format.toUpperCase()}.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting the data.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleHcoExport = (format: "excel" | "json" | "pdf") => {
+    const selectedData = mockHCOs.filter((hco) => selectedHcoRows.includes(hco.id));
+
+    if (selectedData.length === 0) {
+      toast({
+        title: "No rows selected",
+        description: "Please select at least one row to export.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      if (format === "excel") {
+        const excelData = selectedData.map((hco, index) => ({
+          Name: hco.name,
+          "Org ID": hco.orgId,
+          "Skyra MDM ID": hco.mdmId,
+          Identifiers: hco.identifiers.join(", "),
+          "Distinct Patients count": Math.floor(Math.random() * 2000) + 500,
+          "Growth %": Math.floor(Math.random() * 25) + 5,
+          "Addressable count": Math.floor(Math.random() * 1000) + 200,
+        }));
+        exportToExcel(excelData, "facility_accounts_export");
+      } else if (format === "json") {
+        const jsonData = JSON.stringify(selectedData, null, 2);
+        const blob = new Blob([jsonData], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "facility_accounts_export.json";
+        link.click();
+        URL.revokeObjectURL(url);
+      } else if (format === "pdf") {
+        const doc = new jsPDF();
+        const tableData = selectedData.map((hco, index) => [
+          hco.name,
+          hco.orgId,
+          hco.mdmId,
+          hco.identifiers.join(", "),
+          String(Math.floor(Math.random() * 2000) + 500),
+        ]);
+
+        autoTable(doc, {
+          head: [["Name", "Org ID", "Skyra MDM ID", "Identifiers", "Distinct Patients"]],
+          body: tableData,
+        });
+
+        doc.save("facility_accounts_export.pdf");
+      }
+
+      toast({
+        title: "Export successful",
+        description: `${selectedData.length} facility account(s) exported as ${format.toUpperCase()}.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting the data.",
+        variant: "destructive",
+      });
+    }
   };
 
   const topStats = [
@@ -409,7 +599,31 @@ const MyDataHighlights = () => {
                     />
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground">Showing 13 of 15 profiles</p>
+                <div className="flex items-center gap-2">
+                  {selectedHcpRows.length > 0 && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <Download className="h-4 w-4 mr-2" />
+                          Export Selected ({selectedHcpRows.length})
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => handleHcpExport("excel")}>
+                          Export as Excel
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleHcpExport("json")}>
+                          <FileJson className="h-4 w-4 mr-2" />
+                          Export as JSON
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleHcpExport("pdf")}>
+                          Export as PDF
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                  <p className="text-sm text-muted-foreground">Showing 13 of 15 profiles</p>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -417,6 +631,12 @@ const MyDataHighlights = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground w-12">
+                        <Checkbox
+                          checked={selectedHcpRows.length === mockHCPs.filter((r) => r.status === "Active").slice(0, 10).length}
+                          onCheckedChange={handleSelectAllHcp}
+                        />
+                      </th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">NPI</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">City</th>
@@ -454,6 +674,13 @@ const MyDataHighlights = () => {
 
                         return (
                           <tr key={index} className="border-b hover:bg-muted/50">
+                            <td className="py-3 px-4">
+                              <Checkbox
+                                checked={selectedHcpRows.includes(record.id)}
+                                onCheckedChange={(checked) => handleSelectHcpRow(record.id, checked as boolean)}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            </td>
                             <td className="py-3 px-4">
                               Dr. {record.firstName} {record.lastName}
                             </td>
@@ -529,7 +756,31 @@ const MyDataHighlights = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-                <p className="text-sm text-muted-foreground">Showing 441 of 468 profiles</p>
+                <div className="flex items-center gap-2">
+                  {selectedHcoRows.length > 0 && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <Download className="h-4 w-4 mr-2" />
+                          Export Selected ({selectedHcoRows.length})
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => handleHcoExport("excel")}>
+                          Export as Excel
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleHcoExport("json")}>
+                          <FileJson className="h-4 w-4 mr-2" />
+                          Export as JSON
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleHcoExport("pdf")}>
+                          Export as PDF
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                  <p className="text-sm text-muted-foreground">Showing 441 of 468 profiles</p>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -537,6 +788,12 @@ const MyDataHighlights = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground w-12">
+                        <Checkbox
+                          checked={selectedHcoRows.length === mockHCOs.filter((r) => r.status === "Active").slice(0, 10).length}
+                          onCheckedChange={handleSelectAllHco}
+                        />
+                      </th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Name</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Org ID</th>
                       <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">Skyra MDM ID</th>
@@ -567,6 +824,12 @@ const MyDataHighlights = () => {
                             className="border-b hover:bg-muted/50 cursor-pointer"
                             onClick={() => navigate(`/hco/${record.id}`)}
                           >
+                            <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
+                              <Checkbox
+                                checked={selectedHcoRows.includes(record.id)}
+                                onCheckedChange={(checked) => handleSelectHcoRow(record.id, checked as boolean)}
+                              />
+                            </td>
                             <td className="py-3 px-4">{record.name}</td>
                             <td className="py-3 px-4 text-sm">{record.orgId}</td>
                             <td className="py-3 px-4 text-sm">{record.mdmId}</td>
