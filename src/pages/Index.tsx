@@ -761,6 +761,82 @@ const Index = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground w-12">
+                        <Checkbox
+                          checked={(() => {
+                            const activeRecords = mockHCPs.filter((record) => record.status === "Active");
+                            const preparedData = activeRecords.map((record, index) => ({
+                              ...record,
+                              npiId: `12345${6789 + index}0`,
+                              city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
+                              state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
+                              subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
+                            }));
+
+                            let filteredData = preparedData;
+                            if (hcpSearchQuery) {
+                              const query = hcpSearchQuery.toLowerCase();
+                              filteredData = preparedData.filter((record) => {
+                                const name = `Dr. ${record.firstName} ${record.lastName}`.toLowerCase();
+                                const npi = record.npiId.toLowerCase();
+                                const city = record.city.toLowerCase();
+                                const state = record.state.toLowerCase();
+                                const specialty = record.speciality[0].toLowerCase();
+                                const subSpecialty = record.subSpeciality.toLowerCase();
+
+                                return (
+                                  name.includes(query) ||
+                                  npi.includes(query) ||
+                                  city.includes(query) ||
+                                  state.includes(query) ||
+                                  specialty.includes(query) ||
+                                  subSpecialty.includes(query)
+                                );
+                              });
+                            }
+
+                            const startIndex = (hcpCurrentPage - 1) * hcpRowsPerPage;
+                            const paginatedData = filteredData.slice(startIndex, startIndex + hcpRowsPerPage);
+                            return paginatedData.length > 0 && selectedHcpRows.length === paginatedData.length;
+                          })()}
+                          onCheckedChange={(checked) => {
+                            const activeRecords = mockHCPs.filter((record) => record.status === "Active");
+                            const preparedData = activeRecords.map((record, index) => ({
+                              ...record,
+                              npiId: `12345${6789 + index}0`,
+                              city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
+                              state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
+                              subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
+                            }));
+
+                            let filteredData = preparedData;
+                            if (hcpSearchQuery) {
+                              const query = hcpSearchQuery.toLowerCase();
+                              filteredData = preparedData.filter((record) => {
+                                const name = `Dr. ${record.firstName} ${record.lastName}`.toLowerCase();
+                                const npi = record.npiId.toLowerCase();
+                                const city = record.city.toLowerCase();
+                                const state = record.state.toLowerCase();
+                                const specialty = record.speciality[0].toLowerCase();
+                                const subSpecialty = record.subSpeciality.toLowerCase();
+
+                                return (
+                                  name.includes(query) ||
+                                  npi.includes(query) ||
+                                  city.includes(query) ||
+                                  state.includes(query) ||
+                                  specialty.includes(query) ||
+                                  subSpecialty.includes(query)
+                                );
+                              });
+                            }
+
+                            const startIndex = (hcpCurrentPage - 1) * hcpRowsPerPage;
+                            const paginatedData = filteredData.slice(startIndex, startIndex + hcpRowsPerPage);
+                            handleSelectAllHcp(checked as boolean, paginatedData);
+                          }}
+                        />
+                      </th>
                       <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
                         onClick={() => handleHcpSort("name")}
@@ -933,6 +1009,13 @@ const Index = () => {
 
                       return paginatedData.map((record, index) => (
                         <tr key={index} className="border-b hover:bg-muted/50">
+                          <td className="py-3 px-4">
+                            <Checkbox
+                              checked={selectedHcpRows.includes(record.id)}
+                              onCheckedChange={() => handleSelectHcpRow(record.id)}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </td>
                           <td className="py-3 px-4">
                             {record.firstName} {record.lastName}
                           </td>
@@ -1223,6 +1306,60 @@ const Index = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground w-12">
+                        <Checkbox
+                          checked={(() => {
+                            const activeRecords = mockHCOs.filter((record) => record.status === "Active");
+                            const preparedData = activeRecords.map((record, index) => ({
+                              ...record,
+                              distinctPatients: Math.floor(Math.random() * 2000) + 500,
+                              growth: Math.floor(Math.random() * 25) + 5,
+                              addressableCount: Math.floor(Math.random() * 1000) + 200,
+                            }));
+
+                            let filteredData = preparedData;
+                            if (hcoSearchQuery) {
+                              const query = hcoSearchQuery.toLowerCase();
+                              filteredData = preparedData.filter((record) => {
+                                const name = record.name.toLowerCase();
+                                const orgId = record.orgId.toLowerCase();
+                                const mdmId = record.mdmId.toLowerCase();
+
+                                return name.includes(query) || orgId.includes(query) || mdmId.includes(query);
+                              });
+                            }
+
+                            const startIndex = (hcoCurrentPage - 1) * hcoRowsPerPage;
+                            const paginatedData = filteredData.slice(startIndex, startIndex + hcoRowsPerPage);
+                            return paginatedData.length > 0 && selectedHcoRows.length === paginatedData.length;
+                          })()}
+                          onCheckedChange={(checked) => {
+                            const activeRecords = mockHCOs.filter((record) => record.status === "Active");
+                            const preparedData = activeRecords.map((record, index) => ({
+                              ...record,
+                              distinctPatients: Math.floor(Math.random() * 2000) + 500,
+                              growth: Math.floor(Math.random() * 25) + 5,
+                              addressableCount: Math.floor(Math.random() * 1000) + 200,
+                            }));
+
+                            let filteredData = preparedData;
+                            if (hcoSearchQuery) {
+                              const query = hcoSearchQuery.toLowerCase();
+                              filteredData = preparedData.filter((record) => {
+                                const name = record.name.toLowerCase();
+                                const orgId = record.orgId.toLowerCase();
+                                const mdmId = record.mdmId.toLowerCase();
+
+                                return name.includes(query) || orgId.includes(query) || mdmId.includes(query);
+                              });
+                            }
+
+                            const startIndex = (hcoCurrentPage - 1) * hcoRowsPerPage;
+                            const paginatedData = filteredData.slice(startIndex, startIndex + hcoRowsPerPage);
+                            handleSelectAllHco(checked as boolean, paginatedData);
+                          }}
+                        />
+                      </th>
                       <th
                         className="text-left py-3 px-4 font-medium text-sm text-muted-foreground cursor-pointer hover:text-foreground"
                         onClick={() => handleHcoSort("name")}
