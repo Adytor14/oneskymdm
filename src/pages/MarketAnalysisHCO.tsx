@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { mockHCOs } from "@/lib/mockData";
-import { Database, Building2, Eye, Search, FileSpreadsheet, FileText, Check, ChevronsUpDown, ArrowUpDown, ArrowUp, ArrowDown, X } from "lucide-react";
+import { Database, Building2, Eye, Search, FileSpreadsheet, FileText, Check, ChevronsUpDown, ArrowUpDown, ArrowUp, ArrowDown, X, SlidersHorizontal } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { exportToExcel } from "@/lib/exportUtils";
 import jsPDF from "jspdf";
@@ -14,6 +15,7 @@ import autoTable from "jspdf-autotable";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 const MarketAnalysisHCO = () => {
@@ -31,6 +33,15 @@ const MarketAnalysisHCO = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [zipCode, setZipCode] = useState("");
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  
+  // Additional filters
+  const [showAdditionalFilters, setShowAdditionalFilters] = useState(false);
+  const [payerFilter, setPayerFilter] = useState("all");
+  const [facilityTypeFilter, setFacilityTypeFilter] = useState("all");
+  const [bedCountFilter, setBedCountFilter] = useState("all");
+  const [affiliationsFilter, setAffiliationsFilter] = useState("all");
+  const [patientVolumeFilter, setPatientVolumeFilter] = useState("all");
+  const [deliberateDuplicates, setDeliberateDuplicates] = useState(false);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
@@ -69,6 +80,12 @@ const MarketAnalysisHCO = () => {
     setSelectedQuarters([]);
     setZipCode("");
     setSearchTerm("");
+    setPayerFilter("all");
+    setFacilityTypeFilter("all");
+    setBedCountFilter("all");
+    setAffiliationsFilter("all");
+    setPatientVolumeFilter("all");
+    setDeliberateDuplicates(false);
   };
 
   const handleSelectAll = (checked: boolean) => {
@@ -127,7 +144,7 @@ const MarketAnalysisHCO = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">State</label>
               <Popover>
@@ -253,45 +270,109 @@ const MarketAnalysisHCO = () => {
                 </PopoverContent>
               </Popover>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Payer Type</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-between">
-                    {selectedPayers.length > 0 ? `${selectedPayers.length} selected` : "Select payers"}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0" align="start">
-                  <Command>
-                    <CommandInput placeholder="Search payers..." />
-                    <CommandEmpty>No payer found.</CommandEmpty>
-                    <CommandGroup className="max-h-64 overflow-auto">
-                      {payers.map((payer) => (
-                        <CommandItem
-                          key={payer}
-                          onSelect={() => {
-                            setSelectedPayers(
-                              selectedPayers.includes(payer)
-                                ? selectedPayers.filter((p) => p !== payer)
-                                : [...selectedPayers, payer]
-                            );
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              selectedPayers.includes(payer) ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {payer}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
+          </div>
+          <div className="mt-4">
+            <Sheet open={showAdditionalFilters} onOpenChange={setShowAdditionalFilters}>
+              <SheetTrigger asChild>
+                <Button variant="outline">
+                  <SlidersHorizontal className="h-4 w-4 mr-2" />
+                  Additional Filters
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[400px] sm:w-[540px]">
+                <SheetHeader>
+                  <SheetTitle>Additional Filters</SheetTitle>
+                </SheetHeader>
+                <div className="space-y-4 mt-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Payer Type</label>
+                    <Select value={payerFilter} onValueChange={setPayerFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="All Payers" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Payers</SelectItem>
+                        <SelectItem value="medicare">Medicare</SelectItem>
+                        <SelectItem value="medicaid">Medicaid</SelectItem>
+                        <SelectItem value="private">Private Insurance</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Facility Type</label>
+                    <Select value={facilityTypeFilter} onValueChange={setFacilityTypeFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="All Facility Types" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Facility Types</SelectItem>
+                        <SelectItem value="hospital">Hospital</SelectItem>
+                        <SelectItem value="nursing-home">Nursing Home</SelectItem>
+                        <SelectItem value="clinic">Clinic</SelectItem>
+                        <SelectItem value="urgent-care">Urgent Care</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Bed Count</label>
+                    <Select value={bedCountFilter} onValueChange={setBedCountFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="All Bed Counts" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Bed Counts</SelectItem>
+                        <SelectItem value="0-50">0 - 50</SelectItem>
+                        <SelectItem value="50-100">50 - 100</SelectItem>
+                        <SelectItem value="100-200">100 - 200</SelectItem>
+                        <SelectItem value="200+">200+</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Affiliations</label>
+                    <Select value={affiliationsFilter} onValueChange={setAffiliationsFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="All Affiliations" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Affiliations</SelectItem>
+                        <SelectItem value="network-a">Healthcare Network A</SelectItem>
+                        <SelectItem value="network-b">Healthcare Network B</SelectItem>
+                        <SelectItem value="independent">Independent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Patient Volume</label>
+                    <Select value={patientVolumeFilter} onValueChange={setPatientVolumeFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="All Volumes" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Volumes</SelectItem>
+                        <SelectItem value="0-500">0 - 500</SelectItem>
+                        <SelectItem value="500-1000">500 - 1,000</SelectItem>
+                        <SelectItem value="1000-2000">1,000 - 2,000</SelectItem>
+                        <SelectItem value="2000+">2,000+</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="deliberate-duplicates"
+                      checked={deliberateDuplicates}
+                      onCheckedChange={(checked) => setDeliberateDuplicates(checked as boolean)}
+                    />
+                    <Label
+                      htmlFor="deliberate-duplicates"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Deliberate Duplicates
+                    </Label>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </CardContent>
       </Card>
