@@ -73,9 +73,38 @@ export const RoleSwitcher = () => {
       if (error) throw error;
 
       setCurrentRole(newRole);
+
+      // Determine features based on role
+      const roleFeatures = {
+        admin: {
+          title: "Admin Role Activated",
+          available: "All features available: Market Analysis, My Data, Data Change Requests, Merge/Match, and Rules Management",
+          restricted: null
+        },
+        data_steward: {
+          title: "Data Steward Role Activated",
+          available: "Available: Market Analysis, My Data, and Data Change Requests",
+          restricted: "Restricted: Merge/Match and Rules Management"
+        }
+      };
+
+      const features = roleFeatures[newRole];
+
       toast({
-        title: "Role Updated",
-        description: `Your role has been changed to ${newRole.replace('_', ' ')}`,
+        title: features.title,
+        description: (
+          <div className="space-y-2 mt-2">
+            <div className="text-sm">
+              <span className="font-semibold text-green-600">✓ {features.available}</span>
+            </div>
+            {features.restricted && (
+              <div className="text-sm">
+                <span className="font-semibold text-red-600">✗ {features.restricted}</span>
+              </div>
+            )}
+          </div>
+        ),
+        duration: 5000,
       });
 
       // Refresh the page to update permissions
