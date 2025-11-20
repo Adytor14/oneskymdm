@@ -908,6 +908,18 @@ const Index = () => {
 
         <TabsContent value="hco" className="space-y-4">
           {/* HCO Data Table */}
+          <div className="grid gap-4 md:grid-cols-3">
+            {hcoMetrics.map((metric, index) => (
+              <Card key={index} style={{ backgroundColor: currentTheme.colors.cardBg }}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xl font-bold" style={{ color: currentTheme.colors.primary }}>
+                    {metric.value}
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">{metric.title}</p>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between mb-4">
