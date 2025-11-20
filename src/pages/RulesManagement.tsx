@@ -1018,12 +1018,12 @@ const RulesManagement = () => {
           {/* Survivorship Rules Tab */}
           <TabsContent value="survivorship" className="space-y-6 animate-fade-in">
             {/* Modern Header */}
-            <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 p-6 rounded-lg border border-purple-200 dark:border-purple-800">
+            <div className="flex items-center justify-between bg-gradient-to-r from-primary/10 to-accent/10 dark:from-primary/20 dark:to-accent/20 p-6 rounded-lg border border-primary/30 dark:border-primary/40">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                  <Shield className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-lg">
+                  <Shield className="h-6 w-6 text-primary dark:text-primary" />
                 </div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                   Survivorship Rules
                 </h2>
               </div>
@@ -1045,11 +1045,11 @@ const RulesManagement = () => {
                 </TabsTrigger>
               </TabsList>
 
-              <Card className="border-l-4 border-l-purple-500 bg-gradient-to-br from-purple-50/30 to-white dark:from-purple-950/10 dark:to-background transition-all duration-300 hover:shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-purple-50/50 to-blue-50/50 dark:from-purple-950/30 dark:to-blue-950/30 border-b">
+              <Card className="border-l-4 border-l-primary bg-gradient-to-br from-primary/5 to-card dark:from-primary/10 dark:to-card transition-all duration-300 hover:shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 dark:from-primary/20 dark:to-accent/20 border-b">
                   <div className="flex justify-between items-center">
                     <CardTitle className="text-2xl flex items-center gap-2">
-                      <Shield className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                      <Shield className="h-6 w-6 text-primary" />
                       Attribute Level Survivorship
                     </CardTitle>
                     <div className="flex gap-2">
@@ -1210,21 +1210,21 @@ const RulesManagement = () => {
                 <CardContent>
                   {loading ? (
                     <div className="flex items-center justify-center py-12">
-                      <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
                   ) : (
                     <div className="border rounded-lg overflow-hidden bg-card shadow-sm">
-                      <div className="grid grid-cols-[2fr,1.5fr,3fr,auto] gap-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 font-semibold border-b-2 border-purple-200 dark:border-purple-800">
+                      <div className="grid grid-cols-[2fr,1.5fr,3fr,auto] gap-4 p-4 bg-gradient-to-r from-primary/10 to-accent/10 dark:from-primary/20 dark:to-accent/20 font-semibold border-b-2 border-primary/30 dark:border-primary/40">
                         <div className="flex items-center gap-2">
-                          <Database className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                          <Database className="h-4 w-4 text-primary" />
                           <span>Attribute Name</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Settings className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                          <Settings className="h-4 w-4 text-primary" />
                           <span>Rule Type</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Shield className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                          <Shield className="h-4 w-4 text-primary" />
                           <span>Value/Priority</span>
                         </div>
                         <div className="text-center">Actions</div>
@@ -1232,10 +1232,10 @@ const RulesManagement = () => {
                       <div className="divide-y">
                         {editedSurvivorshipRules.map((rule, idx) => {
                           const ruleTypeColors = {
-                            status: { bg: "bg-blue-50/50 dark:bg-blue-950/20", border: "border-l-blue-400", badge: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300" },
-                            priority: { bg: "bg-purple-50/50 dark:bg-purple-950/20", border: "border-l-purple-400", badge: "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300" },
-                            recency: { bg: "bg-orange-50/50 dark:bg-orange-950/20", border: "border-l-orange-400", badge: "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300" },
-                            aggregation: { bg: "bg-teal-50/50 dark:bg-teal-950/20", border: "border-l-teal-400", badge: "bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300" },
+                            status: { bg: "bg-primary/5 dark:bg-primary/10", border: "border-l-primary/60", badge: "bg-primary/10 dark:bg-primary/20 text-primary" },
+                            priority: { bg: "bg-accent/5 dark:bg-accent/10", border: "border-l-accent/60", badge: "bg-accent/10 dark:bg-accent/20 text-accent" },
+                            recency: { bg: "bg-warning/5 dark:bg-warning/10", border: "border-l-warning/60", badge: "bg-warning/10 dark:bg-warning/20 text-warning dark:text-warning" },
+                            aggregation: { bg: "bg-success/5 dark:bg-success/10", border: "border-l-success/60", badge: "bg-success/10 dark:bg-success/20 text-success dark:text-success" },
                           };
                           const colors = ruleTypeColors[rule.rule_type] || ruleTypeColors.status;
                           
@@ -1257,7 +1257,7 @@ const RulesManagement = () => {
                                     handleSurvivorshipRuleChange(idx, "rule_type", value)
                                   }
                                 >
-                                  <SelectTrigger className={`w-full bg-background border-2 transition-all hover:border-purple-300 dark:hover:border-purple-700`}>
+                                  <SelectTrigger className={`w-full bg-background border-2 transition-all hover:border-primary/50`}>
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent className="bg-background">
@@ -1274,7 +1274,7 @@ const RulesManagement = () => {
                                   onChange={(e) =>
                                     handleSurvivorshipRuleChange(idx, "rule_value", e.target.value)
                                   }
-                                  className="bg-background text-foreground border-2 transition-all hover:border-purple-300 dark:hover:border-purple-700 focus:border-purple-500"
+                                  className="bg-background text-foreground border-2 transition-all hover:border-primary/50 focus:border-primary"
                                   placeholder="Enter value or priority"
                                 />
                               </div>
