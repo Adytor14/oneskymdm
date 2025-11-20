@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const DataChangeRequestDetail = () => {
   const navigate = useNavigate();
@@ -25,22 +26,47 @@ const DataChangeRequestDetail = () => {
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
   const [isReassignDialogOpen, setIsReassignDialogOpen] = useState(false);
   const [selectedAssignee, setSelectedAssignee] = useState("");
+  const [request, setRequest] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const mockRequest = {
-    taskId: "9310282363735619197",
-    subject: "Sarah Johnson",
-    primaryAddress: "123 Medical Plaza, Boston, MA 02115, USA",
-    creator: "rishiraj.acharya@iponesky.com",
-    source: "Epic EMR",
-    requestDate: "16/10/2025",
-    requestedBy: "Rishiraj Acharyya",
-    assignee: "Ujjwal Sirothia",
-    status: "Pending Review",
-    comments: "Update the address of this HCP as he has relocated",
-  };
+  useEffect(() => {
+    const fetchRequest = async () => {
+      if (!id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('change_requests')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (error) throw error;
+        setRequest(data);
+      } catch (error) {
+        console.error('Error fetching request:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load request details",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRequest();
+  }, [id]);
+
+  if (loading) {
+    return <div className="p-6">Loading...</div>;
+  }
+
+  if (!request) {
+    return <div className="p-6">Request not found</div>;
+  }
 
   // Check if DCR is in an actionable state (not approved or rejected)
-  const isActionable = mockRequest.status !== "Approved" && mockRequest.status !== "Rejected";
+  const isActionable = request.status.toLowerCase() !== "approved" && request.status.toLowerCase() !== "rejected";
 
   const availableAssignees = [
     { id: "1", name: "Ujjwal Sirothia", email: "ujjwal.sirothia@iponesky.com" },
@@ -293,45 +319,57 @@ const DataChangeRequestDetail = () => {
           </CardHeader>
           <CardContent className="space-y-4 pt-4">
             <div>
-              <p className="text-sm text-muted-foreground">Task ID</p>
-              <p className="text-sm font-medium">{mockRequest.taskId}</p>
+              <p className="text-sm text-muted-foreground">DCR ID</p>
+              <p className="text-sm font-medium">{request.dcr_id || `DCR-${request.id.slice(0, 8)}`}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Subject</p>
-              <p className="text-sm font-medium">{mockRequest.subject}</p>
+              <p className="text-sm text-muted-foreground">Entity Type</p>
+              <p className="text-sm font-medium">{request.entity_type}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Primary Address</p>
-              <p className="text-sm font-medium">{mockRequest.primaryAddress}</p>
+              <p className="text-sm text-muted-foreground">Entity ID</p>
+              <p className="text-sm font-medium">{request.entity_id}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Creator</p>
-              <p className="text-sm font-medium">{mockRequest.creator}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Source</p>
-              <p className="text-sm font-medium">{mockRequest.source}</p>
+              <p className="text-sm text-muted-foreground">Request Type</p>
+              <p className="text-sm font-medium">{request.request_type}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Request Date</p>
-              <p className="text-sm font-medium">{mockRequest.requestDate}</p>
+              <p className="text-sm font-medium">{new Date(request.created_at).toLocaleDateString("en-GB")}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Requested By</p>
-              <p className="text-sm font-medium">{mockRequest.requestedBy}</p>
+              <p className="text-sm font-medium">{request.requested_by}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Requester Comments</p>
-              <p className="text-sm font-medium">{mockRequest.comments}</p>
+              <p className="text-sm font-medium">{request.reason || 'N/A'}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Assignee</p>
-              <p className="text-sm font-medium">{mockRequest.assignee}</p>
+              <p className="text-sm text-muted-foreground">Priority</p>
+              <p className="text-sm font-medium">{request.priority}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Status</p>
-              <Badge className="bg-orange-500 hover:bg-orange-600">{mockRequest.status}</Badge>
+              <Badge className={
+                request.status.toLowerCase() === "approved" ? "bg-green-500 hover:bg-green-600" :
+                request.status.toLowerCase() === "rejected" ? "bg-red-500 hover:bg-red-600" :
+                "bg-orange-500 hover:bg-orange-600"
+              }>{request.status}</Badge>
             </div>
+            {request.approved_by && (
+              <div>
+                <p className="text-sm text-muted-foreground">Approved/Rejected By</p>
+                <p className="text-sm font-medium">{request.approved_by}</p>
+              </div>
+            )}
+            {request.approved_at && (
+              <div>
+                <p className="text-sm text-muted-foreground">Approved/Rejected At</p>
+                <p className="text-sm font-medium">{new Date(request.approved_at).toLocaleDateString("en-GB")}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
