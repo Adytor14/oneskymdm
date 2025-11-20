@@ -447,37 +447,6 @@ const HCPList = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const activeRecords = mockHCPs.filter((record) => record.status === "Active");
-                    const preparedData = activeRecords.map((record, index) => ({
-                      "L4QTR Rank": index + 1,
-                      "Physician Name": ` ${record.firstName} ${record.lastName}`,
-                      NPI: `12345${6789 + index}0`,
-                      County: ["Kings County", "Los Angeles County", "Cook County", "Harris County", "Maricopa County"][
-                        index % 5
-                      ],
-                      City: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
-                      State: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
-                      Speciality: record.speciality[0],
-                      "ONE ID": record.mdmId,
-                      "Annual Patient Count (FFS)": Math.floor(Math.random() * 2000) + 500,
-                      "L4QTR HH Patient / HOS Patients Count": Math.floor(Math.random() * 500) + 100,
-                      "L4QTR Growth %": Math.floor(Math.random() * 20) + 1,
-                      "Addressable Count": Math.floor(Math.random() * 500) + 100,
-                    }));
-                    exportToExcel(preparedData, "Market_Analysis_Physicians");
-                    toast({
-                      title: "Export successful",
-                      description: "Data exported to Excel",
-                    });
-                  }}
-                >
-                  <FileSpreadsheet className="h-4 w-4 mr-2" />
-                  Export to Excel
-                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button size="sm" disabled={selectedRows.size === 0}>
