@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Plus, Trash2, Check, X, Settings, Database, GitMerge, Loader2 } from "lucide-react";
+import { Pencil, Plus, Trash2, Check, X, Settings, Database, GitMerge, Loader2, Shield } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -983,7 +983,19 @@ const RulesManagement = () => {
           </TabsContent>
 
           {/* Survivorship Rules Tab */}
-          <TabsContent value="survivorship" className="space-y-6">
+          <TabsContent value="survivorship" className="space-y-6 animate-fade-in">
+            {/* Modern Header */}
+            <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 p-6 rounded-lg border border-purple-200 dark:border-purple-800">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                  <Shield className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
+                  Survivorship Rules
+                </h2>
+              </div>
+            </div>
+
             <Tabs value={activeEntityTab} onValueChange={setActiveEntityTab}>
               <TabsList className="bg-muted">
                 <TabsTrigger
@@ -1000,10 +1012,13 @@ const RulesManagement = () => {
                 </TabsTrigger>
               </TabsList>
 
-              <Card>
-                <CardHeader>
+              <Card className="border-l-4 border-l-purple-500 bg-gradient-to-br from-purple-50/30 to-white dark:from-purple-950/10 dark:to-background transition-all duration-300 hover:shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-purple-50/50 to-blue-50/50 dark:from-purple-950/30 dark:to-blue-950/30 border-b">
                   <div className="flex justify-between items-center">
-                    <CardTitle className="text-2xl">Attribute Level Survivorship</CardTitle>
+                    <CardTitle className="text-2xl flex items-center gap-2">
+                      <Shield className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                      Attribute Level Survivorship
+                    </CardTitle>
                     <div className="flex gap-2">
                       <Dialog
                         open={isCreateSurvivorshipDialogOpen}
@@ -1162,55 +1177,81 @@ const RulesManagement = () => {
                 <CardContent>
                   {loading ? (
                     <div className="flex items-center justify-center py-12">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
                     </div>
                   ) : (
-                    <div className="border rounded-lg overflow-hidden bg-card">
-                      <div className="grid grid-cols-[2fr,1.5fr,3fr] gap-4 p-4 bg-muted/50 font-semibold border-b">
-                        <div>Attribute Name</div>
-                        <div>Rule Type</div>
-                        <div>Value/Priority</div>
+                    <div className="border rounded-lg overflow-hidden bg-card shadow-sm">
+                      <div className="grid grid-cols-[2fr,1.5fr,3fr] gap-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 font-semibold border-b-2 border-purple-200 dark:border-purple-800">
+                        <div className="flex items-center gap-2">
+                          <Database className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                          <span>Attribute Name</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Settings className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                          <span>Rule Type</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Shield className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                          <span>Value/Priority</span>
+                        </div>
                       </div>
                       <div className="divide-y">
-                        {editedSurvivorshipRules.map((rule, idx) => (
-                          <div
-                            key={rule.id}
-                            className="grid grid-cols-[2fr,1.5fr,3fr] gap-4 p-4 items-center hover:bg-muted/30 transition-colors"
-                          >
-                            <div className="font-medium text-foreground">{rule.attribute_name}</div>
-                            <div>
-                              <Select
-                                value={rule.rule_type}
-                                onValueChange={(value: any) =>
-                                  handleSurvivorshipRuleChange(idx, "rule_type", value)
-                                }
-                              >
-                                <SelectTrigger className="w-full bg-background">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="bg-background">
-                                  <SelectItem value="status">Status</SelectItem>
-                                  <SelectItem value="priority">Priority</SelectItem>
-                                  <SelectItem value="recency">Recency</SelectItem>
-                                  <SelectItem value="aggregation">Aggregation</SelectItem>
-                                </SelectContent>
-                              </Select>
+                        {editedSurvivorshipRules.map((rule, idx) => {
+                          const ruleTypeColors = {
+                            status: { bg: "bg-blue-50/50 dark:bg-blue-950/20", border: "border-l-blue-400", badge: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300" },
+                            priority: { bg: "bg-purple-50/50 dark:bg-purple-950/20", border: "border-l-purple-400", badge: "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300" },
+                            recency: { bg: "bg-orange-50/50 dark:bg-orange-950/20", border: "border-l-orange-400", badge: "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300" },
+                            aggregation: { bg: "bg-teal-50/50 dark:bg-teal-950/20", border: "border-l-teal-400", badge: "bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300" },
+                          };
+                          const colors = ruleTypeColors[rule.rule_type] || ruleTypeColors.status;
+                          
+                          return (
+                            <div
+                              key={rule.id}
+                              className={`grid grid-cols-[2fr,1.5fr,3fr] gap-4 p-4 items-center hover:shadow-md transition-all duration-200 border-l-4 ${colors.border} ${colors.bg} animate-fade-in`}
+                              style={{ animationDelay: `${idx * 0.05}s` }}
+                            >
+                              <div className="font-semibold text-foreground flex items-center gap-2">
+                                <Badge className={`${colors.badge} text-xs`}>
+                                  {rule.attribute_name}
+                                </Badge>
+                              </div>
+                              <div>
+                                <Select
+                                  value={rule.rule_type}
+                                  onValueChange={(value: any) =>
+                                    handleSurvivorshipRuleChange(idx, "rule_type", value)
+                                  }
+                                >
+                                  <SelectTrigger className={`w-full bg-background border-2 transition-all hover:border-purple-300 dark:hover:border-purple-700`}>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-background">
+                                    <SelectItem value="status">Status</SelectItem>
+                                    <SelectItem value="priority">Priority</SelectItem>
+                                    <SelectItem value="recency">Recency</SelectItem>
+                                    <SelectItem value="aggregation">Aggregation</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <Input
+                                  value={rule.rule_value}
+                                  onChange={(e) =>
+                                    handleSurvivorshipRuleChange(idx, "rule_value", e.target.value)
+                                  }
+                                  className="bg-background text-foreground border-2 transition-all hover:border-purple-300 dark:hover:border-purple-700 focus:border-purple-500"
+                                  placeholder="Enter value or priority"
+                                />
+                              </div>
                             </div>
-                            <div>
-                              <Input
-                                value={rule.rule_value}
-                                onChange={(e) =>
-                                  handleSurvivorshipRuleChange(idx, "rule_value", e.target.value)
-                                }
-                                className="bg-background text-foreground"
-                                placeholder="Enter value or priority"
-                              />
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                         {editedSurvivorshipRules.length === 0 && (
-                          <div className="p-8 text-center text-muted-foreground">
-                            No survivorship rules configured yet
+                          <div className="p-12 text-center">
+                            <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-3 opacity-50" />
+                            <p className="text-muted-foreground font-medium">No survivorship rules configured yet</p>
+                            <p className="text-sm text-muted-foreground/70 mt-1">Add a rule to get started</p>
                           </div>
                         )}
                       </div>
