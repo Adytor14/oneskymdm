@@ -28,27 +28,32 @@ export const RoleSwitcher = () => {
 
       setUserId(user.id);
 
-      const { data, error } = await supabase
+      // First, clean up any duplicate roles for this user
+      const { data: allRoles } = await supabase
         .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .maybeSingle();
+        .select("*")
+        .eq("user_id", user.id);
 
-      if (error) {
-        console.error("Error fetching role:", error);
-        return;
-      }
-
-      // If no role exists, assign default "admin" role
-      if (!data) {
+      if (allRoles && allRoles.length > 1) {
+        // Keep only the first role, delete others
+        const keepRole = allRoles[0];
+        const deleteIds = allRoles.slice(1).map(r => r.id);
+        
+        await supabase
+          .from("user_roles")
+          .delete()
+          .in("id", deleteIds);
+        
+        setCurrentRole(keepRole.role as AppRole);
+      } else if (allRoles && allRoles.length === 1) {
+        const role = allRoles[0].role === "user" ? "admin" : allRoles[0].role;
+        setCurrentRole(role as AppRole);
+      } else {
+        // No role exists, assign default "admin" role
         await supabase
           .from("user_roles")
           .insert({ user_id: user.id, role: "admin" });
         setCurrentRole("admin");
-      } else {
-        // Map old "user" role to "admin" if it exists
-        const role = data.role === "user" ? "admin" : data.role;
-        setCurrentRole(role as AppRole);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -59,7 +64,7 @@ export const RoleSwitcher = () => {
     if (!userId) return;
 
     try {
-      // Delete existing role
+      // Delete all existing roles for this user
       await supabase
         .from("user_roles")
         .delete()
