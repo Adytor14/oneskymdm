@@ -24,6 +24,7 @@ import {
   Download,
   FileSpreadsheet,
   X,
+  FileJson,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -32,6 +33,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { exportToExcel } from "@/lib/exportUtils";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -64,6 +68,10 @@ const Index = () => {
   // Search states
   const [hcpSearchQuery, setHcpSearchQuery] = useState("");
   const [hcoSearchQuery, setHcoSearchQuery] = useState("");
+
+  // Row selection states
+  const [selectedHcpRows, setSelectedHcpRows] = useState<string[]>([]);
+  const [selectedHcoRows, setSelectedHcoRows] = useState<string[]>([]);
 
   // Get current organization theme
   const currentTheme = getOrganizationTheme(selectedOrganization);
@@ -173,6 +181,189 @@ const Index = () => {
     selectedPayers.length > 0 ||
     hcpSearchQuery.length > 0 ||
     hcoSearchQuery.length > 0;
+
+  // Row selection handlers for HCP
+  const handleSelectAllHcp = (checked: boolean, filteredData: any[]) => {
+    if (checked) {
+      setSelectedHcpRows(filteredData.map((row) => row.id));
+    } else {
+      setSelectedHcpRows([]);
+    }
+  };
+
+  const handleSelectHcpRow = (id: string) => {
+    setSelectedHcpRows((prev) =>
+      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
+    );
+  };
+
+  // Row selection handlers for HCO
+  const handleSelectAllHco = (checked: boolean, filteredData: any[]) => {
+    if (checked) {
+      setSelectedHcoRows(filteredData.map((row) => row.id));
+    } else {
+      setSelectedHcoRows([]);
+    }
+  };
+
+  const handleSelectHcoRow = (id: string) => {
+    setSelectedHcoRows((prev) =>
+      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
+    );
+  };
+
+  // Export handlers
+  const handleHcpExport = (format: "excel" | "json" | "pdf") => {
+    const activeRecords = mockHCPs.filter((record) => record.status === "Active");
+    const preparedData = activeRecords.map((record, index) => ({
+      ...record,
+      npiId: `12345${6789 + index}0`,
+      city: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"][index % 5],
+      state: ["NY", "CA", "IL", "TX", "AZ"][index % 5],
+      subSpeciality: record.speciality[0] === "Cardiology" ? "Interventional" : "General",
+      assignedAccounts: `EMR-${String(index + 1).padStart(6, "0")}`,
+      distinctPatients: Math.floor(Math.random() * 500) + 100,
+      growth: Math.floor(Math.random() * 20) + 1,
+      addressableCount: Math.floor(Math.random() * 300) + 50,
+    }));
+
+    const selectedData = preparedData.filter((record) => selectedHcpRows.includes(record.id));
+
+    if (selectedData.length === 0) {
+      toast({
+        title: "No rows selected",
+        description: "Please select at least one row to export",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      if (format === "excel") {
+        const exportData = selectedData.map((record) => ({
+          Name: `${record.firstName} ${record.lastName}`,
+          NPI: record.npiId,
+          City: record.city,
+          State: record.state,
+          "One ID": record.mdmId,
+          Speciality: record.speciality[0],
+          "Sub Speciality": record.subSpeciality,
+          "Assigned Accounts": record.assignedAccounts,
+          "Distinct Patients": record.distinctPatients,
+          "Growth %": record.growth,
+          "Addressable Count": record.addressableCount,
+        }));
+        exportToExcel(exportData, "physician_accounts.xlsx");
+      } else if (format === "json") {
+        const dataStr = JSON.stringify(selectedData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "physician_accounts.json";
+        link.click();
+        URL.revokeObjectURL(url);
+      } else if (format === "pdf") {
+        const doc = new jsPDF();
+        doc.text("Physician Accounts", 14, 15);
+        autoTable(doc, {
+          head: [["Name", "NPI", "City", "State", "One ID", "Speciality", "Sub Speciality"]],
+          body: selectedData.map((record) => [
+            `${record.firstName} ${record.lastName}`,
+            record.npiId,
+            record.city,
+            record.state,
+            record.mdmId,
+            record.speciality[0],
+            record.subSpeciality,
+          ]),
+          startY: 20,
+        });
+        doc.save("physician_accounts.pdf");
+      }
+
+      toast({
+        title: "Export successful",
+        description: `${selectedData.length} records exported as ${format.toUpperCase()}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting the data",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleHcoExport = (format: "excel" | "json" | "pdf") => {
+    const activeRecords = mockHCOs.filter((record) => record.status === "Active");
+    const preparedData = activeRecords.map((record, index) => ({
+      ...record,
+      distinctPatients: Math.floor(Math.random() * 2000) + 500,
+      growth: Math.floor(Math.random() * 25) + 5,
+      addressableCount: Math.floor(Math.random() * 1000) + 200,
+    }));
+
+    const selectedData = preparedData.filter((record) => selectedHcoRows.includes(record.id));
+
+    if (selectedData.length === 0) {
+      toast({
+        title: "No rows selected",
+        description: "Please select at least one row to export",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      if (format === "excel") {
+        const exportData = selectedData.map((record) => ({
+          Name: record.name,
+          "Org ID": record.orgId,
+          "One ID": record.mdmId,
+          "Distinct Patients": record.distinctPatients,
+          "Growth %": record.growth,
+          "Addressable Count": record.addressableCount,
+        }));
+        exportToExcel(exportData, "facility_accounts.xlsx");
+      } else if (format === "json") {
+        const dataStr = JSON.stringify(selectedData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "facility_accounts.json";
+        link.click();
+        URL.revokeObjectURL(url);
+      } else if (format === "pdf") {
+        const doc = new jsPDF();
+        doc.text("Facility Accounts", 14, 15);
+        autoTable(doc, {
+          head: [["Name", "Org ID", "One ID", "Distinct Patients", "Growth %"]],
+          body: selectedData.map((record) => [
+            record.name,
+            record.orgId,
+            record.mdmId,
+            record.distinctPatients,
+            record.growth,
+          ]),
+          startY: 20,
+        });
+        doc.save("facility_accounts.pdf");
+      }
+
+      toast({
+        title: "Export successful",
+        description: `${selectedData.length} records exported as ${format.toUpperCase()}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting the data",
+        variant: "destructive",
+      });
+    }
+  };
 
   const topStats = [
     {
@@ -485,6 +676,30 @@ const Index = () => {
               <div className="flex items-center justify-between mb-4">
                 <CardTitle className="text-lg">Physician Accounts</CardTitle>
                 <div className="flex items-center gap-2">
+                  {selectedHcpRows.length > 0 && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <Download className="h-4 w-4 mr-2" />
+                          Export Selected ({selectedHcpRows.length})
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleHcpExport("excel")}>
+                          <FileSpreadsheet className="h-4 w-4 mr-2" />
+                          Export as Excel
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleHcpExport("json")}>
+                          <FileJson className="h-4 w-4 mr-2" />
+                          Export as JSON
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleHcpExport("pdf")}>
+                          <FileText className="h-4 w-4 mr-2" />
+                          Export as PDF
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                   <Button
                     variant="outline"
                     size="sm"
@@ -931,6 +1146,30 @@ const Index = () => {
               <div className="flex items-center justify-between mb-4">
                 <CardTitle className="text-lg">Facility Accounts</CardTitle>
                 <div className="flex items-center gap-2">
+                  {selectedHcoRows.length > 0 && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <Download className="h-4 w-4 mr-2" />
+                          Export Selected ({selectedHcoRows.length})
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleHcoExport("excel")}>
+                          <FileSpreadsheet className="h-4 w-4 mr-2" />
+                          Export as Excel
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleHcoExport("json")}>
+                          <FileJson className="h-4 w-4 mr-2" />
+                          Export as JSON
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleHcoExport("pdf")}>
+                          <FileText className="h-4 w-4 mr-2" />
+                          Export as PDF
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                   <Button
                     variant="outline"
                     size="sm"
@@ -1071,12 +1310,19 @@ const Index = () => {
                       const paginatedData = sortedData.slice(startIndex, startIndex + hcoRowsPerPage);
 
                       return paginatedData.map((record, index) => (
-                        <tr
-                          key={index}
-                          className="border-b hover:bg-muted/50 cursor-pointer"
-                          onClick={() => navigate(`/hco/${record.id}`)}
-                        >
-                          <td className="py-3 px-4">{record.name}</td>
+                        <tr key={index} className="border-b hover:bg-muted/50">
+                          <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
+                            <Checkbox
+                              checked={selectedHcoRows.includes(record.id)}
+                              onCheckedChange={() => handleSelectHcoRow(record.id)}
+                            />
+                          </td>
+                          <td
+                            className="py-3 px-4 cursor-pointer"
+                            onClick={() => navigate(`/hco/${record.id}`)}
+                          >
+                            {record.name}
+                          </td>
                           <td className="py-3 px-4 text-sm">{record.orgId}</td>
                           <td className="py-3 px-4 text-sm">{record.mdmId}</td>
                           <td className="py-3 px-4 text-sm">NPI-{record.mdmId.slice(-6)}</td>
