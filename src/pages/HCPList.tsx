@@ -143,7 +143,7 @@ const HCPList = () => {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      const allIds = mockHCPs.filter((r) => r.status === "Active").map((r) => r.mdmId);
+      const allIds = mockHCPs.filter((r) => r.status === "Active").map((r) => r.id);
       setSelectedRows(new Set(allIds));
     } else {
       setSelectedRows(new Set());
