@@ -569,17 +569,6 @@ const RulesManagement = () => {
             >
               <Pencil className="h-4 w-4" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-all duration-200 text-destructive hover:bg-destructive/10"
-              onClick={() => {
-                setRuleToDelete(rule.id);
-                setDeleteDialogOpen(true);
-              }}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </CardHeader>
@@ -983,29 +972,6 @@ const RulesManagement = () => {
                       {filteredRules("suspect").length === 0 && (
                         <Card className="border-dashed border-2 flex items-center justify-center min-h-[200px] col-span-full">
                           <p className="text-muted-foreground">No suspect rules yet</p>
-                        </Card>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Negative Rules */}
-                  <div className="space-y-4 animate-fade-in" style={{ animationDelay: "200ms" }}>
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-red-50 to-transparent dark:from-red-950/20 dark:to-transparent border-l-4 border-red-500">
-                      <div className="h-10 w-10 rounded-full bg-red-500 flex items-center justify-center">
-                        <X className="h-5 w-5 text-white" />
-                      </div>
-                      <h3 className="text-xl font-bold">Negative Matches</h3>
-                      <Badge className="bg-red-500 hover:bg-red-600 text-white">{filteredRules("negative").length}</Badge>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {filteredRules("negative").map((rule, idx) => (
-                        <div key={rule.id} style={{ animationDelay: `${idx * 50}ms` }} className="animate-fade-in">
-                          <RuleCard rule={rule} />
-                        </div>
-                      ))}
-                      {filteredRules("negative").length === 0 && (
-                        <Card className="border-dashed border-2 flex items-center justify-center min-h-[200px] col-span-full">
-                          <p className="text-muted-foreground">No negative rules yet</p>
                         </Card>
                       )}
                     </div>
