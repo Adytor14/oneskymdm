@@ -1,13 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 
 type AppRole = "admin" | "data_steward";
@@ -23,36 +17,30 @@ export const RoleSwitcher = () => {
 
   const fetchCurrentRole = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       setUserId(user.id);
 
       // First, clean up any duplicate roles for this user
-      const { data: allRoles } = await supabase
-        .from("user_roles")
-        .select("*")
-        .eq("user_id", user.id);
+      const { data: allRoles } = await supabase.from("user_roles").select("*").eq("user_id", user.id);
 
       if (allRoles && allRoles.length > 1) {
         // Keep only the first role, delete others
         const keepRole = allRoles[0];
-        const deleteIds = allRoles.slice(1).map(r => r.id);
-        
-        await supabase
-          .from("user_roles")
-          .delete()
-          .in("id", deleteIds);
-        
+        const deleteIds = allRoles.slice(1).map((r) => r.id);
+
+        await supabase.from("user_roles").delete().in("id", deleteIds);
+
         setCurrentRole(keepRole.role as AppRole);
       } else if (allRoles && allRoles.length === 1) {
         const role = allRoles[0].role === "user" ? "admin" : allRoles[0].role;
         setCurrentRole(role as AppRole);
       } else {
         // No role exists, assign default "admin" role
-        await supabase
-          .from("user_roles")
-          .insert({ user_id: user.id, role: "admin" });
+        await supabase.from("user_roles").insert({ user_id: user.id, role: "admin" });
         setCurrentRole("admin");
       }
     } catch (error) {
@@ -65,15 +53,10 @@ export const RoleSwitcher = () => {
 
     try {
       // Delete all existing roles for this user
-      await supabase
-        .from("user_roles")
-        .delete()
-        .eq("user_id", userId);
+      await supabase.from("user_roles").delete().eq("user_id", userId);
 
       // Insert new role
-      const { error } = await supabase
-        .from("user_roles")
-        .insert({ user_id: userId, role: newRole });
+      const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: newRole });
 
       if (error) throw error;
 
@@ -83,14 +66,15 @@ export const RoleSwitcher = () => {
       const roleFeatures = {
         admin: {
           title: "Admin Role Activated",
-          available: "All features available: Market Analysis, My Data, Data Change Requests, Merge/Match, and Rules Management",
-          restricted: null
+          available:
+            "All features available: Market Analysis, My Data, Data Change Requests, Merge/Match, and Rules Management",
+          restricted: null,
         },
         data_steward: {
           title: "Data Steward Role Activated",
           available: "Available: Market Analysis, My Data, and Data Change Requests",
-          restricted: "Restricted: Merge/Match and Rules Management"
-        }
+          restricted: "Restricted: Merge/Match and Rules Management",
+        },
       };
 
       const features = roleFeatures[newRole];
@@ -123,19 +107,19 @@ export const RoleSwitcher = () => {
     }
   };
 
-  if (!currentRole) return (
-    <div className="flex items-center gap-2">
-      <Select disabled>
-        <SelectTrigger className="w-[160px] bg-background border-border">
-          <SelectValue placeholder="Loading role..." />
-        </SelectTrigger>
-      </Select>
-    </div>
-  );
+  if (!currentRole)
+    return (
+      <div className="flex items-center gap-2">
+        <Select disabled>
+          <SelectTrigger className="w-[160px] bg-background border-border">
+            <SelectValue placeholder="Loading role..." />
+          </SelectTrigger>
+        </Select>
+      </div>
+    );
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm text-muted-foreground">Role:</span>
       <Select value={currentRole} onValueChange={handleRoleChange}>
         <SelectTrigger className="w-[160px] bg-background border-border hover:bg-accent hover:text-accent-foreground">
           <SelectValue placeholder="Select role" />
