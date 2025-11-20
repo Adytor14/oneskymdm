@@ -89,15 +89,24 @@ export const RoleSwitcher = () => {
     }
   };
 
-  if (!currentRole) return null;
+  if (!currentRole) return (
+    <div className="flex items-center gap-2">
+      <Select disabled>
+        <SelectTrigger className="w-[160px] bg-background border-border">
+          <SelectValue placeholder="Loading role..." />
+        </SelectTrigger>
+      </Select>
+    </div>
+  );
 
   return (
     <div className="flex items-center gap-2">
+      <span className="text-sm text-muted-foreground">Role:</span>
       <Select value={currentRole} onValueChange={handleRoleChange}>
-        <SelectTrigger className="w-[140px]">
-          <SelectValue />
+        <SelectTrigger className="w-[160px] bg-background border-border hover:bg-accent hover:text-accent-foreground">
+          <SelectValue placeholder="Select role" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-popover border-border z-50">
           <SelectItem value="admin">Admin</SelectItem>
           <SelectItem value="data_steward">Data Steward</SelectItem>
         </SelectContent>
