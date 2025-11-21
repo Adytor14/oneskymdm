@@ -58,6 +58,7 @@ export function AppSidebar() {
   const { toast } = useToast();
   const location = useLocation();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [canViewMergeMatch, setCanViewMergeMatch] = useState(false);
   const [dcrOpen, setDcrOpen] = useState(true);
   const [mergeMatchOpen, setMergeMatchOpen] = useState(false);
 
@@ -73,17 +74,25 @@ export function AppSidebar() {
       if (!user) return;
 
       // Check if user is admin
-      const { data, error } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+      const { data: isAdminData, error: adminError } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+      
+      // Check if user is data_steward
+      const { data: isDataStewardData, error: dataStewardError } = await supabase.rpc("has_role", { _user_id: user.id, _role: "data_steward" });
 
-      if (!error && data) {
+      if (!adminError && isAdminData) {
         setIsAdmin(true);
-      } else {
-        // If not admin, they might be data_steward (which also hides these sections)
+        setCanViewMergeMatch(true);
+      } else if (!dataStewardError && isDataStewardData) {
         setIsAdmin(false);
+        setCanViewMergeMatch(true);
+      } else {
+        setIsAdmin(false);
+        setCanViewMergeMatch(false);
       }
     } catch (error) {
       console.error("Error checking user role:", error);
       setIsAdmin(false);
+      setCanViewMergeMatch(false);
     }
   };
 
@@ -192,68 +201,68 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {isAdmin && (
-          <>
-            <SidebarGroup>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <Collapsible open={mergeMatchOpen} onOpenChange={setMergeMatchOpen} className="group/collapsible">
-                    <SidebarMenuItem>
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuButton>
-                          <GitMerge className="h-4 w-4" />
-                          <span>Merge/Match</span>
-                          <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub>
-                          {mergeMatchItems.map((item) => (
-                            <SidebarMenuSubItem key={item.title}>
-                              <SidebarMenuSubButton asChild>
-                                <NavLink
-                                  to={item.url}
-                                  className={({ isActive }) =>
-                                    isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
-                                  }
-                                >
-                                  <item.icon className="h-4 w-4" />
-                                  <span>{item.title}</span>
-                                </NavLink>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </SidebarMenuItem>
-                  </Collapsible>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-
-            <SidebarGroup>
-              <SidebarGroupLabel>Admin</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {adminItems.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild>
-                        <NavLink
-                          to={item.url}
-                          className={({ isActive }) =>
-                            isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
-                          }
-                        >
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.title}</span>
-                        </NavLink>
+        {canViewMergeMatch && (
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <Collapsible open={mergeMatchOpen} onOpenChange={setMergeMatchOpen} className="group/collapsible">
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton>
+                        <GitMerge className="h-4 w-4" />
+                        <span>Merge/Match</span>
+                        <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
                       </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {mergeMatchItems.map((item) => (
+                          <SidebarMenuSubItem key={item.title}>
+                            <SidebarMenuSubButton asChild>
+                              <NavLink
+                                to={item.url}
+                                className={({ isActive }) =>
+                                  isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
+                                }
+                              >
+                                <item.icon className="h-4 w-4" />
+                                <span>{item.title}</span>
+                              </NavLink>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {isAdmin && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Admin</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {adminItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to={item.url}
+                        className={({ isActive }) =>
+                          isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
+                        }
+                      >
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
         )}
       </SidebarContent>
       <SidebarFooter>
