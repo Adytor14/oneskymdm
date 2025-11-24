@@ -499,125 +499,71 @@ const RulesManagement = () => {
   const RuleCard = ({ rule }: { rule: MergeMatchRule }) => (
     <Card
       className={cn(
-        "group relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-fade-in",
+        "group transition-all hover:shadow-md",
         rule.is_active
-          ? "border-l-4 border-l-green-500 bg-gradient-to-br from-green-50/50 to-background dark:from-green-950/20 dark:to-background shadow-md"
-          : "border-l-4 border-l-gray-400 bg-gradient-to-br from-gray-50/50 to-background dark:from-gray-900/20 dark:to-background opacity-75 hover:opacity-90",
+          ? "border-l-2 border-l-primary"
+          : "border-l-2 border-l-muted-foreground/30 opacity-80",
       )}
     >
-      {rule.is_active ? (
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/10 via-green-400/5 to-transparent rounded-bl-full" />
-      ) : (
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-400/10 via-gray-300/5 to-transparent rounded-bl-full" />
-      )}
-
-      <CardHeader className="pb-3 relative">
+      <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <CardTitle className="text-lg font-semibold">{rule.rule_name}</CardTitle>
-              <Badge
-                className={cn(
-                  "text-xs font-semibold",
-                  rule.is_active
-                    ? "bg-green-500 hover:bg-green-600 text-white"
-                    : "bg-gray-400 hover:bg-gray-500 text-white",
-                )}
-              >
-                {rule.is_active ? (
-                  <>
-                    <Check className="h-3 w-3 mr-1" /> Active
-                  </>
-                ) : (
-                  <>
-                    <X className="h-3 w-3 mr-1" /> Inactive
-                  </>
-                )}
-              </Badge>
-            </div>
-            <Badge
-              variant="secondary"
-              className={cn(
-                "text-xs font-medium",
-                rule.match_type === "automatic" && "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
-                rule.match_type === "suspect" &&
-                  "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300",
-                rule.match_type === "negative" && "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
+              <CardTitle className="text-base font-semibold">{rule.rule_name}</CardTitle>
+              {rule.is_active && (
+                <Badge variant="secondary" className="text-xs">
+                  Active
+                </Badge>
               )}
-            >
-              {rule.match_type.toUpperCase()}
+            </div>
+            <Badge variant="outline" className="text-xs">
+              {rule.match_type.charAt(0).toUpperCase() + rule.match_type.slice(1)}
             </Badge>
           </div>
-          <div className="flex gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-primary/10"
-              onClick={() => openEditDialog(rule)}
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={() => openEditDialog(rule)}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3 relative">
-        <div className="space-y-2">
+      <CardContent className="space-y-3">
+        <div className="space-y-1.5">
           {rule.attributes.slice(0, 4).map((attr, idx) => (
             <div
               key={idx}
-              className={cn(
-                "flex items-center justify-between p-2.5 rounded-lg transition-all duration-200 hover:scale-[1.02]",
-                rule.is_active
-                  ? "bg-green-50/50 hover:bg-green-100/70 dark:bg-green-950/20 dark:hover:bg-green-950/30"
-                  : "bg-muted/50 hover:bg-muted",
-              )}
+              className="flex items-center justify-between p-2 rounded bg-muted/30 hover:bg-muted/50 transition-colors"
             >
-              <span className="text-sm font-medium">{attr.attribute_name}</span>
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant={attr.match_category === "exact" ? "default" : "outline"}
-                  className={cn(
-                    "text-xs font-medium",
-                    attr.match_category === "exact" && rule.is_active && "bg-green-600 hover:bg-green-700",
-                  )}
-                >
-                  {attr.match_category === "exact" ? "Exact" : `Fuzzy ${attr.weightage}%`}
-                </Badge>
-              </div>
+              <span className="text-sm">{attr.attribute_name}</span>
+              <Badge variant="outline" className="text-xs">
+                {attr.match_category === "exact" ? "Exact" : `Fuzzy ${attr.weightage}%`}
+              </Badge>
             </div>
           ))}
           {rule.attributes.length > 4 && (
             <p className="text-xs text-muted-foreground text-center py-1">
-              +{rule.attributes.length - 4} more attributes
+              +{rule.attributes.length - 4} more
             </p>
           )}
         </div>
 
         {(rule.threshold_min !== null || rule.threshold_max !== null) && (
-          <div
-            className={cn("pt-2 border-t", rule.is_active ? "border-green-200 dark:border-green-900" : "border-border")}
-          >
-            <div className="flex items-center gap-2">
-              <Settings className="h-3 w-3 text-muted-foreground" />
-              <p className="text-xs font-medium text-muted-foreground">
-                Threshold: {rule.threshold_min}% - {rule.threshold_max}%
-              </p>
-            </div>
+          <div className="pt-2 border-t">
+            <p className="text-xs text-muted-foreground">
+              Threshold: {rule.threshold_min}% - {rule.threshold_max}%
+            </p>
           </div>
         )}
 
-        <div
-          className={cn(
-            "pt-2 border-t flex items-center justify-between",
-            rule.is_active ? "border-green-200 dark:border-green-900" : "border-border",
-          )}
-        >
+        <div className="pt-2 border-t flex items-center justify-between">
           <p className="text-xs text-muted-foreground">{new Date(rule.created_at).toLocaleDateString()}</p>
           <Switch
             checked={rule.is_active}
             onCheckedChange={() => handleToggleRuleStatus(rule.id, rule.is_active)}
-            className={cn("scale-90 transition-all", rule.is_active && "data-[state=checked]:bg-green-500")}
           />
         </div>
       </CardContent>
