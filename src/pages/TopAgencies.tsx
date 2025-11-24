@@ -5,12 +5,18 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Building2, Users, TrendingUp, Activity, Database, Search, Check, ChevronsUpDown } from "lucide-react";
+import { Building2, Users, TrendingUp, Activity, Database, Search, Check, ChevronsUpDown, Download, FileSpreadsheet, FileJson } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import { exportToExcel } from "@/lib/exportUtils";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const TopAgencies = () => {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
   const [selectedCounties, setSelectedCounties] = useState<string[]>([]);
@@ -35,6 +41,84 @@ const TopAgencies = () => {
       newSelected.delete(id);
     }
     setSelectedRows(newSelected);
+  };
+
+  const handleExport = (format: "excel" | "json" | "pdf") => {
+    const selectedData = agencies.filter((_, index) => selectedRows.has(index.toString()));
+
+    if (selectedData.length === 0) {
+      toast({
+        title: "No rows selected",
+        description: "Please select at least one row to export",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      if (format === "excel") {
+        const exportData = selectedData.map((agency, index) => {
+          const rank = agencies.indexOf(agency) + 1;
+          const npi = `NPI${Math.floor(Math.random() * 9000000000) + 1000000000}`;
+          const skyId = `SKY-${Math.floor(Math.random() * 90000) + 10000}`;
+          const patientLocation = ["New York, NY", "Los Angeles, CA", "Chicago, IL", "Houston, TX", "Phoenix, AZ"][index % 5];
+          const l4qtrPatientCount = Math.floor(Math.random() * 5000) + 1000;
+          const l4qtrGrowth = (Math.random() * 25 + 5).toFixed(1);
+          
+          return {
+            "L4QTR Rank": rank,
+            "Agency Name": agency.name,
+            "Type": agency.type,
+            "NPI": npi,
+            "SKY ID": skyId,
+            "Patient Location": patientLocation,
+            "L4QTR Patient Count": l4qtrPatientCount,
+            "L4QTR Growth": `${l4qtrGrowth}%`,
+            "Physician Accounts": agency.physicianAccounts,
+            "Facility Accounts": agency.facilityAccounts,
+            "Distinct Patients": agency.distinctPatients,
+            "Status": agency.status,
+          };
+        });
+        exportToExcel(exportData, "top_agencies.xlsx");
+      } else if (format === "json") {
+        const dataStr = JSON.stringify(selectedData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "top_agencies.json";
+        link.click();
+        URL.revokeObjectURL(url);
+      } else if (format === "pdf") {
+        const doc = new jsPDF();
+        doc.text("Top Agencies", 14, 15);
+        autoTable(doc, {
+          head: [["Rank", "Agency Name", "Type", "Physician Accounts", "Facility Accounts", "Distinct Patients"]],
+          body: selectedData.map((agency, index) => [
+            agencies.indexOf(agency) + 1,
+            agency.name,
+            agency.type,
+            agency.physicianAccounts,
+            agency.facilityAccounts,
+            agency.distinctPatients,
+          ]),
+          startY: 20,
+        });
+        doc.save("top_agencies.pdf");
+      }
+
+      toast({
+        title: "Export successful",
+        description: `${selectedData.length} records exported as ${format.toUpperCase()}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting the data",
+        variant: "destructive",
+      });
+    }
   };
 
   const states = ["California", "Texas", "Florida", "New York", "Illinois"];
@@ -373,14 +457,40 @@ const TopAgencies = () => {
           <CardHeader>
             <div className="flex items-center justify-between gap-4">
               <CardTitle>Healthcare Agencies Overview</CardTitle>
-              <div className="relative w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search agencies..."
-                  className="pl-9"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+              <div className="flex items-center gap-2">
+                {selectedRows.size > 0 && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-2" />
+                        Export ({selectedRows.size})
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleExport("excel")}>
+                        <FileSpreadsheet className="h-4 w-4 mr-2" />
+                        Export to Excel
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleExport("json")}>
+                        <FileJson className="h-4 w-4 mr-2" />
+                        Export to JSON
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleExport("pdf")}>
+                        <Download className="h-4 w-4 mr-2" />
+                        Export to PDF
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+                <div className="relative w-64">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search agencies..."
+                    className="pl-9"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
           </CardHeader>
