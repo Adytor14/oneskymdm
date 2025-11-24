@@ -878,12 +878,12 @@ const RulesManagement = () => {
     mergeMatchRules.filter((rule) => rule.match_type === type);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="space-y-6 p-6 animate-fade-in">
+    <div className="min-h-screen">
+      <div className="space-y-6 p-6">
         {/* Header */}
         <div className="flex justify-between items-start">
           <div className="space-y-1">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold">
               Rules Management
             </h1>
             <p className="text-muted-foreground text-lg">Configure intelligent merge, match, and survivorship rules</p>
@@ -1010,11 +1010,11 @@ const RulesManagement = () => {
                 </TabsTrigger>
               </TabsList>
 
-              <Card className="border-l-4 border-l-primary bg-gradient-to-br from-primary/5 to-card dark:from-primary/10 dark:to-card transition-all duration-300 hover:shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 dark:from-primary/20 dark:to-accent/20 border-b">
+              <Card>
+                <CardHeader>
                   <div className="flex justify-between items-center">
-                    <CardTitle className="text-2xl flex items-center gap-2">
-                      <Shield className="h-6 w-6 text-primary" />
+                    <CardTitle className="text-xl flex items-center gap-2">
+                      <Shield className="h-5 w-5" />
                       Attribute Level Survivorship
                     </CardTitle>
                     <div className="flex gap-2">
@@ -1175,68 +1175,31 @@ const RulesManagement = () => {
                       <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
                   ) : (
-                    <div className="border rounded-lg overflow-hidden bg-card shadow-sm">
-                      <div className="grid grid-cols-[2fr,1.5fr,3fr,auto] gap-4 p-4 bg-gradient-to-r from-primary/10 to-accent/10 dark:from-primary/20 dark:to-accent/20 font-semibold border-b-2 border-primary/30 dark:border-primary/40">
-                        <div className="flex items-center gap-2">
-                          <Database className="h-4 w-4 text-primary" />
-                          <span>Attribute Name</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Settings className="h-4 w-4 text-primary" />
-                          <span>Rule Type</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Shield className="h-4 w-4 text-primary" />
-                          <span>Value/Priority</span>
-                        </div>
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="grid grid-cols-[2fr,1.5fr,3fr,auto] gap-4 p-4 bg-muted font-semibold">
+                        <div>Attribute Name</div>
+                        <div>Rule Type</div>
+                        <div>Value/Priority</div>
                         <div className="text-center">Actions</div>
                       </div>
                       <div className="divide-y">
-                        {editedSurvivorshipRules.map((rule, idx) => {
-                          const ruleTypeColors = {
-                            status: {
-                              bg: "bg-primary/5 dark:bg-primary/10",
-                              border: "border-l-primary/60",
-                              badge: "bg-primary/10 dark:bg-primary/20 text-primary",
-                            },
-                            priority: {
-                              bg: "bg-accent/5 dark:bg-accent/10",
-                              border: "border-l-accent/60",
-                              badge: "bg-accent/10 dark:bg-accent/20 text-accent",
-                            },
-                            recency: {
-                              bg: "bg-warning/5 dark:bg-warning/10",
-                              border: "border-l-warning/60",
-                              badge: "bg-warning/10 dark:bg-warning/20 text-warning dark:text-warning",
-                            },
-                            aggregation: {
-                              bg: "bg-success/5 dark:bg-success/10",
-                              border: "border-l-success/60",
-                              badge: "bg-success/10 dark:bg-success/20 text-success dark:text-success",
-                            },
-                          };
-                          const colors = ruleTypeColors[rule.rule_type] || ruleTypeColors.status;
-
-                          return (
+                        {editedSurvivorshipRules.map((rule, idx) => (
                             <div
                               key={rule.id}
-                              className={`grid grid-cols-[2fr,1.5fr,3fr,auto] gap-4 p-4 items-center hover:shadow-md transition-all duration-200 border-l-4 ${colors.border} ${colors.bg} animate-fade-in`}
-                              style={{ animationDelay: `${idx * 0.05}s` }}
+                              className="grid grid-cols-[2fr,1.5fr,3fr,auto] gap-4 p-4 items-center hover:bg-muted/50 transition-colors"
                             >
-                              <div className="font-semibold text-foreground flex items-center gap-2">
-                                <Badge className={`${colors.badge} text-xs`}>{rule.attribute_name}</Badge>
+                              <div className="font-medium">
+                                {rule.attribute_name}
                               </div>
                               <div>
                                 <Select
                                   value={rule.rule_type}
                                   onValueChange={(value: any) => handleSurvivorshipRuleChange(idx, "rule_type", value)}
                                 >
-                                  <SelectTrigger
-                                    className={`w-full bg-background border-2 transition-all hover:border-primary/50`}
-                                  >
+                                  <SelectTrigger className="w-full">
                                     <SelectValue />
                                   </SelectTrigger>
-                                  <SelectContent className="bg-background">
+                                  <SelectContent>
                                     <SelectItem value="status">Status</SelectItem>
                                     <SelectItem value="priority">Priority</SelectItem>
                                     <SelectItem value="recency">Recency</SelectItem>
@@ -1248,7 +1211,6 @@ const RulesManagement = () => {
                                 <Input
                                   value={rule.rule_value}
                                   onChange={(e) => handleSurvivorshipRuleChange(idx, "rule_value", e.target.value)}
-                                  className="bg-background text-foreground border-2 transition-all hover:border-primary/50 focus:border-primary"
                                   placeholder="Enter value or priority"
                                 />
                               </div>
@@ -1260,19 +1222,16 @@ const RulesManagement = () => {
                                     setSurvivorshipRuleToDelete(rule.id);
                                     setSurvivorshipDeleteDialogOpen(true);
                                   }}
-                                  className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
+                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
                             </div>
-                          );
-                        })}
+                        ))}
                         {editedSurvivorshipRules.length === 0 && (
                           <div className="p-12 text-center">
-                            <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-3 opacity-50" />
-                            <p className="text-muted-foreground font-medium">No survivorship rules configured yet</p>
-                            <p className="text-sm text-muted-foreground/70 mt-1">Add a rule to get started</p>
+                            <p className="text-muted-foreground">No survivorship rules configured yet</p>
                           </div>
                         )}
                       </div>
