@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Plus, Trash2, Check, X, Settings, Database, GitMerge, Loader2, Shield } from "lucide-react";
+import { Pencil, Plus, Trash2, Check, X, Settings, Database, GitMerge, Loader2, Shield, FileCheck } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,6 +56,15 @@ interface SurvivorshipRule {
   created_at: string;
 }
 
+interface DCRRule {
+  id: string;
+  entity_type: "HCP" | "HCO" | "Address" | "SLN";
+  attribute_name: string;
+  eligible_for_dcr: boolean;
+  interference_type: "manual" | "automatic";
+  created_at: string;
+}
+
 // Validation schema for survivorship rules
 const survivorshipRuleSchema = z.object({
   attribute_name: z
@@ -96,6 +105,8 @@ const RulesManagement = () => {
   const [mergeMatchRules, setMergeMatchRules] = useState<MergeMatchRule[]>([]);
   const [survivorshipRules, setSurvivorshipRules] = useState<SurvivorshipRule[]>([]);
   const [editedSurvivorshipRules, setEditedSurvivorshipRules] = useState<SurvivorshipRule[]>([]);
+  const [dcrRules, setDcrRules] = useState<DCRRule[]>([]);
+  const [editedDcrRules, setEditedDcrRules] = useState<DCRRule[]>([]);
   const [editingRule, setEditingRule] = useState<MergeMatchRule | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -161,6 +172,17 @@ const RulesManagement = () => {
       if (survError) throw survError;
       setSurvivorshipRules(survData || []);
       setEditedSurvivorshipRules(survData || []);
+
+      // Fetch DCR rules
+      const { data: dcrData, error: dcrError } = await supabase
+        .from("dcr_rules")
+        .select("*")
+        .eq("entity_type", entityType)
+        .order("attribute_name");
+
+      if (dcrError) throw dcrError;
+      setDcrRules((dcrData || []) as DCRRule[]);
+      setEditedDcrRules((dcrData || []) as DCRRule[]);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -240,6 +262,47 @@ const RulesManagement = () => {
     const newRules = [...editedSurvivorshipRules];
     newRules[idx] = { ...newRules[idx], [field]: value };
     setEditedSurvivorshipRules(newRules);
+  };
+
+  const handleDcrRuleChange = (idx: number, field: "eligible_for_dcr" | "interference_type", value: boolean | string) => {
+    const newRules = [...editedDcrRules];
+    newRules[idx] = { ...newRules[idx], [field]: value };
+    setEditedDcrRules(newRules);
+  };
+
+  const handleSaveDcrRules = async () => {
+    setSaving(true);
+    try {
+      // Update each edited rule
+      const updates = editedDcrRules.map(async (rule) => {
+        const { error } = await supabase
+          .from("dcr_rules")
+          .update({
+            eligible_for_dcr: rule.eligible_for_dcr,
+            interference_type: rule.interference_type,
+          })
+          .eq("id", rule.id);
+
+        if (error) throw error;
+      });
+
+      await Promise.all(updates);
+
+      toast({
+        title: "Success",
+        description: "DCR rules saved successfully",
+      });
+
+      fetchRules();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCreateSurvivorshipRule = async () => {
@@ -853,6 +916,13 @@ const RulesManagement = () => {
               <Database className="h-4 w-4 mr-2" />
               Survivorship Rules
             </TabsTrigger>
+            <TabsTrigger
+              value="dcr"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-6 py-3"
+            >
+              <FileCheck className="h-4 w-4 mr-2" />
+              DCR Rules
+            </TabsTrigger>
           </TabsList>
 
           {/* Merge/Match Rules Tab */}
@@ -1178,6 +1248,114 @@ const RulesManagement = () => {
                         {editedSurvivorshipRules.length === 0 && (
                           <div className="p-12 text-center">
                             <p className="text-muted-foreground">No survivorship rules configured yet</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </Tabs>
+          </TabsContent>
+
+          {/* DCR Rules Tab */}
+          <TabsContent value="dcr" className="space-y-6 animate-fade-in">
+            <Tabs value={activeEntityTab} onValueChange={setActiveEntityTab}>
+              <TabsList className="bg-muted">
+                <TabsTrigger
+                  value="hcp"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  Physician Accounts
+                </TabsTrigger>
+                <TabsTrigger
+                  value="hco"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  Facility Accounts
+                </TabsTrigger>
+              </TabsList>
+
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-xl flex items-center gap-2">
+                      <FileCheck className="h-5 w-5" />
+                      Attributes Eligible for DCR
+                    </CardTitle>
+                    <Button
+                      onClick={handleSaveDcrRules}
+                      disabled={saving}
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      {saving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Database className="h-4 w-4 mr-2" />
+                          Save Rules
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {loading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : (
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="grid grid-cols-[2fr,1.5fr,2fr] gap-4 p-4 bg-muted font-semibold">
+                        <div>Attribute Name</div>
+                        <div>Eligible for DCR</div>
+                        <div>Manual/Automatic Interference</div>
+                      </div>
+                      <div className="divide-y">
+                        {editedDcrRules.map((rule, idx) => (
+                          <div
+                            key={rule.id}
+                            className="grid grid-cols-[2fr,1.5fr,2fr] gap-4 p-4 items-center hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="font-medium">{rule.attribute_name}</div>
+                            <div>
+                              <Switch
+                                checked={rule.eligible_for_dcr}
+                                onCheckedChange={(checked) =>
+                                  handleDcrRuleChange(idx, "eligible_for_dcr", checked)
+                                }
+                              />
+                            </div>
+                            <div>
+                              <RadioGroup
+                                value={rule.interference_type}
+                                onValueChange={(value: "manual" | "automatic") =>
+                                  handleDcrRuleChange(idx, "interference_type", value)
+                                }
+                                className="flex gap-6"
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="manual" id={`manual-${rule.id}`} />
+                                  <Label htmlFor={`manual-${rule.id}`} className="cursor-pointer">
+                                    Manual
+                                  </Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="automatic" id={`automatic-${rule.id}`} />
+                                  <Label htmlFor={`automatic-${rule.id}`} className="cursor-pointer">
+                                    Automatic
+                                  </Label>
+                                </div>
+                              </RadioGroup>
+                            </div>
+                          </div>
+                        ))}
+                        {editedDcrRules.length === 0 && (
+                          <div className="p-8 text-center text-muted-foreground">
+                            No DCR rules configured for this entity type
                           </div>
                         )}
                       </div>
