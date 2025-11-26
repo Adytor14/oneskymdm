@@ -65,6 +65,39 @@ export type Database = {
         }
         Relationships: []
       }
+      dcr_rules: {
+        Row: {
+          attribute_name: string
+          created_at: string | null
+          created_by: string | null
+          eligible_for_dcr: boolean
+          entity_type: Database["public"]["Enums"]["entity_type"]
+          id: string
+          interference_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          attribute_name: string
+          created_at?: string | null
+          created_by?: string | null
+          eligible_for_dcr?: boolean
+          entity_type: Database["public"]["Enums"]["entity_type"]
+          id?: string
+          interference_type?: string
+          updated_at?: string | null
+        }
+        Update: {
+          attribute_name?: string
+          created_at?: string | null
+          created_by?: string | null
+          eligible_for_dcr?: boolean
+          entity_type?: Database["public"]["Enums"]["entity_type"]
+          id?: string
+          interference_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       match_proposals: {
         Row: {
           comments: string | null
