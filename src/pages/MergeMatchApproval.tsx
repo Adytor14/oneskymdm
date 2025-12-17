@@ -26,7 +26,7 @@ const MergeMatchApproval = () => {
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [comment, setComment] = useState("");
-  const [entityActions, setEntityActions] = useState<Record<string, 'approve' | 'duplicate'>>({});
+  const [entityActions, setEntityActions] = useState<Record<string, 'approve' | 'duplicate' | 'reject'>>({});
 
   const mockPendingDataHCP = [
     {
@@ -548,7 +548,7 @@ const MergeMatchApproval = () => {
     setEntityActions(initialActions);
   };
 
-  const handleEntityActionChange = (entityId: string, action: 'approve' | 'duplicate') => {
+  const handleEntityActionChange = (entityId: string, action: 'approve' | 'duplicate' | 'reject') => {
     setEntityActions(prev => ({
       ...prev,
       [entityId]: action
@@ -562,13 +562,19 @@ const MergeMatchApproval = () => {
     const duplicateEntities = Object.entries(entityActions)
       .filter(([_, action]) => action === 'duplicate')
       .map(([id]) => id);
+    const rejectedEntities = Object.entries(entityActions)
+      .filter(([_, action]) => action === 'reject')
+      .map(([id]) => id);
 
     let message = "";
     if (approvedEntities.length > 0) {
       message += `Approved for merge: ${approvedEntities.join(", ")}. `;
     }
     if (duplicateEntities.length > 0) {
-      message += `Marked as deliberate duplicate: ${duplicateEntities.join(", ")}.`;
+      message += `Marked as deliberate duplicate: ${duplicateEntities.join(", ")}. `;
+    }
+    if (rejectedEntities.length > 0) {
+      message += `Rejected: ${rejectedEntities.join(", ")}.`;
     }
 
     toast({
@@ -861,7 +867,7 @@ const MergeMatchApproval = () => {
                       <div className="flex items-center gap-4">
                         <RadioGroup
                           value={entityActions[trimmedId] || 'approve'}
-                          onValueChange={(value) => handleEntityActionChange(trimmedId, value as 'approve' | 'duplicate')}
+                          onValueChange={(value) => handleEntityActionChange(trimmedId, value as 'approve' | 'duplicate' | 'reject')}
                           className="flex items-center gap-4"
                         >
                           <div className="flex items-center space-x-2">
@@ -871,6 +877,10 @@ const MergeMatchApproval = () => {
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="duplicate" id={`duplicate-${trimmedId}`} />
                             <Label htmlFor={`duplicate-${trimmedId}`} className="cursor-pointer">Mark Deliberate Duplicate</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="reject" id={`reject-${trimmedId}`} />
+                            <Label htmlFor={`reject-${trimmedId}`} className="cursor-pointer">Reject</Label>
                           </div>
                         </RadioGroup>
                         <Button 
