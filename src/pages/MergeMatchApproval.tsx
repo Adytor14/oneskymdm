@@ -7,8 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-
-import { Eye, Search, X } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Eye, Search } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -25,7 +26,7 @@ const MergeMatchApproval = () => {
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [comment, setComment] = useState("");
-  
+  const [entityActions, setEntityActions] = useState<Record<string, 'approve' | 'duplicate'>>({});
 
   const mockPendingDataHCP = [
     {
@@ -538,29 +539,43 @@ const MergeMatchApproval = () => {
     setSelectedRequest(record);
     setIsDialogOpen(true);
     setComment("");
+    // Initialize all entities with 'approve' as default action
+    const entityIds = record.entityIds.split(", ").map((id: string) => id.trim());
+    const initialActions: Record<string, 'approve' | 'duplicate'> = {};
+    entityIds.forEach((id: string) => {
+      initialActions[id] = 'approve';
+    });
+    setEntityActions(initialActions);
   };
 
-  // Individual entity action handlers
-  const handleApproveEntity = (entityId: string) => {
-    toast({
-      title: "Entity Approved for Merge",
-      description: `Entity ${entityId} has been approved for merge in request ${selectedRequest?.requestId}.`,
-    });
+  const handleEntityActionChange = (entityId: string, action: 'approve' | 'duplicate') => {
+    setEntityActions(prev => ({
+      ...prev,
+      [entityId]: action
+    }));
   };
 
-  const handleRejectEntity = (entityId: string) => {
-    toast({
-      title: "Entity Rejected",
-      description: `Entity ${entityId} has been rejected from merge request ${selectedRequest?.requestId}.`,
-      variant: "destructive",
-    });
-  };
+  const handleSubmitActions = () => {
+    const approvedEntities = Object.entries(entityActions)
+      .filter(([_, action]) => action === 'approve')
+      .map(([id]) => id);
+    const duplicateEntities = Object.entries(entityActions)
+      .filter(([_, action]) => action === 'duplicate')
+      .map(([id]) => id);
 
-  const handleMarkDuplicateEntity = (entityId: string) => {
+    let message = "";
+    if (approvedEntities.length > 0) {
+      message += `Approved for merge: ${approvedEntities.join(", ")}. `;
+    }
+    if (duplicateEntities.length > 0) {
+      message += `Marked as deliberate duplicate: ${duplicateEntities.join(", ")}.`;
+    }
+
     toast({
-      title: "Marked as Deliberate Duplicate",
-      description: `Entity ${entityId} marked as deliberate duplicate in request ${selectedRequest?.requestId}.`,
+      title: "Actions Submitted",
+      description: message || "No actions selected.",
     });
+    setIsDialogOpen(false);
   };
 
   return (
@@ -843,29 +858,21 @@ const MergeMatchApproval = () => {
                       <div className="flex items-center gap-3">
                         <span className="text-lg font-semibold">{trimmedId}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
-                          onClick={() => handleRejectEntity(trimmedId)}
+                      <div className="flex items-center gap-4">
+                        <RadioGroup
+                          value={entityActions[trimmedId] || 'approve'}
+                          onValueChange={(value) => handleEntityActionChange(trimmedId, value as 'approve' | 'duplicate')}
+                          className="flex items-center gap-4"
                         >
-                          Reject
-                        </Button>
-                        <Button 
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleMarkDuplicateEntity(trimmedId)}
-                        >
-                          Mark Duplicate
-                        </Button>
-                        <Button 
-                          size="sm"
-                          className="bg-primary text-primary-foreground hover:bg-primary/90"
-                          onClick={() => handleApproveEntity(trimmedId)}
-                        >
-                          Approve
-                        </Button>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="approve" id={`approve-${trimmedId}`} />
+                            <Label htmlFor={`approve-${trimmedId}`} className="cursor-pointer">Approve</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="duplicate" id={`duplicate-${trimmedId}`} />
+                            <Label htmlFor={`duplicate-${trimmedId}`} className="cursor-pointer">Mark Deliberate Duplicate</Label>
+                          </div>
+                        </RadioGroup>
                         <Button 
                           variant="link" 
                           className="text-primary p-0 h-auto"
@@ -960,6 +967,13 @@ const MergeMatchApproval = () => {
                   onChange={(e) => setComment(e.target.value)}
                   className="min-h-[100px]"
                 />
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-end pt-4 border-t">
+                <Button onClick={handleSubmitActions}>
+                  Submit
+                </Button>
               </div>
 
             </div>
