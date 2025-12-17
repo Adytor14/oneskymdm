@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, Search, X } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -24,18 +25,19 @@ const MergeMatchApproval = () => {
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [comment, setComment] = useState("");
+  const [selectedEntityIds, setSelectedEntityIds] = useState<string[]>([]);
 
   const mockPendingDataHCP = [
     {
       requestId: "8f569b06",
-      entityIds: "PHY1001, PHY2104",
+      entityIds: "PHY1001, PHY2104, PHY3201",
       matchScore: 70,
       status: "Pending",
       processedDate: "16/10/2025",
     },
     {
       requestId: "8f569b07",
-      entityIds: "PHY1002, PHY3205",
+      entityIds: "PHY1002, PHY3205, PHY4301, PHY5402",
       matchScore: 85,
       status: "Pending",
       processedDate: "17/10/2025",
@@ -49,14 +51,14 @@ const MergeMatchApproval = () => {
     },
     {
       requestId: "8f569b09",
-      entityIds: "PHY1004, PHY5207",
+      entityIds: "PHY1004, PHY5207, PHY6308",
       matchScore: 81,
       status: "Pending",
       processedDate: "19/10/2025",
     },
     {
       requestId: "8f569b10",
-      entityIds: "PHY1005, PHY6308",
+      entityIds: "PHY1005, PHY6308, PHY7409, PHY8510, PHY9611",
       matchScore: 68,
       status: "Pending",
       processedDate: "20/10/2025",
@@ -123,6 +125,146 @@ const MergeMatchApproval = () => {
       mdmId: "MDM-PHY-001",
       medicalLicense: "MA-MD-123456",
       address: "123 Medical Plaza, Boston, MA 02115, USA",
+    },
+    PHY3201: {
+      firstName: "Sara",
+      lastName: "Johnson",
+      npiId: "1234567890",
+      orgId: "ORG-12346",
+      source: "Cerner",
+      mdmId: "MDM-PHY-002",
+      medicalLicense: "MA-MD-123457",
+      address: "125 Medical Plaza, Boston, MA 02115, USA",
+    },
+    PHY1002: {
+      firstName: "Michael",
+      lastName: "Williams",
+      npiId: "2345678901",
+      orgId: "ORG-23456",
+      source: "Epic EMR",
+      mdmId: "MDM-PHY-003",
+      medicalLicense: "NY-MD-234567",
+      address: "456 Health Ave, New York, NY 10001, USA",
+    },
+    PHY3205: {
+      firstName: "Mike",
+      lastName: "Williams",
+      npiId: "2345678901",
+      orgId: "ORG-23456",
+      source: "Cerner",
+      mdmId: "MDM-PHY-003",
+      medicalLicense: "NY-MD-234567",
+      address: "456 Health Ave, New York, NY 10001, USA",
+    },
+    PHY4301: {
+      firstName: "M.",
+      lastName: "Williams",
+      npiId: "2345678901",
+      orgId: "ORG-23457",
+      source: "Allscripts",
+      mdmId: "MDM-PHY-004",
+      medicalLicense: "NY-MD-234568",
+      address: "458 Health Ave, New York, NY 10001, USA",
+    },
+    PHY5402: {
+      firstName: "Michael",
+      lastName: "Wiliams",
+      npiId: "2345678901",
+      orgId: "ORG-23456",
+      source: "Epic EMR",
+      mdmId: "MDM-PHY-003",
+      medicalLicense: "NY-MD-234567",
+      address: "456 Health Ave, New York, NY 10001, USA",
+    },
+    PHY1003: {
+      firstName: "Emily",
+      lastName: "Davis",
+      npiId: "3456789012",
+      orgId: "ORG-34567",
+      source: "Epic EMR",
+      mdmId: "MDM-PHY-005",
+      medicalLicense: "CA-MD-345678",
+      address: "789 Care Blvd, Los Angeles, CA 90001, USA",
+    },
+    PHY4106: {
+      firstName: "Emily",
+      lastName: "Davies",
+      npiId: "3456789012",
+      orgId: "ORG-34567",
+      source: "Cerner",
+      mdmId: "MDM-PHY-005",
+      medicalLicense: "CA-MD-345678",
+      address: "789 Care Blvd, Los Angeles, CA 90001, USA",
+    },
+    PHY1004: {
+      firstName: "Robert",
+      lastName: "Brown",
+      npiId: "4567890123",
+      orgId: "ORG-45678",
+      source: "Epic EMR",
+      mdmId: "MDM-PHY-006",
+      medicalLicense: "TX-MD-456789",
+      address: "321 Wellness Dr, Houston, TX 77001, USA",
+    },
+    PHY5207: {
+      firstName: "Rob",
+      lastName: "Brown",
+      npiId: "4567890123",
+      orgId: "ORG-45678",
+      source: "Cerner",
+      mdmId: "MDM-PHY-006",
+      medicalLicense: "TX-MD-456789",
+      address: "321 Wellness Dr, Houston, TX 77001, USA",
+    },
+    PHY6308: {
+      firstName: "Robert",
+      lastName: "Browne",
+      npiId: "4567890123",
+      orgId: "ORG-45679",
+      source: "Allscripts",
+      mdmId: "MDM-PHY-007",
+      medicalLicense: "TX-MD-456790",
+      address: "323 Wellness Dr, Houston, TX 77001, USA",
+    },
+    PHY1005: {
+      firstName: "Jennifer",
+      lastName: "Martinez",
+      npiId: "5678901234",
+      orgId: "ORG-56789",
+      source: "Epic EMR",
+      mdmId: "MDM-PHY-008",
+      medicalLicense: "FL-MD-567890",
+      address: "654 Medical Center, Miami, FL 33101, USA",
+    },
+    PHY7409: {
+      firstName: "Jenny",
+      lastName: "Martinez",
+      npiId: "5678901234",
+      orgId: "ORG-56789",
+      source: "Cerner",
+      mdmId: "MDM-PHY-008",
+      medicalLicense: "FL-MD-567890",
+      address: "654 Medical Center, Miami, FL 33101, USA",
+    },
+    PHY8510: {
+      firstName: "J.",
+      lastName: "Martinez",
+      npiId: "5678901234",
+      orgId: "ORG-56790",
+      source: "Allscripts",
+      mdmId: "MDM-PHY-009",
+      medicalLicense: "FL-MD-567891",
+      address: "656 Medical Center, Miami, FL 33101, USA",
+    },
+    PHY9611: {
+      firstName: "Jennifer",
+      lastName: "Martines",
+      npiId: "5678901234",
+      orgId: "ORG-56789",
+      source: "Epic EMR",
+      mdmId: "MDM-PHY-008",
+      medicalLicense: "FL-MD-567890",
+      address: "654 Medical Center, Miami, FL 33101, USA",
     },
   };
 
@@ -261,29 +403,64 @@ const MergeMatchApproval = () => {
     setSelectedRequest(record);
     setIsDialogOpen(true);
     setComment("");
+    // Initialize with all entity IDs selected by default
+    const entityIds = record.entityIds.split(", ").map((id: string) => id.trim());
+    setSelectedEntityIds(entityIds);
+  };
+
+  const handleEntityCheckboxChange = (entityId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedEntityIds(prev => [...prev, entityId]);
+    } else {
+      setSelectedEntityIds(prev => prev.filter(id => id !== entityId));
+    }
   };
 
   const handleApprove = () => {
+    if (selectedEntityIds.length < 2) {
+      toast({
+        title: "Selection Required",
+        description: "Please select at least 2 entities to merge.",
+        variant: "destructive",
+      });
+      return;
+    }
     toast({
       title: "Request Approved",
-      description: `Merge request ${selectedRequest?.requestId} has been approved.`,
+      description: `Merge request ${selectedRequest?.requestId} has been approved for entities: ${selectedEntityIds.join(", ")}.`,
     });
     setIsDialogOpen(false);
   };
 
   const handleReject = () => {
+    if (selectedEntityIds.length === 0) {
+      toast({
+        title: "Selection Required",
+        description: "Please select at least 1 entity to reject.",
+        variant: "destructive",
+      });
+      return;
+    }
     toast({
       title: "Request Rejected",
-      description: `Merge request ${selectedRequest?.requestId} has been rejected.`,
+      description: `Entities ${selectedEntityIds.join(", ")} have been rejected from merge request ${selectedRequest?.requestId}.`,
       variant: "destructive",
     });
     setIsDialogOpen(false);
   };
 
   const handleMarkDuplicate = () => {
+    if (selectedEntityIds.length === 0) {
+      toast({
+        title: "Selection Required",
+        description: "Please select at least 1 entity to mark as deliberate duplicate.",
+        variant: "destructive",
+      });
+      return;
+    }
     toast({
       title: "Marked as Deliberate Duplicate",
-      description: `Request ${selectedRequest?.requestId} marked as deliberate duplicate.`,
+      description: `Entities ${selectedEntityIds.join(", ")} marked as deliberate duplicate in request ${selectedRequest?.requestId}.`,
     });
     setIsDialogOpen(false);
   };
@@ -555,90 +732,134 @@ const MergeMatchApproval = () => {
                 </div>
               </div>
 
+              {/* Selection Info */}
+              <div className="p-3 bg-muted/50 rounded-lg border flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  <strong>{selectedEntityIds.length}</strong> of {selectedRequest.entityIds.split(", ").length} entities selected. 
+                  Select entities below to merge, reject, or mark as deliberate duplicate.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const allIds = selectedRequest.entityIds.split(", ").map((id: string) => id.trim());
+                    if (selectedEntityIds.length === allIds.length) {
+                      setSelectedEntityIds([]);
+                    } else {
+                      setSelectedEntityIds(allIds);
+                    }
+                  }}
+                >
+                  {selectedEntityIds.length === selectedRequest.entityIds.split(", ").length ? "Deselect All" : "Select All"}
+                </Button>
+              </div>
+
               {/* Entity Details */}
               {selectedRequest.entityIds.split(", ").map((entityId: string, index: number) => {
-                const details = mockEntityDetails[entityId as keyof typeof mockEntityDetails];
+                const trimmedId = entityId.trim();
+                const details = mockEntityDetails[trimmedId as keyof typeof mockEntityDetails];
+                const isSelected = selectedEntityIds.includes(trimmedId);
                 return (
-                  <div key={entityId} className="space-y-3">
+                  <div 
+                    key={trimmedId} 
+                    className={`space-y-3 p-4 rounded-lg border transition-colors ${
+                      isSelected ? 'bg-primary/5 border-primary/30' : 'bg-background border-border'
+                    }`}
+                  >
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">{entityId}</h3>
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          id={`entity-${trimmedId}`}
+                          checked={isSelected}
+                          onCheckedChange={(checked) => handleEntityCheckboxChange(trimmedId, checked === true)}
+                        />
+                        <label 
+                          htmlFor={`entity-${trimmedId}`} 
+                          className="text-lg font-semibold cursor-pointer"
+                        >
+                          {trimmedId}
+                        </label>
+                        {isSelected && (
+                          <Badge variant="outline" className="text-xs">Selected</Badge>
+                        )}
+                      </div>
                       <Button 
                         variant="link" 
                         className="text-primary p-0 h-auto"
-                        onClick={() => navigate(entityType === "hco" ? `/hco/${entityId}` : `/hcp/${entityId}`)}
+                        onClick={() => navigate(entityType === "hco" ? `/hco/${trimmedId}` : `/hcp/${trimmedId}`)}
                       >
                         View more
                       </Button>
                     </div>
                     
                     {entityType === "hco" ? (
-                      <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                      <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm ml-7">
                         <div>
                           <div className="text-muted-foreground mb-1">Facility Name</div>
                           <div className={index === 0 ? "text-red-600 font-medium" : ""}>
-                            {details?.name}
+                            {details?.name || "N/A"}
                           </div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">NPI ID</div>
-                          <div>{details?.npiId}</div>
+                          <div>{details?.npiId || "N/A"}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">ORG ID</div>
-                          <div>{details?.orgId}</div>
+                          <div>{details?.orgId || "N/A"}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">Source</div>
-                          <div>{details?.source}</div>
+                          <div>{details?.source || "N/A"}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">MDM ID</div>
-                          <div>{details?.mdmId}</div>
+                          <div>{details?.mdmId || "N/A"}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">Tax ID</div>
-                          <div>{details?.taxId}</div>
+                          <div>{details?.taxId || "N/A"}</div>
                         </div>
                         <div className="col-span-2">
                           <div className="text-muted-foreground mb-1">Address</div>
-                          <div>{details?.address}</div>
+                          <div>{details?.address || "N/A"}</div>
                         </div>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                      <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm ml-7">
                         <div>
                           <div className="text-muted-foreground mb-1">First Name</div>
                           <div className={index === 0 ? "text-red-600 font-medium" : ""}>
-                            {details?.firstName}
+                            {details?.firstName || "N/A"}
                           </div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">NPI ID</div>
-                          <div>{details?.npiId}</div>
+                          <div>{details?.npiId || "N/A"}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">Last Name</div>
-                          <div>{details?.lastName}</div>
+                          <div>{details?.lastName || "N/A"}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">ORG ID</div>
-                          <div>{details?.orgId}</div>
+                          <div>{details?.orgId || "N/A"}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">Source</div>
-                          <div>{details?.source}</div>
+                          <div>{details?.source || "N/A"}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">MDM ID</div>
-                          <div>{details?.mdmId}</div>
+                          <div>{details?.mdmId || "N/A"}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">Medical License</div>
-                          <div>{details?.medicalLicense}</div>
+                          <div>{details?.medicalLicense || "N/A"}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">Address</div>
-                          <div>{details?.address}</div>
+                          <div>{details?.address || "N/A"}</div>
                         </div>
                       </div>
                     )}
