@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { Eye, Search, X } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -25,7 +25,7 @@ const MergeMatchApproval = () => {
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [comment, setComment] = useState("");
-  const [selectedEntityIds, setSelectedEntityIds] = useState<string[]>([]);
+  
 
   const mockPendingDataHCP = [
     {
@@ -538,66 +538,29 @@ const MergeMatchApproval = () => {
     setSelectedRequest(record);
     setIsDialogOpen(true);
     setComment("");
-    // Initialize with all entity IDs selected by default
-    const entityIds = record.entityIds.split(", ").map((id: string) => id.trim());
-    setSelectedEntityIds(entityIds);
   };
 
-  const handleEntityCheckboxChange = (entityId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedEntityIds(prev => [...prev, entityId]);
-    } else {
-      setSelectedEntityIds(prev => prev.filter(id => id !== entityId));
-    }
-  };
-
-  const handleApprove = () => {
-    if (selectedEntityIds.length < 2) {
-      toast({
-        title: "Selection Required",
-        description: "Please select at least 2 entities to merge.",
-        variant: "destructive",
-      });
-      return;
-    }
+  // Individual entity action handlers
+  const handleApproveEntity = (entityId: string) => {
     toast({
-      title: "Request Approved",
-      description: `Merge request ${selectedRequest?.requestId} has been approved for entities: ${selectedEntityIds.join(", ")}.`,
+      title: "Entity Approved for Merge",
+      description: `Entity ${entityId} has been approved for merge in request ${selectedRequest?.requestId}.`,
     });
-    setIsDialogOpen(false);
   };
 
-  const handleReject = () => {
-    if (selectedEntityIds.length === 0) {
-      toast({
-        title: "Selection Required",
-        description: "Please select at least 1 entity to reject.",
-        variant: "destructive",
-      });
-      return;
-    }
+  const handleRejectEntity = (entityId: string) => {
     toast({
-      title: "Request Rejected",
-      description: `Entities ${selectedEntityIds.join(", ")} have been rejected from merge request ${selectedRequest?.requestId}.`,
+      title: "Entity Rejected",
+      description: `Entity ${entityId} has been rejected from merge request ${selectedRequest?.requestId}.`,
       variant: "destructive",
     });
-    setIsDialogOpen(false);
   };
 
-  const handleMarkDuplicate = () => {
-    if (selectedEntityIds.length === 0) {
-      toast({
-        title: "Selection Required",
-        description: "Please select at least 1 entity to mark as deliberate duplicate.",
-        variant: "destructive",
-      });
-      return;
-    }
+  const handleMarkDuplicateEntity = (entityId: string) => {
     toast({
       title: "Marked as Deliberate Duplicate",
-      description: `Entities ${selectedEntityIds.join(", ")} marked as deliberate duplicate in request ${selectedRequest?.requestId}.`,
+      description: `Entity ${entityId} marked as deliberate duplicate in request ${selectedRequest?.requestId}.`,
     });
-    setIsDialogOpen(false);
   };
 
   return (
@@ -867,68 +830,54 @@ const MergeMatchApproval = () => {
                 </div>
               </div>
 
-              {/* Selection Info */}
-              <div className="p-3 bg-muted/50 rounded-lg border flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
-                  <strong>{selectedEntityIds.length}</strong> of {selectedRequest.entityIds.split(", ").length} entities selected. 
-                  Select entities below to merge, reject, or mark as deliberate duplicate.
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const allIds = selectedRequest.entityIds.split(", ").map((id: string) => id.trim());
-                    if (selectedEntityIds.length === allIds.length) {
-                      setSelectedEntityIds([]);
-                    } else {
-                      setSelectedEntityIds(allIds);
-                    }
-                  }}
-                >
-                  {selectedEntityIds.length === selectedRequest.entityIds.split(", ").length ? "Deselect All" : "Select All"}
-                </Button>
-              </div>
-
               {/* Entity Details */}
               {selectedRequest.entityIds.split(", ").map((entityId: string, index: number) => {
                 const trimmedId = entityId.trim();
                 const details = mockEntityDetails[trimmedId as keyof typeof mockEntityDetails];
-                const isSelected = selectedEntityIds.includes(trimmedId);
                 return (
                   <div 
                     key={trimmedId} 
-                    className={`space-y-3 p-4 rounded-lg border transition-colors ${
-                      isSelected ? 'bg-primary/5 border-primary/30' : 'bg-background border-border'
-                    }`}
+                    className="space-y-3 p-4 rounded-lg border bg-background border-border"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <Checkbox
-                          id={`entity-${trimmedId}`}
-                          checked={isSelected}
-                          onCheckedChange={(checked) => handleEntityCheckboxChange(trimmedId, checked === true)}
-                        />
-                        <label 
-                          htmlFor={`entity-${trimmedId}`} 
-                          className="text-lg font-semibold cursor-pointer"
-                        >
-                          {trimmedId}
-                        </label>
-                        {isSelected && (
-                          <Badge variant="outline" className="text-xs">Selected</Badge>
-                        )}
+                        <span className="text-lg font-semibold">{trimmedId}</span>
                       </div>
-                      <Button 
-                        variant="link" 
-                        className="text-primary p-0 h-auto"
-                        onClick={() => navigate(entityType === "hco" ? `/hco/${trimmedId}` : `/hcp/${trimmedId}`)}
-                      >
-                        View more
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+                          onClick={() => handleRejectEntity(trimmedId)}
+                        >
+                          Reject
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleMarkDuplicateEntity(trimmedId)}
+                        >
+                          Mark Duplicate
+                        </Button>
+                        <Button 
+                          size="sm"
+                          className="bg-primary text-primary-foreground hover:bg-primary/90"
+                          onClick={() => handleApproveEntity(trimmedId)}
+                        >
+                          Approve
+                        </Button>
+                        <Button 
+                          variant="link" 
+                          className="text-primary p-0 h-auto"
+                          onClick={() => navigate(entityType === "hco" ? `/hco/${trimmedId}` : `/hcp/${trimmedId}`)}
+                        >
+                          View more
+                        </Button>
+                      </div>
                     </div>
                     
                     {entityType === "hco" ? (
-                      <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm ml-7">
+                      <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
                         <div>
                           <div className="text-muted-foreground mb-1">Facility Name</div>
                           <div className={index === 0 ? "text-red-600 font-medium" : ""}>
@@ -961,7 +910,7 @@ const MergeMatchApproval = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm ml-7">
+                      <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
                         <div>
                           <div className="text-muted-foreground mb-1">First Name</div>
                           <div className={index === 0 ? "text-red-600 font-medium" : ""}>
@@ -1013,28 +962,6 @@ const MergeMatchApproval = () => {
                 />
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t">
-                <Button 
-                  variant="outline" 
-                  className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
-                  onClick={handleReject}
-                >
-                  Reject
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={handleMarkDuplicate}
-                >
-                  Mark Deliberate Duplicate
-                </Button>
-                <Button 
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
-                  onClick={handleApprove}
-                >
-                  Approve
-                </Button>
-              </div>
             </div>
           )}
         </DialogContent>
