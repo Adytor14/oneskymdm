@@ -7,9 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Eye, Search } from "lucide-react";
+import { Eye, Search, X } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -26,19 +24,18 @@ const MergeMatchApproval = () => {
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [comment, setComment] = useState("");
-  const [entityActions, setEntityActions] = useState<Record<string, 'approve' | 'duplicate' | 'reject'>>({});
 
   const mockPendingDataHCP = [
     {
       requestId: "8f569b06",
-      entityIds: "PHY1001, PHY2104, PHY3201",
+      entityIds: "PHY1001, PHY2104",
       matchScore: 70,
       status: "Pending",
       processedDate: "16/10/2025",
     },
     {
       requestId: "8f569b07",
-      entityIds: "PHY1002, PHY3205, PHY4301, PHY5402",
+      entityIds: "PHY1002, PHY3205",
       matchScore: 85,
       status: "Pending",
       processedDate: "17/10/2025",
@@ -52,14 +49,14 @@ const MergeMatchApproval = () => {
     },
     {
       requestId: "8f569b09",
-      entityIds: "PHY1004, PHY5207, PHY6308",
+      entityIds: "PHY1004, PHY5207",
       matchScore: 81,
       status: "Pending",
       processedDate: "19/10/2025",
     },
     {
       requestId: "8f569b10",
-      entityIds: "PHY1005, PHY6308, PHY7409, PHY8510, PHY9611",
+      entityIds: "PHY1005, PHY6308",
       matchScore: 68,
       status: "Pending",
       processedDate: "20/10/2025",
@@ -69,14 +66,14 @@ const MergeMatchApproval = () => {
   const mockPendingDataHCO = [
     {
       requestId: "9a671c01",
-      entityIds: "FAC2001, FAC3102, FAC4201",
+      entityIds: "FAC2001, FAC3102",
       matchScore: 75,
       status: "Pending",
       processedDate: "15/10/2025",
     },
     {
       requestId: "9a671c02",
-      entityIds: "FAC2002, FAC4203, FAC5301, FAC6402",
+      entityIds: "FAC2002, FAC4203",
       matchScore: 88,
       status: "Pending",
       processedDate: "16/10/2025",
@@ -90,14 +87,14 @@ const MergeMatchApproval = () => {
     },
     {
       requestId: "9a671c04",
-      entityIds: "FAC2004, FAC6405, FAC7503",
+      entityIds: "FAC2004, FAC6405",
       matchScore: 79,
       status: "Pending",
       processedDate: "18/10/2025",
     },
     {
       requestId: "9a671c05",
-      entityIds: "FAC2005, FAC7506, FAC8604, FAC9705, FAC1806",
+      entityIds: "FAC2005, FAC7506",
       matchScore: 83,
       status: "Pending",
       processedDate: "19/10/2025",
@@ -127,146 +124,6 @@ const MergeMatchApproval = () => {
       medicalLicense: "MA-MD-123456",
       address: "123 Medical Plaza, Boston, MA 02115, USA",
     },
-    PHY3201: {
-      firstName: "Sara",
-      lastName: "Johnson",
-      npiId: "1234567890",
-      orgId: "ORG-12346",
-      source: "Cerner",
-      mdmId: "MDM-PHY-002",
-      medicalLicense: "MA-MD-123457",
-      address: "125 Medical Plaza, Boston, MA 02115, USA",
-    },
-    PHY1002: {
-      firstName: "Michael",
-      lastName: "Williams",
-      npiId: "2345678901",
-      orgId: "ORG-23456",
-      source: "Epic EMR",
-      mdmId: "MDM-PHY-003",
-      medicalLicense: "NY-MD-234567",
-      address: "456 Health Ave, New York, NY 10001, USA",
-    },
-    PHY3205: {
-      firstName: "Mike",
-      lastName: "Williams",
-      npiId: "2345678901",
-      orgId: "ORG-23456",
-      source: "Cerner",
-      mdmId: "MDM-PHY-003",
-      medicalLicense: "NY-MD-234567",
-      address: "456 Health Ave, New York, NY 10001, USA",
-    },
-    PHY4301: {
-      firstName: "M.",
-      lastName: "Williams",
-      npiId: "2345678901",
-      orgId: "ORG-23457",
-      source: "Allscripts",
-      mdmId: "MDM-PHY-004",
-      medicalLicense: "NY-MD-234568",
-      address: "458 Health Ave, New York, NY 10001, USA",
-    },
-    PHY5402: {
-      firstName: "Michael",
-      lastName: "Wiliams",
-      npiId: "2345678901",
-      orgId: "ORG-23456",
-      source: "Epic EMR",
-      mdmId: "MDM-PHY-003",
-      medicalLicense: "NY-MD-234567",
-      address: "456 Health Ave, New York, NY 10001, USA",
-    },
-    PHY1003: {
-      firstName: "Emily",
-      lastName: "Davis",
-      npiId: "3456789012",
-      orgId: "ORG-34567",
-      source: "Epic EMR",
-      mdmId: "MDM-PHY-005",
-      medicalLicense: "CA-MD-345678",
-      address: "789 Care Blvd, Los Angeles, CA 90001, USA",
-    },
-    PHY4106: {
-      firstName: "Emily",
-      lastName: "Davies",
-      npiId: "3456789012",
-      orgId: "ORG-34567",
-      source: "Cerner",
-      mdmId: "MDM-PHY-005",
-      medicalLicense: "CA-MD-345678",
-      address: "789 Care Blvd, Los Angeles, CA 90001, USA",
-    },
-    PHY1004: {
-      firstName: "Robert",
-      lastName: "Brown",
-      npiId: "4567890123",
-      orgId: "ORG-45678",
-      source: "Epic EMR",
-      mdmId: "MDM-PHY-006",
-      medicalLicense: "TX-MD-456789",
-      address: "321 Wellness Dr, Houston, TX 77001, USA",
-    },
-    PHY5207: {
-      firstName: "Rob",
-      lastName: "Brown",
-      npiId: "4567890123",
-      orgId: "ORG-45678",
-      source: "Cerner",
-      mdmId: "MDM-PHY-006",
-      medicalLicense: "TX-MD-456789",
-      address: "321 Wellness Dr, Houston, TX 77001, USA",
-    },
-    PHY6308: {
-      firstName: "Robert",
-      lastName: "Browne",
-      npiId: "4567890123",
-      orgId: "ORG-45679",
-      source: "Allscripts",
-      mdmId: "MDM-PHY-007",
-      medicalLicense: "TX-MD-456790",
-      address: "323 Wellness Dr, Houston, TX 77001, USA",
-    },
-    PHY1005: {
-      firstName: "Jennifer",
-      lastName: "Martinez",
-      npiId: "5678901234",
-      orgId: "ORG-56789",
-      source: "Epic EMR",
-      mdmId: "MDM-PHY-008",
-      medicalLicense: "FL-MD-567890",
-      address: "654 Medical Center, Miami, FL 33101, USA",
-    },
-    PHY7409: {
-      firstName: "Jenny",
-      lastName: "Martinez",
-      npiId: "5678901234",
-      orgId: "ORG-56789",
-      source: "Cerner",
-      mdmId: "MDM-PHY-008",
-      medicalLicense: "FL-MD-567890",
-      address: "654 Medical Center, Miami, FL 33101, USA",
-    },
-    PHY8510: {
-      firstName: "J.",
-      lastName: "Martinez",
-      npiId: "5678901234",
-      orgId: "ORG-56790",
-      source: "Allscripts",
-      mdmId: "MDM-PHY-009",
-      medicalLicense: "FL-MD-567891",
-      address: "656 Medical Center, Miami, FL 33101, USA",
-    },
-    PHY9611: {
-      firstName: "Jennifer",
-      lastName: "Martines",
-      npiId: "5678901234",
-      orgId: "ORG-56789",
-      source: "Epic EMR",
-      mdmId: "MDM-PHY-008",
-      medicalLicense: "FL-MD-567890",
-      address: "654 Medical Center, Miami, FL 33101, USA",
-    },
   };
 
   const mockEntityDetailsHCO: Record<string, any> = {
@@ -287,141 +144,6 @@ const MergeMatchApproval = () => {
       mdmId: "MDM-FAC-501",
       taxId: "12-3456789",
       address: "456 Healthcare Ave, Boston, MA 02116, USA",
-    },
-    FAC4201: {
-      name: "Boston Gen. Hospital",
-      npiId: "9876543210",
-      orgId: "ORG-56790",
-      source: "Epic EMR",
-      mdmId: "MDM-FAC-502",
-      taxId: "12-3456790",
-      address: "458 Healthcare Ave, Boston, MA 02116, USA",
-    },
-    FAC2002: {
-      name: "New York Presbyterian",
-      npiId: "8765432109",
-      orgId: "ORG-67890",
-      source: "Epic EMR",
-      mdmId: "MDM-FAC-503",
-      taxId: "23-4567890",
-      address: "789 Medical Blvd, New York, NY 10001, USA",
-    },
-    FAC4203: {
-      name: "NY Presbyterian Hospital",
-      npiId: "8765432109",
-      orgId: "ORG-67890",
-      source: "Cerner",
-      mdmId: "MDM-FAC-503",
-      taxId: "23-4567890",
-      address: "789 Medical Blvd, New York, NY 10001, USA",
-    },
-    FAC5301: {
-      name: "New York Presby. Medical",
-      npiId: "8765432109",
-      orgId: "ORG-67891",
-      source: "Allscripts",
-      mdmId: "MDM-FAC-504",
-      taxId: "23-4567891",
-      address: "791 Medical Blvd, New York, NY 10001, USA",
-    },
-    FAC6402: {
-      name: "NYP Hospital",
-      npiId: "8765432109",
-      orgId: "ORG-67890",
-      source: "Epic EMR",
-      mdmId: "MDM-FAC-503",
-      taxId: "23-4567890",
-      address: "789 Medical Blvd, New York, NY 10001, USA",
-    },
-    FAC2003: {
-      name: "UCLA Medical Center",
-      npiId: "7654321098",
-      orgId: "ORG-78901",
-      source: "Epic EMR",
-      mdmId: "MDM-FAC-505",
-      taxId: "34-5678901",
-      address: "321 Wellness Dr, Los Angeles, CA 90001, USA",
-    },
-    FAC5304: {
-      name: "UCLA Medical Ctr",
-      npiId: "7654321098",
-      orgId: "ORG-78901",
-      source: "Cerner",
-      mdmId: "MDM-FAC-505",
-      taxId: "34-5678901",
-      address: "321 Wellness Dr, Los Angeles, CA 90001, USA",
-    },
-    FAC2004: {
-      name: "Houston Methodist",
-      npiId: "6543210987",
-      orgId: "ORG-89012",
-      source: "Epic EMR",
-      mdmId: "MDM-FAC-506",
-      taxId: "45-6789012",
-      address: "654 Care Center, Houston, TX 77001, USA",
-    },
-    FAC6405: {
-      name: "Houston Methodist Hospital",
-      npiId: "6543210987",
-      orgId: "ORG-89012",
-      source: "Cerner",
-      mdmId: "MDM-FAC-506",
-      taxId: "45-6789012",
-      address: "654 Care Center, Houston, TX 77001, USA",
-    },
-    FAC7503: {
-      name: "Methodist Hosp Houston",
-      npiId: "6543210987",
-      orgId: "ORG-89013",
-      source: "Allscripts",
-      mdmId: "MDM-FAC-507",
-      taxId: "45-6789013",
-      address: "656 Care Center, Houston, TX 77001, USA",
-    },
-    FAC2005: {
-      name: "Miami General Hospital",
-      npiId: "5432109876",
-      orgId: "ORG-90123",
-      source: "Epic EMR",
-      mdmId: "MDM-FAC-508",
-      taxId: "56-7890123",
-      address: "987 Health Plaza, Miami, FL 33101, USA",
-    },
-    FAC7506: {
-      name: "Miami General Med Center",
-      npiId: "5432109876",
-      orgId: "ORG-90123",
-      source: "Cerner",
-      mdmId: "MDM-FAC-508",
-      taxId: "56-7890123",
-      address: "987 Health Plaza, Miami, FL 33101, USA",
-    },
-    FAC8604: {
-      name: "Miami Gen. Hospital",
-      npiId: "5432109876",
-      orgId: "ORG-90124",
-      source: "Allscripts",
-      mdmId: "MDM-FAC-509",
-      taxId: "56-7890124",
-      address: "989 Health Plaza, Miami, FL 33101, USA",
-    },
-    FAC9705: {
-      name: "MGH Miami",
-      npiId: "5432109876",
-      orgId: "ORG-90123",
-      source: "Epic EMR",
-      mdmId: "MDM-FAC-508",
-      taxId: "56-7890123",
-      address: "987 Health Plaza, Miami, FL 33101, USA",
-    },
-    FAC1806: {
-      name: "Miami General Hosp",
-      npiId: "5432109876",
-      orgId: "ORG-90125",
-      source: "Meditech",
-      mdmId: "MDM-FAC-510",
-      taxId: "56-7890125",
-      address: "991 Health Plaza, Miami, FL 33101, USA",
     },
   };
 
@@ -539,47 +261,29 @@ const MergeMatchApproval = () => {
     setSelectedRequest(record);
     setIsDialogOpen(true);
     setComment("");
-    // Initialize all entities with 'approve' as default action
-    const entityIds = record.entityIds.split(", ").map((id: string) => id.trim());
-    const initialActions: Record<string, 'approve' | 'duplicate'> = {};
-    entityIds.forEach((id: string) => {
-      initialActions[id] = 'approve';
-    });
-    setEntityActions(initialActions);
   };
 
-  const handleEntityActionChange = (entityId: string, action: 'approve' | 'duplicate' | 'reject') => {
-    setEntityActions(prev => ({
-      ...prev,
-      [entityId]: action
-    }));
-  };
-
-  const handleSubmitActions = () => {
-    const approvedEntities = Object.entries(entityActions)
-      .filter(([_, action]) => action === 'approve')
-      .map(([id]) => id);
-    const duplicateEntities = Object.entries(entityActions)
-      .filter(([_, action]) => action === 'duplicate')
-      .map(([id]) => id);
-    const rejectedEntities = Object.entries(entityActions)
-      .filter(([_, action]) => action === 'reject')
-      .map(([id]) => id);
-
-    let message = "";
-    if (approvedEntities.length > 0) {
-      message += `Approved for merge: ${approvedEntities.join(", ")}. `;
-    }
-    if (duplicateEntities.length > 0) {
-      message += `Marked as deliberate duplicate: ${duplicateEntities.join(", ")}. `;
-    }
-    if (rejectedEntities.length > 0) {
-      message += `Rejected: ${rejectedEntities.join(", ")}.`;
-    }
-
+  const handleApprove = () => {
     toast({
-      title: "Actions Submitted",
-      description: message || "No actions selected.",
+      title: "Request Approved",
+      description: `Merge request ${selectedRequest?.requestId} has been approved.`,
+    });
+    setIsDialogOpen(false);
+  };
+
+  const handleReject = () => {
+    toast({
+      title: "Request Rejected",
+      description: `Merge request ${selectedRequest?.requestId} has been rejected.`,
+      variant: "destructive",
+    });
+    setIsDialogOpen(false);
+  };
+
+  const handleMarkDuplicate = () => {
+    toast({
+      title: "Marked as Deliberate Duplicate",
+      description: `Request ${selectedRequest?.requestId} marked as deliberate duplicate.`,
     });
     setIsDialogOpen(false);
   };
@@ -853,44 +557,18 @@ const MergeMatchApproval = () => {
 
               {/* Entity Details */}
               {selectedRequest.entityIds.split(", ").map((entityId: string, index: number) => {
-                const trimmedId = entityId.trim();
-                const details = mockEntityDetails[trimmedId as keyof typeof mockEntityDetails];
+                const details = mockEntityDetails[entityId as keyof typeof mockEntityDetails];
                 return (
-                  <div 
-                    key={trimmedId} 
-                    className="space-y-3 p-4 rounded-lg border bg-background border-border"
-                  >
+                  <div key={entityId} className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg font-semibold">{trimmedId}</span>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <RadioGroup
-                          value={entityActions[trimmedId] || 'approve'}
-                          onValueChange={(value) => handleEntityActionChange(trimmedId, value as 'approve' | 'duplicate' | 'reject')}
-                          className="flex items-center gap-4"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="approve" id={`approve-${trimmedId}`} />
-                            <Label htmlFor={`approve-${trimmedId}`} className="cursor-pointer">Approve</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="duplicate" id={`duplicate-${trimmedId}`} />
-                            <Label htmlFor={`duplicate-${trimmedId}`} className="cursor-pointer">Mark Deliberate Duplicate</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="reject" id={`reject-${trimmedId}`} />
-                            <Label htmlFor={`reject-${trimmedId}`} className="cursor-pointer">Reject</Label>
-                          </div>
-                        </RadioGroup>
-                        <Button 
-                          variant="link" 
-                          className="text-primary p-0 h-auto"
-                          onClick={() => navigate(entityType === "hco" ? `/hco/${trimmedId}` : `/hcp/${trimmedId}`)}
-                        >
-                          View more
-                        </Button>
-                      </div>
+                      <h3 className="text-lg font-semibold">{entityId}</h3>
+                      <Button 
+                        variant="link" 
+                        className="text-primary p-0 h-auto"
+                        onClick={() => navigate(entityType === "hco" ? `/hco/${entityId}` : `/hcp/${entityId}`)}
+                      >
+                        View more
+                      </Button>
                     </div>
                     
                     {entityType === "hco" ? (
@@ -898,32 +576,32 @@ const MergeMatchApproval = () => {
                         <div>
                           <div className="text-muted-foreground mb-1">Facility Name</div>
                           <div className={index === 0 ? "text-red-600 font-medium" : ""}>
-                            {details?.name || "N/A"}
+                            {details?.name}
                           </div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">NPI ID</div>
-                          <div>{details?.npiId || "N/A"}</div>
+                          <div>{details?.npiId}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">ORG ID</div>
-                          <div>{details?.orgId || "N/A"}</div>
+                          <div>{details?.orgId}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">Source</div>
-                          <div>{details?.source || "N/A"}</div>
+                          <div>{details?.source}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">MDM ID</div>
-                          <div>{details?.mdmId || "N/A"}</div>
+                          <div>{details?.mdmId}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">Tax ID</div>
-                          <div>{details?.taxId || "N/A"}</div>
+                          <div>{details?.taxId}</div>
                         </div>
                         <div className="col-span-2">
                           <div className="text-muted-foreground mb-1">Address</div>
-                          <div>{details?.address || "N/A"}</div>
+                          <div>{details?.address}</div>
                         </div>
                       </div>
                     ) : (
@@ -931,36 +609,36 @@ const MergeMatchApproval = () => {
                         <div>
                           <div className="text-muted-foreground mb-1">First Name</div>
                           <div className={index === 0 ? "text-red-600 font-medium" : ""}>
-                            {details?.firstName || "N/A"}
+                            {details?.firstName}
                           </div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">NPI ID</div>
-                          <div>{details?.npiId || "N/A"}</div>
+                          <div>{details?.npiId}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">Last Name</div>
-                          <div>{details?.lastName || "N/A"}</div>
+                          <div>{details?.lastName}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">ORG ID</div>
-                          <div>{details?.orgId || "N/A"}</div>
+                          <div>{details?.orgId}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">Source</div>
-                          <div>{details?.source || "N/A"}</div>
+                          <div>{details?.source}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">MDM ID</div>
-                          <div>{details?.mdmId || "N/A"}</div>
+                          <div>{details?.mdmId}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">Medical License</div>
-                          <div>{details?.medicalLicense || "N/A"}</div>
+                          <div>{details?.medicalLicense}</div>
                         </div>
                         <div>
                           <div className="text-muted-foreground mb-1">Address</div>
-                          <div>{details?.address || "N/A"}</div>
+                          <div>{details?.address}</div>
                         </div>
                       </div>
                     )}
@@ -979,13 +657,28 @@ const MergeMatchApproval = () => {
                 />
               </div>
 
-              {/* Submit Button */}
-              <div className="flex justify-end pt-4 border-t">
-                <Button onClick={handleSubmitActions}>
-                  Submit
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                <Button 
+                  variant="outline" 
+                  className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+                  onClick={handleReject}
+                >
+                  Reject
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={handleMarkDuplicate}
+                >
+                  Mark Deliberate Duplicate
+                </Button>
+                <Button 
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  onClick={handleApprove}
+                >
+                  Approve
                 </Button>
               </div>
-
             </div>
           )}
         </DialogContent>
