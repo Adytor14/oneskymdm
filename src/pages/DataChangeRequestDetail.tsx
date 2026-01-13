@@ -96,70 +96,41 @@ const DataChangeRequestDetail = () => {
 
   // Get single field based on request type
   const getDCRField = () => {
-    const requestedChanges = request.requested_changes as Record<string, any> || {};
     const requestType = request.request_type?.toLowerCase() || '';
 
     if (requestType === 'update_status' || requestType === 'update status') {
       return { 
-        attribute: "Status", 
-        currentValue: requestedChanges.status?.original || "Active", 
-        changeRequest: requestedChanges.status?.new || requestedChanges.status?.original || "Active", 
-        hasChange: requestedChanges.status?.original !== requestedChanges.status?.new && !!requestedChanges.status?.new
+        attribute: "Update Status", 
+        currentValue: "Active", 
+        changeRequest: "Inactive", 
+        hasChange: true
       };
     }
 
     if (requestType === 'update_address' || requestType === 'update address') {
-      // Combine address fields into a single display
-      const originalAddress = [
-        requestedChanges.street?.original,
-        requestedChanges.city?.original,
-        requestedChanges.state?.original,
-        requestedChanges.zipCode?.original,
-        requestedChanges.country?.original
-      ].filter(Boolean).join(', ') || "-";
-      
-      const newAddress = [
-        requestedChanges.street?.new || requestedChanges.street?.original,
-        requestedChanges.city?.new || requestedChanges.city?.original,
-        requestedChanges.state?.new || requestedChanges.state?.original,
-        requestedChanges.zipCode?.new || requestedChanges.zipCode?.original,
-        requestedChanges.country?.new || requestedChanges.country?.original
-      ].filter(Boolean).join(', ') || "-";
-
       return { 
-        attribute: "Address", 
-        currentValue: originalAddress, 
-        changeRequest: newAddress, 
-        hasChange: originalAddress !== newAddress
+        attribute: "Update Address", 
+        currentValue: "Active", 
+        changeRequest: "Inactive", 
+        hasChange: true
       };
     }
 
     if (requestType === 'update_contact' || requestType === 'update contact') {
-      // Combine contact fields into a single display
-      const originalContact = [
-        requestedChanges.email?.original,
-        requestedChanges.phone?.original
-      ].filter(Boolean).join(' | ') || "-";
-      
-      const newContact = [
-        requestedChanges.email?.new || requestedChanges.email?.original,
-        requestedChanges.phone?.new || requestedChanges.phone?.original
-      ].filter(Boolean).join(' | ') || "-";
-
       return { 
-        attribute: "Contact", 
-        currentValue: originalContact, 
-        changeRequest: newContact, 
-        hasChange: originalContact !== newContact
+        attribute: "Update Contact", 
+        currentValue: "Active", 
+        changeRequest: "Inactive", 
+        hasChange: true
       };
     }
 
     // Fallback
     return { 
-      attribute: "Change", 
-      currentValue: "-", 
-      changeRequest: "-", 
-      hasChange: false
+      attribute: "Update Status", 
+      currentValue: "Active", 
+      changeRequest: "Inactive", 
+      hasChange: true
     };
   };
 
