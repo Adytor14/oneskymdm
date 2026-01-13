@@ -96,28 +96,104 @@ const DataChangeRequestDetail = () => {
     },
   ];
 
-  const changeFields = [
-    {
-      category: "Primary Information",
-      fields: [
-        { attribute: "Status", currentValue: "Active", changeRequest: "Active", hasChange: false },
-      ],
-    },
-    {
-      category: "Personal Information",
-      fields: [
-        { attribute: "NPI ID", currentValue: "1234567890", changeRequest: "1234567890", hasChange: false },
-        { attribute: "First Name", currentValue: "Sarah", changeRequest: "Sayrah", hasChange: true },
-        { attribute: "Last Name", currentValue: "Johnson", changeRequest: "Johanson", hasChange: true },
-        { attribute: "Address", currentValue: "123 Medical Plaza, Boston, MA 02115, USA", changeRequest: "123 Medical Plaza, Boston, MA 02115, USA", hasChange: false },
-        { attribute: "Org ID", currentValue: "ORG-12345", changeRequest: "ORG-12345", hasChange: false },
-      ],
-    },
-    {
-      category: "Parent Affiliation",
-      fields: [],
-    },
-  ];
+  // Get fields based on request type
+  const getFieldsForRequestType = () => {
+    const requestedChanges = request.requested_changes as Record<string, any> || {};
+    const requestType = request.request_type?.toLowerCase() || '';
+
+    if (requestType === 'update_status' || requestType === 'update status') {
+      return [
+        {
+          category: "Status Information",
+          fields: [
+            { 
+              attribute: "Status", 
+              currentValue: requestedChanges.status?.original || "Active", 
+              changeRequest: requestedChanges.status?.new || requestedChanges.status?.original || "Active", 
+              hasChange: requestedChanges.status?.original !== requestedChanges.status?.new && !!requestedChanges.status?.new
+            },
+          ],
+        },
+      ];
+    }
+
+    if (requestType === 'update_address' || requestType === 'update address') {
+      return [
+        {
+          category: "Address Information",
+          fields: [
+            { 
+              attribute: "Street", 
+              currentValue: requestedChanges.street?.original || "-", 
+              changeRequest: requestedChanges.street?.new || requestedChanges.street?.original || "-", 
+              hasChange: requestedChanges.street?.original !== requestedChanges.street?.new && !!requestedChanges.street?.new
+            },
+            { 
+              attribute: "City", 
+              currentValue: requestedChanges.city?.original || "-", 
+              changeRequest: requestedChanges.city?.new || requestedChanges.city?.original || "-", 
+              hasChange: requestedChanges.city?.original !== requestedChanges.city?.new && !!requestedChanges.city?.new
+            },
+            { 
+              attribute: "State", 
+              currentValue: requestedChanges.state?.original || "-", 
+              changeRequest: requestedChanges.state?.new || requestedChanges.state?.original || "-", 
+              hasChange: requestedChanges.state?.original !== requestedChanges.state?.new && !!requestedChanges.state?.new
+            },
+            { 
+              attribute: "Zip Code", 
+              currentValue: requestedChanges.zipCode?.original || "-", 
+              changeRequest: requestedChanges.zipCode?.new || requestedChanges.zipCode?.original || "-", 
+              hasChange: requestedChanges.zipCode?.original !== requestedChanges.zipCode?.new && !!requestedChanges.zipCode?.new
+            },
+            { 
+              attribute: "Country", 
+              currentValue: requestedChanges.country?.original || "-", 
+              changeRequest: requestedChanges.country?.new || requestedChanges.country?.original || "-", 
+              hasChange: requestedChanges.country?.original !== requestedChanges.country?.new && !!requestedChanges.country?.new
+            },
+          ],
+        },
+      ];
+    }
+
+    if (requestType === 'update_contact' || requestType === 'update contact') {
+      return [
+        {
+          category: "Contact Information",
+          fields: [
+            { 
+              attribute: "Email", 
+              currentValue: requestedChanges.email?.original || "-", 
+              changeRequest: requestedChanges.email?.new || requestedChanges.email?.original || "-", 
+              hasChange: requestedChanges.email?.original !== requestedChanges.email?.new && !!requestedChanges.email?.new
+            },
+            { 
+              attribute: "Phone", 
+              currentValue: requestedChanges.phone?.original || "-", 
+              changeRequest: requestedChanges.phone?.new || requestedChanges.phone?.original || "-", 
+              hasChange: requestedChanges.phone?.original !== requestedChanges.phone?.new && !!requestedChanges.phone?.new
+            },
+          ],
+        },
+      ];
+    }
+
+    // Fallback for unknown request types
+    return [
+      {
+        category: "Requested Changes",
+        fields: Object.entries(requestedChanges).map(([key, value]: [string, any]) => ({
+          attribute: key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1'),
+          currentValue: value?.original || "-",
+          changeRequest: value?.new || value?.original || "-",
+          hasChange: value?.original !== value?.new && !!value?.new,
+        })),
+      },
+    ];
+  };
+
+  const changeFields = getFieldsForRequestType();
 
   const handleApprove = () => {
     if (!approvalNote.trim()) {
@@ -305,24 +381,15 @@ const DataChangeRequestDetail = () => {
                     <div>Current Value</div>
                     <div>Change Request</div>
                   </div>
-                  <CategorySection
-                    category="Primary Information"
-                    fields={changeFields[0].fields}
-                    isOpen={isPrimaryInfoOpen}
-                    setIsOpen={setIsPrimaryInfoOpen}
-                  />
-                  <CategorySection
-                    category="Personal Information"
-                    fields={changeFields[1].fields}
-                    isOpen={isPersonalInfoOpen}
-                    setIsOpen={setIsPersonalInfoOpen}
-                  />
-                  <CategorySection
-                    category="Parent Affiliation"
-                    fields={changeFields[2].fields}
-                    isOpen={isParentAffiliationOpen}
-                    setIsOpen={setIsParentAffiliationOpen}
-                  />
+                  {changeFields.map((section, index) => (
+                    <CategorySection
+                      key={index}
+                      category={section.category}
+                      fields={section.fields}
+                      isOpen={isPrimaryInfoOpen}
+                      setIsOpen={setIsPrimaryInfoOpen}
+                    />
+                  ))}
                 </TabsContent>
 
                 <TabsContent value="all-fields" className="m-0">
