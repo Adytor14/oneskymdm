@@ -52,28 +52,14 @@ const DataChangeRequests = () => {
 
   const getDCRTypeName = (entityType: string, requestType: string) => {
     const type = requestType.toLowerCase();
-    const entity = entityType.toLowerCase();
     
-    if (entity === 'hcp' || entity === 'physician') {
-      if (type.includes('name') || type.includes('first')) return 'First Name Change - Physician';
-      if (type.includes('last')) return 'Last Name Change - Physician';
-      if (type.includes('address')) return 'Update Address - Physician';
-      if (type.includes('zip')) return 'Update ZIP - Physician';
-      if (type.includes('phone')) return 'Phone Update - Physician';
-      if (type.includes('email')) return 'Email Update - Physician';
-      return 'Update - Physician';
-    } else if (entity === 'hco' || entity === 'facility') {
-      if (type.includes('name')) return 'Name Change - Facility';
-      if (type.includes('address')) return 'Update Address - Facility';
-      if (type.includes('zip')) return 'Update ZIP - Facility';
-      if (type.includes('phone')) return 'Phone Update - Facility';
-      if (type.includes('email')) return 'Email Update - Facility';
-      return 'Update - Facility';
-    } else if (entity === 'address') {
-      if (type.includes('zip')) return 'Update ZIP';
-      return 'Update Address';
-    }
-    return requestType;
+    // Map to only the three allowed DCR types
+    if (type.includes('address')) return 'Update Address';
+    if (type.includes('status')) return 'Update Status';
+    if (type.includes('contact')) return 'Update Contact';
+    
+    // Default fallback based on common patterns
+    return 'Update Status';
   };
 
   const formatPriority = (priority: string) => {
