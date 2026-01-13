@@ -17,8 +17,6 @@ const DataChangeRequestDetail = () => {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState("dcr-fields");
   const [isPrimaryInfoOpen, setIsPrimaryInfoOpen] = useState(true);
-  const [isPersonalInfoOpen, setIsPersonalInfoOpen] = useState(true);
-  const [isParentAffiliationOpen, setIsParentAffiliationOpen] = useState(true);
   const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
   const [approvalNote, setApprovalNote] = useState("");
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
