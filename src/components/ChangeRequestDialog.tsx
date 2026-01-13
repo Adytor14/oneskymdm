@@ -210,59 +210,69 @@ export const ChangeRequestDialog = ({ entityType, entityId, entityData }: Change
       case "HCP":
         return (
           <>
-            {/* Status Field */}
-            <div className="grid gap-2">
-              <Label>Status</Label>
-              <Select value={fieldChanges.status || ""} onValueChange={(value) => handleFieldChange("status", value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Inactive">Inactive</SelectItem>
-                  <SelectItem value="Pending">Pending</SelectItem>
-                  <SelectItem value="Suspended">Suspended</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Show Status fields only for Update Status */}
+            {requestType === "update_status" && (
+              <div className="grid gap-2">
+                <Label>Status</Label>
+                <Select value={fieldChanges.status || ""} onValueChange={(value) => handleFieldChange("status", value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Inactive">Inactive</SelectItem>
+                    <SelectItem value="Pending">Pending</SelectItem>
+                    <SelectItem value="Suspended">Suspended</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             
-            <Separator />
-            <h4 className="font-semibold">Contact Information</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label>Email</Label>
-                <Input type="email" value={fieldChanges.email || ""} onChange={(e) => handleFieldChange("email", e.target.value)} />
-              </div>
-              <div className="grid gap-2">
-                <Label>Phone</Label>
-                <Input value={fieldChanges.phone || ""} onChange={(e) => handleFieldChange("phone", e.target.value)} />
-              </div>
-            </div>
+            {/* Show Contact fields only for Update Contact */}
+            {requestType === "update_contact" && (
+              <>
+                <h4 className="font-semibold">Contact Information</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label>Email</Label>
+                    <Input type="email" value={fieldChanges.email || ""} onChange={(e) => handleFieldChange("email", e.target.value)} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Phone</Label>
+                    <Input value={fieldChanges.phone || ""} onChange={(e) => handleFieldChange("phone", e.target.value)} />
+                  </div>
+                </div>
+              </>
+            )}
             
-            <Separator />
-            <h4 className="font-semibold">Address</h4>
-            <div className="grid gap-2">
-              <Label>Street</Label>
-              <Input value={fieldChanges.street || ""} onChange={(e) => handleFieldChange("street", e.target.value)} />
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="grid gap-2">
-                <Label>City</Label>
-                <Input value={fieldChanges.city || ""} onChange={(e) => handleFieldChange("city", e.target.value)} />
-              </div>
-              <div className="grid gap-2">
-                <Label>State</Label>
-                <Input value={fieldChanges.state || ""} onChange={(e) => handleFieldChange("state", e.target.value)} />
-              </div>
-              <div className="grid gap-2">
-                <Label>ZIP Code</Label>
-                <Input value={fieldChanges.zipCode || ""} onChange={(e) => handleFieldChange("zipCode", e.target.value)} />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <Label>Country</Label>
-              <Input value={fieldChanges.country || ""} onChange={(e) => handleFieldChange("country", e.target.value)} />
-            </div>
+            {/* Show Address fields only for Update Address */}
+            {requestType === "update_address" && (
+              <>
+                <h4 className="font-semibold">Address</h4>
+                <div className="grid gap-2">
+                  <Label>Street</Label>
+                  <Input value={fieldChanges.street || ""} onChange={(e) => handleFieldChange("street", e.target.value)} />
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="grid gap-2">
+                    <Label>City</Label>
+                    <Input value={fieldChanges.city || ""} onChange={(e) => handleFieldChange("city", e.target.value)} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>State</Label>
+                    <Input value={fieldChanges.state || ""} onChange={(e) => handleFieldChange("state", e.target.value)} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>ZIP Code</Label>
+                    <Input value={fieldChanges.zipCode || ""} onChange={(e) => handleFieldChange("zipCode", e.target.value)} />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label>Country</Label>
+                  <Input value={fieldChanges.country || ""} onChange={(e) => handleFieldChange("country", e.target.value)} />
+                </div>
+              </>
+            )}
           </>
         );
       case "HCO":
