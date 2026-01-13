@@ -188,22 +188,12 @@ const DataChangeRequestDetail = () => {
         </CollapsibleTrigger>
         <CollapsibleContent>
           {fields.map((field: any, idx: number) => (
-            <div key={idx} className={`grid ${isActionable ? 'grid-cols-4' : 'grid-cols-3'} gap-4 p-3 border-t items-center hover:bg-muted/25`}>
+            <div key={idx} className="grid grid-cols-3 gap-4 p-3 border-t items-center hover:bg-muted/25">
               <div className="text-muted-foreground">{field.attribute}</div>
               <div>{field.currentValue}</div>
               <div className={field.hasChange ? "text-orange-600 font-medium" : ""}>
                 {field.changeRequest}
               </div>
-              {isActionable && (
-                <div className="flex gap-2">
-                  <Button size="icon" variant="ghost" className="h-8 w-8">
-                    <Check className="h-4 w-4 text-green-600" />
-                  </Button>
-                  <Button size="icon" variant="ghost" className="h-8 w-8">
-                    <X className="h-4 w-4 text-red-600" />
-                  </Button>
-                </div>
-              )}
             </div>
           ))}
         </CollapsibleContent>
@@ -310,11 +300,10 @@ const DataChangeRequestDetail = () => {
                 </div>
 
                 <TabsContent value="dcr-fields" className="m-0">
-                  <div className={`grid ${isActionable ? 'grid-cols-4' : 'grid-cols-3'} gap-4 p-3 bg-primary text-primary-foreground font-medium`}>
+                  <div className="grid grid-cols-3 gap-4 p-3 bg-primary text-primary-foreground font-medium">
                     <div>Attributes</div>
                     <div>Current Value</div>
                     <div>Change Request</div>
-                    {isActionable && <div>Action</div>}
                   </div>
                   <CategorySection
                     category="Primary Information"
