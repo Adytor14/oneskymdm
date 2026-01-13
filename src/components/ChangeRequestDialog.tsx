@@ -25,8 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 const changeRequestSchema = z.object({
   reason: z.string().trim().min(10, "Reason must be at least 10 characters").max(1000, "Reason must be less than 1000 characters"),
   requestedChanges: z.string().trim().min(1, "Please describe the changes you want to make"),
-  requestType: z.enum(["create", "update", "delete"]),
-  priority: z.enum(["low", "medium", "high", "urgent"]),
+  requestType: z.enum(["update_address", "update_status", "update_contact"]),
 });
 
 interface ChangeRequestDialogProps {
@@ -38,8 +37,7 @@ interface ChangeRequestDialogProps {
 export const ChangeRequestDialog = ({ entityType, entityId, entityData }: ChangeRequestDialogProps) => {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
-  const [requestType, setRequestType] = useState<"create" | "update" | "delete">("update");
-  const [priority, setPriority] = useState<"low" | "medium" | "high" | "urgent">("medium");
+  const [requestType, setRequestType] = useState<"update_address" | "update_status" | "update_contact">("update_address");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fieldChanges, setFieldChanges] = useState<Record<string, any>>({});
   const { toast } = useToast();
@@ -63,20 +61,15 @@ export const ChangeRequestDialog = ({ entityType, entityId, entityData }: Change
     switch (entityType) {
       case "HCP":
         const hcp = entityData as HCPProfile;
-        changes.firstName = hcp.firstName;
-        changes.lastName = hcp.lastName;
-        changes.npiId = hcp.npiId;
-        changes.email = hcp.email;
-        changes.phone = hcp.phone;
-        changes.speciality = hcp.speciality.join(", ");
-        changes.organization = hcp.organization;
-        changes.license = hcp.license;
-        changes.degreeType = hcp.degreeType;
+        // Only include editable fields: Address, Status, and Contact
         changes.street = hcp.address.street;
         changes.city = hcp.address.city;
         changes.state = hcp.address.state;
         changes.zipCode = hcp.address.zipCode;
         changes.country = hcp.address.country;
+        changes.status = hcp.status;
+        changes.email = hcp.email;
+        changes.phone = hcp.phone;
         break;
       case "HCO":
         const hco = entityData as HCOProfile;
@@ -125,8 +118,7 @@ export const ChangeRequestDialog = ({ entityType, entityId, entityData }: Change
     if (newOpen) {
       setFieldChanges(initializeFieldChanges());
       setReason("");
-      setRequestType("update");
-      setPriority("medium");
+      setRequestType("update_address");
     }
   };
 
@@ -179,7 +171,7 @@ export const ChangeRequestDialog = ({ entityType, entityId, entityData }: Change
           reason: reason,
           requested_changes: fieldChanges,
           request_type: requestType,
-          priority: priority,
+          priority: "medium",
           status: "pending",
         });
 
@@ -200,8 +192,7 @@ export const ChangeRequestDialog = ({ entityType, entityId, entityData }: Change
       // Reset form and close dialog
       setReason("");
       setFieldChanges({});
-      setRequestType("update");
-      setPriority("medium");
+      setRequestType("update_address");
       setOpen(false);
     } catch (error) {
       toast({
@@ -219,26 +210,24 @@ export const ChangeRequestDialog = ({ entityType, entityId, entityData }: Change
       case "HCP":
         return (
           <>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label>First Name</Label>
-                <Input value={fieldChanges.firstName || ""} onChange={(e) => handleFieldChange("firstName", e.target.value)} />
-              </div>
-              <div className="grid gap-2">
-                <Label>Last Name</Label>
-                <Input value={fieldChanges.lastName || ""} onChange={(e) => handleFieldChange("lastName", e.target.value)} />
-              </div>
+            {/* Status Field */}
+            <div className="grid gap-2">
+              <Label>Status</Label>
+              <Select value={fieldChanges.status || ""} onValueChange={(value) => handleFieldChange("status", value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Inactive">Inactive</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Suspended">Suspended</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label>NPI ID</Label>
-                <Input value={fieldChanges.npiId || ""} onChange={(e) => handleFieldChange("npiId", e.target.value)} />
-              </div>
-              <div className="grid gap-2">
-                <Label>License</Label>
-                <Input value={fieldChanges.license || ""} onChange={(e) => handleFieldChange("license", e.target.value)} />
-              </div>
-            </div>
+            
+            <Separator />
+            <h4 className="font-semibold">Contact Information</h4>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>Email</Label>
@@ -249,18 +238,7 @@ export const ChangeRequestDialog = ({ entityType, entityId, entityData }: Change
                 <Input value={fieldChanges.phone || ""} onChange={(e) => handleFieldChange("phone", e.target.value)} />
               </div>
             </div>
-            <div className="grid gap-2">
-              <Label>Specialties (comma-separated)</Label>
-              <Input value={fieldChanges.speciality || ""} onChange={(e) => handleFieldChange("speciality", e.target.value)} />
-            </div>
-            <div className="grid gap-2">
-              <Label>Organization</Label>
-              <Input value={fieldChanges.organization || ""} onChange={(e) => handleFieldChange("organization", e.target.value)} />
-            </div>
-            <div className="grid gap-2">
-              <Label>Degree Type</Label>
-              <Input value={fieldChanges.degreeType || ""} onChange={(e) => handleFieldChange("degreeType", e.target.value)} />
-            </div>
+            
             <Separator />
             <h4 className="font-semibold">Address</h4>
             <div className="grid gap-2">
@@ -464,34 +442,18 @@ export const ChangeRequestDialog = ({ entityType, entityId, entityData }: Change
         </DialogHeader>
         <ScrollArea className="max-h-[60vh] pr-4">
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label>Request Type *</Label>
-                <Select value={requestType} onValueChange={(value: any) => setRequestType(value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="create">Create</SelectItem>
-                    <SelectItem value="update">Update</SelectItem>
-                    <SelectItem value="delete">Delete</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-2">
-                <Label>Priority *</Label>
-                <Select value={priority} onValueChange={(value: any) => setPriority(value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="urgent">Urgent</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="grid gap-2">
+              <Label>Request Type *</Label>
+              <Select value={requestType} onValueChange={(value: any) => setRequestType(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="update_address">Update Address</SelectItem>
+                  <SelectItem value="update_status">Update Status</SelectItem>
+                  <SelectItem value="update_contact">Update Contact</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
             <Separator />
