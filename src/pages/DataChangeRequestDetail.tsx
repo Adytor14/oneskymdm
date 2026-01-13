@@ -94,104 +94,76 @@ const DataChangeRequestDetail = () => {
     },
   ];
 
-  // Get fields based on request type
-  const getFieldsForRequestType = () => {
+  // Get single field based on request type
+  const getDCRField = () => {
     const requestedChanges = request.requested_changes as Record<string, any> || {};
     const requestType = request.request_type?.toLowerCase() || '';
 
     if (requestType === 'update_status' || requestType === 'update status') {
-      return [
-        {
-          category: "Status Information",
-          fields: [
-            { 
-              attribute: "Status", 
-              currentValue: requestedChanges.status?.original || "Active", 
-              changeRequest: requestedChanges.status?.new || requestedChanges.status?.original || "Active", 
-              hasChange: requestedChanges.status?.original !== requestedChanges.status?.new && !!requestedChanges.status?.new
-            },
-          ],
-        },
-      ];
+      return { 
+        attribute: "Status", 
+        currentValue: requestedChanges.status?.original || "Active", 
+        changeRequest: requestedChanges.status?.new || requestedChanges.status?.original || "Active", 
+        hasChange: requestedChanges.status?.original !== requestedChanges.status?.new && !!requestedChanges.status?.new
+      };
     }
 
     if (requestType === 'update_address' || requestType === 'update address') {
-      return [
-        {
-          category: "Address Information",
-          fields: [
-            { 
-              attribute: "Street", 
-              currentValue: requestedChanges.street?.original || "-", 
-              changeRequest: requestedChanges.street?.new || requestedChanges.street?.original || "-", 
-              hasChange: requestedChanges.street?.original !== requestedChanges.street?.new && !!requestedChanges.street?.new
-            },
-            { 
-              attribute: "City", 
-              currentValue: requestedChanges.city?.original || "-", 
-              changeRequest: requestedChanges.city?.new || requestedChanges.city?.original || "-", 
-              hasChange: requestedChanges.city?.original !== requestedChanges.city?.new && !!requestedChanges.city?.new
-            },
-            { 
-              attribute: "State", 
-              currentValue: requestedChanges.state?.original || "-", 
-              changeRequest: requestedChanges.state?.new || requestedChanges.state?.original || "-", 
-              hasChange: requestedChanges.state?.original !== requestedChanges.state?.new && !!requestedChanges.state?.new
-            },
-            { 
-              attribute: "Zip Code", 
-              currentValue: requestedChanges.zipCode?.original || "-", 
-              changeRequest: requestedChanges.zipCode?.new || requestedChanges.zipCode?.original || "-", 
-              hasChange: requestedChanges.zipCode?.original !== requestedChanges.zipCode?.new && !!requestedChanges.zipCode?.new
-            },
-            { 
-              attribute: "Country", 
-              currentValue: requestedChanges.country?.original || "-", 
-              changeRequest: requestedChanges.country?.new || requestedChanges.country?.original || "-", 
-              hasChange: requestedChanges.country?.original !== requestedChanges.country?.new && !!requestedChanges.country?.new
-            },
-          ],
-        },
-      ];
+      // Combine address fields into a single display
+      const originalAddress = [
+        requestedChanges.street?.original,
+        requestedChanges.city?.original,
+        requestedChanges.state?.original,
+        requestedChanges.zipCode?.original,
+        requestedChanges.country?.original
+      ].filter(Boolean).join(', ') || "-";
+      
+      const newAddress = [
+        requestedChanges.street?.new || requestedChanges.street?.original,
+        requestedChanges.city?.new || requestedChanges.city?.original,
+        requestedChanges.state?.new || requestedChanges.state?.original,
+        requestedChanges.zipCode?.new || requestedChanges.zipCode?.original,
+        requestedChanges.country?.new || requestedChanges.country?.original
+      ].filter(Boolean).join(', ') || "-";
+
+      return { 
+        attribute: "Address", 
+        currentValue: originalAddress, 
+        changeRequest: newAddress, 
+        hasChange: originalAddress !== newAddress
+      };
     }
 
     if (requestType === 'update_contact' || requestType === 'update contact') {
-      return [
-        {
-          category: "Contact Information",
-          fields: [
-            { 
-              attribute: "Email", 
-              currentValue: requestedChanges.email?.original || "-", 
-              changeRequest: requestedChanges.email?.new || requestedChanges.email?.original || "-", 
-              hasChange: requestedChanges.email?.original !== requestedChanges.email?.new && !!requestedChanges.email?.new
-            },
-            { 
-              attribute: "Phone", 
-              currentValue: requestedChanges.phone?.original || "-", 
-              changeRequest: requestedChanges.phone?.new || requestedChanges.phone?.original || "-", 
-              hasChange: requestedChanges.phone?.original !== requestedChanges.phone?.new && !!requestedChanges.phone?.new
-            },
-          ],
-        },
-      ];
+      // Combine contact fields into a single display
+      const originalContact = [
+        requestedChanges.email?.original,
+        requestedChanges.phone?.original
+      ].filter(Boolean).join(' | ') || "-";
+      
+      const newContact = [
+        requestedChanges.email?.new || requestedChanges.email?.original,
+        requestedChanges.phone?.new || requestedChanges.phone?.original
+      ].filter(Boolean).join(' | ') || "-";
+
+      return { 
+        attribute: "Contact", 
+        currentValue: originalContact, 
+        changeRequest: newContact, 
+        hasChange: originalContact !== newContact
+      };
     }
 
-    // Fallback for unknown request types
-    return [
-      {
-        category: "Requested Changes",
-        fields: Object.entries(requestedChanges).map(([key, value]: [string, any]) => ({
-          attribute: key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1'),
-          currentValue: value?.original || "-",
-          changeRequest: value?.new || value?.original || "-",
-          hasChange: value?.original !== value?.new && !!value?.new,
-        })),
-      },
-    ];
+    // Fallback
+    return { 
+      attribute: "Change", 
+      currentValue: "-", 
+      changeRequest: "-", 
+      hasChange: false
+    };
   };
 
-  const changeFields = getFieldsForRequestType();
+  const dcrField = getDCRField();
 
   const handleApprove = () => {
     if (!approvalNote.trim()) {
@@ -379,15 +351,13 @@ const DataChangeRequestDetail = () => {
                     <div>Current Value</div>
                     <div>Change Request</div>
                   </div>
-                  {changeFields.map((section, index) => (
-                    <CategorySection
-                      key={index}
-                      category={section.category}
-                      fields={section.fields}
-                      isOpen={isPrimaryInfoOpen}
-                      setIsOpen={setIsPrimaryInfoOpen}
-                    />
-                  ))}
+                  <div className="grid grid-cols-3 gap-4 p-3 border-b items-center hover:bg-muted/25">
+                    <div className="text-muted-foreground">{dcrField.attribute}</div>
+                    <div>{dcrField.currentValue}</div>
+                    <div className={dcrField.hasChange ? "text-orange-600 font-medium" : ""}>
+                      {dcrField.changeRequest}
+                    </div>
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="all-fields" className="m-0">
