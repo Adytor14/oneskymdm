@@ -1309,50 +1309,49 @@ const RulesManagement = () => {
                     </div>
                   ) : (
                     <div className="border rounded-lg overflow-hidden">
-                      <div className="grid grid-cols-[2fr,1.5fr,2fr] gap-4 p-4 bg-muted font-semibold">
-                        <div>Attribute Name</div>
-                        <div>Eligible for DCR</div>
-                        <div>Manual/Automatic Interference</div>
+                      <div className="grid grid-cols-[2fr,2fr] gap-4 p-4 bg-muted font-semibold">
+                        <div>DCR Type</div>
+                        <div>Approval Requirement</div>
                       </div>
                       <div className="divide-y">
-                        {editedDcrRules.map((rule, idx) => (
-                          <div
-                            key={rule.id}
-                            className="grid grid-cols-[2fr,1.5fr,2fr] gap-4 p-4 items-center hover:bg-muted/50 transition-colors"
-                          >
-                            <div className="font-medium">{rule.attribute_name}</div>
-                            <div>
-                              <Switch
-                                checked={rule.eligible_for_dcr}
-                                onCheckedChange={(checked) =>
-                                  handleDcrRuleChange(idx, "eligible_for_dcr", checked)
-                                }
-                              />
+                        {editedDcrRules.map((rule, idx) => {
+                          const getApprovalLabel = (type: string) => {
+                            return type === "manual" ? "Approval Required" : "Auto Approved";
+                          };
+                          
+                          return (
+                            <div
+                              key={rule.id}
+                              className="grid grid-cols-[2fr,2fr] gap-4 p-4 items-center hover:bg-muted/50 transition-colors"
+                            >
+                              <div className="font-medium">
+                                {rule.attribute_name} ({getApprovalLabel(rule.interference_type)})
+                              </div>
+                              <div>
+                                <RadioGroup
+                                  value={rule.interference_type}
+                                  onValueChange={(value: "manual" | "automatic") =>
+                                    handleDcrRuleChange(idx, "interference_type", value)
+                                  }
+                                  className="flex gap-6"
+                                >
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="manual" id={`manual-${rule.id}`} />
+                                    <Label htmlFor={`manual-${rule.id}`} className="cursor-pointer">
+                                      Approval Required
+                                    </Label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="automatic" id={`automatic-${rule.id}`} />
+                                    <Label htmlFor={`automatic-${rule.id}`} className="cursor-pointer">
+                                      Auto Approved
+                                    </Label>
+                                  </div>
+                                </RadioGroup>
+                              </div>
                             </div>
-                            <div>
-                              <RadioGroup
-                                value={rule.interference_type}
-                                onValueChange={(value: "manual" | "automatic") =>
-                                  handleDcrRuleChange(idx, "interference_type", value)
-                                }
-                                className="flex gap-6"
-                              >
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="manual" id={`manual-${rule.id}`} />
-                                  <Label htmlFor={`manual-${rule.id}`} className="cursor-pointer">
-                                    Manual
-                                  </Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="automatic" id={`automatic-${rule.id}`} />
-                                  <Label htmlFor={`automatic-${rule.id}`} className="cursor-pointer">
-                                    Automatic
-                                  </Label>
-                                </div>
-                              </RadioGroup>
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                         {editedDcrRules.length === 0 && (
                           <div className="p-8 text-center text-muted-foreground">
                             No DCR rules configured for this entity type
