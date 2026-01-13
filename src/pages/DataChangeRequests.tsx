@@ -136,8 +136,8 @@ const DataChangeRequests = () => {
     );
   };
 
-  // Get unique values for filters
-  const uniqueDCRTypes = Array.from(new Set(requests.map(r => getDCRTypeName(r.entity_type, r.request_type))));
+  // Fixed DCR Types
+  const dcrTypes = ["Update Address", "Update Status", "Update Contact"];
   const uniqueRequestedBy = Array.from(new Set(requests.map(r => r.requested_by).filter(Boolean)));
 
   // Apply filters to requests
@@ -415,7 +415,7 @@ const DataChangeRequests = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Types</SelectItem>
-                  {uniqueDCRTypes.map(type => (
+                  {dcrTypes.map(type => (
                     <SelectItem key={type} value={type}>{type}</SelectItem>
                   ))}
                 </SelectContent>
