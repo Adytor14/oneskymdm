@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Mail, Phone, MapPin, GraduationCap, Building2, Download, Award, FileJson, FileSpreadsheet, FileText, User } from "lucide-react";
+import { ArrowLeft, Mail, Phone, MapPin, GraduationCap, Building2, Download, Award, FileJson, FileSpreadsheet, FileText, User, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { mockHCPs } from "@/lib/mockData";
 import {
   DropdownMenu,
@@ -22,6 +23,13 @@ const HCPDetail = () => {
   const navigate = useNavigate();
   const hcp = mockHCPs.find((h) => h.id === id);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
+  const [isDuplicateDialogOpen, setIsDuplicateDialogOpen] = useState(false);
+  const [isMarkedDuplicate, setIsMarkedDuplicate] = useState(false);
+
+  const handleMarkDuplicate = () => {
+    setIsMarkedDuplicate(true);
+    setIsDuplicateDialogOpen(false);
+  };
 
   const handleExportExcel = () => {
     if (hcp) {
@@ -107,7 +115,7 @@ const HCPDetail = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button variant="outline" size="sm" onClick={handleExportExcel}>
                     <FileSpreadsheet className="mr-2 h-4 w-4" />
                     Export to Excel
@@ -119,6 +127,15 @@ const HCPDetail = () => {
                   <Button variant="outline" size="sm">
                     <FileJson className="mr-2 h-4 w-4" />
                     DCR History
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsDuplicateDialogOpen(true)}
+                    disabled={isMarkedDuplicate}
+                  >
+                    <Copy className="mr-2 h-4 w-4" />
+                    {isMarkedDuplicate ? "Marked as Duplicate" : "Mark as Duplicate"}
                   </Button>
                   <ChangeRequestDialog entityType="HCP" entityId={hcp.id} entityData={hcp} />
                 </div>
@@ -444,6 +461,30 @@ const HCPDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Mark as Duplicate Confirmation Dialog */}
+      <Dialog open={isDuplicateDialogOpen} onOpenChange={setIsDuplicateDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Copy className="h-5 w-5 text-primary" />
+              Mark as Duplicate
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to mark <span className="font-medium text-foreground">{hcp.firstName} {hcp.lastName}</span> as a duplicate record? This will flag the physician account as a deliberate duplicate for review.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={() => setIsDuplicateDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button size="sm" onClick={handleMarkDuplicate}>
+              <Copy className="mr-2 h-4 w-4" />
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
