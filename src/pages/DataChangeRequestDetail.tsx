@@ -136,6 +136,25 @@ const DataChangeRequestDetail = () => {
 
   const dcrField = getDCRField();
 
+  // Duplicate request comparison data
+  const isDuplicateRequest = (request.request_type || "").toLowerCase().includes("duplicate");
+  const changes: any = request.requested_changes || {};
+  const originalRecord: any = changes.original || null;
+  const duplicateRecord: any = changes.duplicate || null;
+  const comparisonRows = isDuplicateRequest
+    ? [
+        { label: "MDM ID", original: originalRecord?.mdmId, duplicate: duplicateRecord?.mdmId },
+        { label: "Name", original: originalRecord?.name, duplicate: duplicateRecord?.name },
+        { label: "NPI ID", original: originalRecord?.npiId, duplicate: duplicateRecord?.npiId },
+        { label: "Status", original: originalRecord?.status, duplicate: duplicateRecord?.status },
+        { label: "Speciality", original: originalRecord?.speciality, duplicate: duplicateRecord?.speciality },
+        { label: "Organization", original: originalRecord?.organization, duplicate: duplicateRecord?.organization },
+        { label: "Email", original: originalRecord?.email, duplicate: duplicateRecord?.email },
+        { label: "Phone", original: originalRecord?.phone, duplicate: duplicateRecord?.phone },
+        { label: "Address", original: originalRecord?.address, duplicate: duplicateRecord?.address },
+      ]
+    : [];
+
   const handleApprove = () => {
     if (!approvalNote.trim()) {
       toast({
