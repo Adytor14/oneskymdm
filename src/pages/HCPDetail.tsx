@@ -115,7 +115,7 @@ const HCPDetail = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button variant="outline" size="sm" onClick={handleExportExcel}>
                     <FileSpreadsheet className="mr-2 h-4 w-4" />
                     Export to Excel
@@ -127,6 +127,15 @@ const HCPDetail = () => {
                   <Button variant="outline" size="sm">
                     <FileJson className="mr-2 h-4 w-4" />
                     DCR History
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsDuplicateDialogOpen(true)}
+                    disabled={isMarkedDuplicate}
+                  >
+                    <Copy className="mr-2 h-4 w-4" />
+                    {isMarkedDuplicate ? "Marked as Duplicate" : "Mark as Duplicate"}
                   </Button>
                   <ChangeRequestDialog entityType="HCP" entityId={hcp.id} entityData={hcp} />
                 </div>
