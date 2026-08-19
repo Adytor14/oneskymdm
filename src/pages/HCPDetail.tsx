@@ -23,6 +23,13 @@ const HCPDetail = () => {
   const navigate = useNavigate();
   const hcp = mockHCPs.find((h) => h.id === id);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
+  const [isDuplicateDialogOpen, setIsDuplicateDialogOpen] = useState(false);
+  const [isMarkedDuplicate, setIsMarkedDuplicate] = useState(false);
+
+  const handleMarkDuplicate = () => {
+    setIsMarkedDuplicate(true);
+    setIsDuplicateDialogOpen(false);
+  };
 
   const handleExportExcel = () => {
     if (hcp) {
