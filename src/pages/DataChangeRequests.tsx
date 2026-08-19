@@ -53,7 +53,8 @@ const DataChangeRequests = () => {
   const getDCRTypeName = (entityType: string, requestType: string) => {
     const type = requestType.toLowerCase();
     
-    // Map to only the three allowed DCR types
+    // Map to allowed DCR types
+    if (type.includes('duplicate')) return 'Mark as Duplicate';
     if (type.includes('address')) return 'Update Address';
     if (type.includes('status')) return 'Update Status';
     if (type.includes('contact')) return 'Update Contact';

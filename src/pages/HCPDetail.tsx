@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { mockHCPs } from "@/lib/mockData";
 import {
   DropdownMenu,
@@ -15,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { exportToExcel, exportToJSON, exportHCPToPDF, prepareHCPForExport } from "@/lib/exportUtils";
 import { ChangeRequestDialog } from "@/components/ChangeRequestDialog";
+import { MarkDuplicateDialog } from "@/components/MarkDuplicateDialog";
 import { ProfilePhotoUpload } from "@/components/ProfilePhotoUpload";
 import { format } from "date-fns";
 
@@ -25,11 +25,6 @@ const HCPDetail = () => {
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
   const [isDuplicateDialogOpen, setIsDuplicateDialogOpen] = useState(false);
   const [isMarkedDuplicate, setIsMarkedDuplicate] = useState(false);
-
-  const handleMarkDuplicate = () => {
-    setIsMarkedDuplicate(true);
-    setIsDuplicateDialogOpen(false);
-  };
 
   const handleExportExcel = () => {
     if (hcp) {
@@ -462,29 +457,13 @@ const HCPDetail = () => {
         </div>
       </div>
 
-      {/* Mark as Duplicate Confirmation Dialog */}
-      <Dialog open={isDuplicateDialogOpen} onOpenChange={setIsDuplicateDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Copy className="h-5 w-5 text-primary" />
-              Mark as Duplicate
-            </DialogTitle>
-            <DialogDescription>
-              Are you sure you want to mark <span className="font-medium text-foreground">{hcp.firstName} {hcp.lastName}</span> as a duplicate record? This will flag the physician account as a deliberate duplicate for review.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setIsDuplicateDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button size="sm" onClick={handleMarkDuplicate}>
-              <Copy className="mr-2 h-4 w-4" />
-              Confirm
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Mark as Duplicate Dialog */}
+      <MarkDuplicateDialog
+        open={isDuplicateDialogOpen}
+        onOpenChange={setIsDuplicateDialogOpen}
+        duplicate={hcp}
+        onSubmitted={() => setIsMarkedDuplicate(true)}
+      />
     </div>
   );
 };
