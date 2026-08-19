@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { mockHCPs } from "@/lib/mockData";
 import {
   DropdownMenu,
@@ -26,11 +25,6 @@ const HCPDetail = () => {
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
   const [isDuplicateDialogOpen, setIsDuplicateDialogOpen] = useState(false);
   const [isMarkedDuplicate, setIsMarkedDuplicate] = useState(false);
-
-  const handleMarkDuplicate = () => {
-    setIsMarkedDuplicate(true);
-    setIsDuplicateDialogOpen(false);
-  };
 
   const handleExportExcel = () => {
     if (hcp) {
