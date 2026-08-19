@@ -461,6 +461,30 @@ const HCPDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Mark as Duplicate Confirmation Dialog */}
+      <Dialog open={isDuplicateDialogOpen} onOpenChange={setIsDuplicateDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Copy className="h-5 w-5 text-primary" />
+              Mark as Duplicate
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to mark <span className="font-medium text-foreground">{hcp.firstName} {hcp.lastName}</span> as a duplicate record? This will flag the physician account as a deliberate duplicate for review.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={() => setIsDuplicateDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button size="sm" onClick={handleMarkDuplicate}>
+              <Copy className="mr-2 h-4 w-4" />
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
