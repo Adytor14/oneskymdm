@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { exportToExcel, exportToJSON, exportHCPToPDF, prepareHCPForExport } from "@/lib/exportUtils";
 import { ChangeRequestDialog } from "@/components/ChangeRequestDialog";
+import { MarkDuplicateDialog } from "@/components/MarkDuplicateDialog";
 import { ProfilePhotoUpload } from "@/components/ProfilePhotoUpload";
 import { format } from "date-fns";
 
