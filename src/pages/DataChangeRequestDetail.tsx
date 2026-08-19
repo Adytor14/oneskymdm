@@ -323,18 +323,44 @@ const DataChangeRequestDetail = () => {
                 </div>
 
                 <TabsContent value="dcr-fields" className="m-0">
-                  <div className="grid grid-cols-3 gap-4 p-3 bg-primary text-primary-foreground font-medium">
-                    <div>Attributes</div>
-                    <div>Current Value</div>
-                    <div>Change Request</div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 p-3 border-b items-center hover:bg-muted/25">
-                    <div className="text-muted-foreground">{dcrField.attribute}</div>
-                    <div>{dcrField.currentValue}</div>
-                    <div className={dcrField.hasChange ? "text-orange-600 font-medium" : ""}>
-                      {dcrField.changeRequest}
-                    </div>
-                  </div>
+                  {isDuplicateRequest ? (
+                    <>
+                      <div className="grid grid-cols-3 gap-4 p-3 bg-primary text-primary-foreground font-medium">
+                        <div>Attributes</div>
+                        <div>Original Record</div>
+                        <div>Duplicate Record</div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-4 p-3 border-b items-center bg-muted/30 text-sm">
+                        <div className="text-muted-foreground">Record</div>
+                        <div className="font-medium">{originalRecord?.name || originalRecord?.mdmId || 'N/A'}</div>
+                        <div className="font-medium text-orange-600">{duplicateRecord?.name || duplicateRecord?.mdmId || 'N/A'}</div>
+                      </div>
+                      {comparisonRows.map((row) => (
+                        <div key={row.label} className="grid grid-cols-3 gap-4 p-3 border-b items-center hover:bg-muted/25 text-sm">
+                          <div className="text-muted-foreground">{row.label}</div>
+                          <div>{row.original || '—'}</div>
+                          <div className={row.original !== row.duplicate ? "text-orange-600 font-medium" : ""}>
+                            {row.duplicate || '—'}
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-3 gap-4 p-3 bg-primary text-primary-foreground font-medium">
+                        <div>Attributes</div>
+                        <div>Current Value</div>
+                        <div>Change Request</div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-4 p-3 border-b items-center hover:bg-muted/25">
+                        <div className="text-muted-foreground">{dcrField.attribute}</div>
+                        <div>{dcrField.currentValue}</div>
+                        <div className={dcrField.hasChange ? "text-orange-600 font-medium" : ""}>
+                          {dcrField.changeRequest}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="all-fields" className="m-0">
