@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Mail, Phone, MapPin, GraduationCap, Building2, Download, Award, FileJson, FileSpreadsheet, FileText, User } from "lucide-react";
+import { ArrowLeft, Mail, Phone, MapPin, GraduationCap, Building2, Download, Award, FileJson, FileSpreadsheet, FileText, User, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { mockHCPs } from "@/lib/mockData";
 import {
   DropdownMenu,
