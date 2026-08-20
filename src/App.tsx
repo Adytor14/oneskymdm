@@ -75,6 +75,7 @@ const App = () => (
         <Sonner />
         <Routes>
           <Route path="/auth" element={<Auth />} />
+          <Route path="/auth/diagnostics" element={<LoginDiagnostics />} />
           <Route
             path="/*"
             element={
