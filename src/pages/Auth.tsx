@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -160,7 +160,12 @@ const Auth = () => {
           </Button>
 
           <div className="mt-4 text-center text-sm">
-          
+            <Link
+              to="/auth/diagnostics"
+              className="text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
+            >
+              Trouble signing in? Run login diagnostics
+            </Link>
           </div>
         </CardContent>
       </Card>
