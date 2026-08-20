@@ -152,6 +152,43 @@ const LoginDiagnostics = () => {
             "Retry in a minute; if it persists the auth service may be degraded.",
           ],
         };
+      } catch (error: unknown) {
+        // Distinguish a network/DNS/firewall block from a browser- or CORS-level block:
+        // an opaque no-cors probe succeeds whenever the host actually resolves and answers.
+        const message = error instanceof Error ? error.message : String(error);
+        let opaqueReached = false;
+        const probe = withTimeout(8000);
+        try {
+          await fetch(`${AUTH_BASE}/health`, { mode: "no-cors", cache: "no-store", signal: probe.signal });
+          opaqueReached = true;
+        } catch {
+          opaqueReached = false;
+        } finally {
+          probe.clear();
+        }
+
+        if (opaqueReached) {
+          return {
+            status: "fail",
+            detail: `${message} — but an opaque probe did reach the host, so the connection exists and the response is being stripped before the app can read it.`,
+            hints: [
+              "A VPN, TLS-inspecting proxy, or security agent is rewriting the response so the browser rejects it.",
+              "Disable the VPN / proxy for this site, or ask IT to exclude the backend host from TLS inspection.",
+              "Privacy extensions (uBlock, Ghostery, Brave shields, DNS-level blockers) can do the same — retry in a clean private window.",
+            ],
+          };
+        }
+
+        return {
+          status: "fail",
+          detail: `${message} — the opaque probe also failed, so the request never reached the host at all (DNS or firewall block).`,
+          hints: [
+            "The backend host is not resolving or is being dropped at the network edge: this is a DNS/firewall block, not an account or app problem.",
+            "Switch networks — a mobile hotspot is the fastest way to confirm; if sign-in works there, your office network is blocking the host.",
+            "On a corporate network, ask IT to allow *.supabase.co over HTTPS (443) and exclude it from DNS filtering.",
+            "Turn off any custom or filtering DNS (Pi-hole, NextDNS, 1.1.1.1 for Families) and flush the DNS cache.",
+          ],
+        };
       } finally {
         t.clear();
       }
