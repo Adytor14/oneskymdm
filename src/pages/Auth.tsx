@@ -160,7 +160,12 @@ const Auth = () => {
           </Button>
 
           <div className="mt-4 text-center text-sm">
-          
+            <Link
+              to="/auth/diagnostics"
+              className="text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
+            >
+              Trouble signing in? Run login diagnostics
+            </Link>
           </div>
         </CardContent>
       </Card>
